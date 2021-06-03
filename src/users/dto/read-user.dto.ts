@@ -18,8 +18,5 @@ export class ReadUserDto {
   readonly imgPath: string;
 
   @Expose()
-  readonly password: string;
-
-  @Expose()
   readonly isActive: boolean;
 }
