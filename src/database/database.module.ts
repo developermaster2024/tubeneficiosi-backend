@@ -14,9 +14,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         username: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         synchronize: configService.get('DATABASE_SYNCRONIZE') === 'true',
+        logging: configService.get('DATABASE_LOGGING') === 'true',
         entities: ['dist/**/*.entity{.ts,.js}'],
       })
     })
-  ]
+  ],
 })
 export class DatabaseModule {}
