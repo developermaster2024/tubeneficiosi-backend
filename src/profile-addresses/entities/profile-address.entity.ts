@@ -2,7 +2,7 @@ import { User } from "src/users/entities/user.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({
-  name: 'profile_addresses',
+  name: 'client_addresses',
 })
 export class ProfileAddress {
   @PrimaryGeneratedColumn({
