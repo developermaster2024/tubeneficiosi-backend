@@ -1,23 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { plainToClass } from 'class-transformer';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Client } from 'src/clientes/entities/client.entity';
 import { HashingService } from 'src/support/hashing.service';
-import { ReadUserDto } from 'src/users/dto/read-user.dto';
 import { User } from 'src/users/entities/user.entity';
-import { UsersService } from 'src/users/users.service';
-import { RegisterResponseDto } from './dto/register-response.dto';
+import { Roles } from 'src/users/enums/roles.enum';
+import { Repository } from 'typeorm';
 import { RegisterUserDto } from './dto/register-user.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly usersService: UsersService,
+    @InjectRepository(User) private readonly usersRepository: Repository<User>,
     private readonly hashingService: HashingService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<Partial<User>> {
-    const user = await this.usersService.findOneByEmail(email);
+    const user = await this.usersRepository.findOne({
+      where: {email},
+      relations: ['client'],
+    })
 
     if (!user) {
       return null;
@@ -36,17 +39,27 @@ export class AuthService {
 
   login(user: User) {
     return {
-      ...user,
+      user,
       accessToken: this.jwtService.sign(user)
     };
   }
 
-  async register(registerUserDto: RegisterUserDto): Promise<RegisterResponseDto> {
-    const user = await this.usersService.create(registerUserDto);
+  async register({name, phoneNumber, ...registerUserDto}: RegisterUserDto): Promise<{user: User; accessToken: string}> {
+    let user = Object.assign(new User(), {
+      ...registerUserDto,
+      password: await this.hashingService.make(registerUserDto.password),
+      role: Roles.CLIENT,
+    });
+
+    user.client = Object.assign(new Client(), {name, phoneNumber});
+
+    user = await this.usersRepository.save(user);
+
+    const {password, ...userWithoutPassword} = user;
 
     return {
       user,
-      accessToken: this.jwtService.sign({...user}),
+      accessToken: this.jwtService.sign({...userWithoutPassword}),
     };
   }
 }

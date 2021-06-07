@@ -9,18 +9,25 @@ export class ProfileService {
   constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) {}
 
   async findOne(id: number): Promise<User> {
-    const user = await this.usersRepository.findOne(id);
+    const user = await this.usersRepository.findOne({
+      where: {id},
+      relations: ['client']
+    });
 
     return user;
   }
 
-  async update({userId, ...updateProfileDto}: UpdateProfileDto, img: string): Promise<User> {
-    const user = await this.usersRepository.findOne(userId);
-
-    Object.assign(user, {
-      ...updateProfileDto,
-      imgPath: img,
+  async update({userId, name, phoneNumber, ...updateProfileDto}: UpdateProfileDto, img: string): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      where: {id: userId},
+      relations: ['client']
     });
+
+    Object.assign(user, updateProfileDto);
+
+    user.client.name = name;
+    user.client.phoneNumber = phoneNumber;
+    user.client.imgPath = img;
 
     return await this.usersRepository.save(user);
   }

@@ -2,9 +2,8 @@ import { Body, Controller, Get, Put, UploadedFile, UseGuards, UseInterceptors } 
 import { FileInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth-guard';
+import { ReadClientDto } from 'src/clientes/dto/read-client.dto';
 import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-body.interceptor';
-import { ReadUserDto } from 'src/users/dto/read-user.dto';
-import { ReadProfileDto } from './dto/read-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ProfileService } from './profile.service';
 
@@ -15,8 +14,8 @@ export class ProfileController {
 
   @Get()
   @UseInterceptors(new JwtUserToBodyInterceptor())
-  async findOne(@Body('userId') userId: number): Promise<ReadProfileDto> {
-    return plainToClass(ReadUserDto, await this.profileService.findOne(userId));
+  async findOne(@Body('userId') userId: number): Promise<ReadClientDto> {
+    return plainToClass(ReadClientDto, await this.profileService.findOne(userId));
   }
 
   @Put()
@@ -25,7 +24,7 @@ export class ProfileController {
   async update(
     @Body() updateProfileDto: UpdateProfileDto,
     @UploadedFile() img: Express.Multer.File
-  ): Promise<ReadProfileDto> {
-    return plainToClass(ReadProfileDto, await this.profileService.update(updateProfileDto, img.path));
+  ): Promise<ReadClientDto> {
+    return plainToClass(ReadClientDto, await this.profileService.update(updateProfileDto, img.path));
   }
 }
