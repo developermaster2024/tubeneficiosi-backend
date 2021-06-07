@@ -5,7 +5,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersModule } from 'src/users/users.module';
 import { SupportModule } from 'src/support/support.module';
-import { LocalStrategy } from './passport-strategies/local-strategy';
+import { LocalStrategy } from './passport-strategies/local.strategy';
+import { JwtStrategy } from './passport-strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { LocalStrategy } from './passport-strategies/local-strategy';
     UsersModule,
     SupportModule,
   ],
-  providers: [AuthService, LocalStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController]
 })
 export class AuthModule {}

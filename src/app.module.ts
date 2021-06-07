@@ -5,6 +5,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ValidationModule } from './validation/validation.module';
 import { SupportModule } from './support/support.module';
 import { AuthModule } from './auth/auth.module';
+import { ProfileModule } from './profile/profile.module';
+import { ProfileAddressesModule } from './profile-addresses/profile-addresses.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { AuthModule } from './auth/auth.module';
     ValidationModule,
     SupportModule,
     AuthModule,
+    ProfileModule,
+    ProfileAddressesModule,
   ],
 })
 export class AppModule {}
