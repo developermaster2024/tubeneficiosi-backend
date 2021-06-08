@@ -1,9 +1,10 @@
-import { Expose } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { IsEmail, IsPhoneNumber, IsString, MaxLength, MinLength } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import { IsUnique } from 'src/validation/is-unique.constrain';
 
-export class RegisterUserDto {
+@Exclude()
+export class RegisterClientDto {
   @Expose()
   @IsString()
   @MaxLength(250)

@@ -6,7 +6,9 @@ import { HashingService } from 'src/support/hashing.service';
 import { User } from 'src/users/entities/user.entity';
 import { Roles } from 'src/users/enums/roles.enum';
 import { Repository } from 'typeorm';
-import { RegisterUserDto } from './dto/register-user.dto';
+import { RegisterClientDto } from './dto/register-client.dto';
+
+type RegisterResponse = {user: User; accessToken: string};
 
 @Injectable()
 export class AuthService {
@@ -44,7 +46,7 @@ export class AuthService {
     };
   }
 
-  async register({name, phoneNumber, ...registerUserDto}: RegisterUserDto): Promise<{user: User; accessToken: string}> {
+  async register({name, phoneNumber, ...registerUserDto}: RegisterClientDto): Promise<RegisterResponse> {
     let user = Object.assign(new User(), {
       ...registerUserDto,
       password: await this.hashingService.make(registerUserDto.password),
