@@ -55,18 +55,21 @@ export class StoreProfile {
   @Column({
     name: 'banner',
     type: 'varchar',
+    nullable: true,
   })
   banner: string;
 
   @Column({
     name: 'front_image',
     type: 'varchar',
+    nullable: true,
   })
   frontImage: string;
 
   @Column({
     name: 'logo',
     type: 'varchar',
+    nullable: true,
   })
   logo: string;
 }

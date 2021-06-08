@@ -1,5 +1,6 @@
 import { OmitType } from "@nestjs/mapped-types";
-import { Exclude, Expose, Transform } from "class-transformer";
+import { Exclude, Expose, plainToClass, Transform } from "class-transformer";
+import { ReadStoreProfileDto } from "src/stores-profile/dto/read-store-profile.dto";
 import { ReadUserDto } from "src/users/dto/read-user.dto";
 import { User } from "src/users/entities/user.entity";
 
@@ -24,4 +25,14 @@ export class ReadStoreDto extends OmitType(ReadUserDto, ['role']) {
   @Expose()
   @Transform(({obj}: {obj: User}) => obj.store.longitude)
   readonly longitude: string;
+
+  @Expose()
+  @Transform(({obj: {store: {storeProfile}}}: {obj: User}) => {
+    if (!storeProfile || storeProfile instanceof ReadStoreProfileDto) {
+      return storeProfile;
+    }
+
+    return plainToClass(ReadStoreProfileDto, storeProfile);
+  })
+  readonly storeProfile: ReadStoreProfileDto;
 }
