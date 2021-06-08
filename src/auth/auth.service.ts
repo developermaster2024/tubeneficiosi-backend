@@ -20,10 +20,10 @@ export class AuthService {
     private readonly hashingService: HashingService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<Partial<User>> {
+  async validateUser(email: string, password: string, role: Role): Promise<Partial<User>> {
     const user = await this.usersRepository.findOne({
-      where: {email, role: Role.CLIENT},
-      relations: ['client'],
+      where: {email, role},
+      relations: ['client', 'store'],
     });
 
     if (!user) {

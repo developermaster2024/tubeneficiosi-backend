@@ -7,6 +7,8 @@ import { RegisterClientDto } from './dto/register-client.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { RegisterStoreResponseDto } from './dto/register-store-response.dto';
 import { RegisterStoreDto } from './dto/register-store.dto';
+import { LoginStoreResponseDto } from './dto/login-store-response.dto';
+import { LocalAuthStoreGuard } from './guards/local-auth-store.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -21,6 +23,12 @@ export class AuthController {
   @Post('/register')
   async register(@Body() registerUserDto: RegisterClientDto): Promise<RegisterResponseDto> {
     return plainToClass(RegisterResponseDto, await this.authService.register(registerUserDto));
+  }
+
+  @UseGuards(LocalAuthStoreGuard)
+  @Post('/login-store')
+  async loginStore(@Request() req): Promise<LoginStoreResponseDto> {
+    return plainToClass(LoginStoreResponseDto, this.authService.login(req.user));
   }
 
   @Post('/register-store')
