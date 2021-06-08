@@ -1,4 +1,5 @@
 import { Client } from "src/clientes/entities/client.entity";
+import { Store } from "src/stores/entities/store.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Roles } from "../enums/roles.enum";
 
@@ -43,6 +44,11 @@ export class User {
   })
   client: Client;
 
+  @OneToOne(() => Store, store => store.user, {
+    cascade: ['insert', 'update']
+  })
+  store: Store;
+
   @CreateDateColumn({
     name: 'created_at',
     select: false,
@@ -60,4 +66,8 @@ export class User {
     select: false
   })
   deletedAt: Date;
+
+  static create(data: Partial<User>): User {
+    return Object.assign(new User(), data);
+  }
 }

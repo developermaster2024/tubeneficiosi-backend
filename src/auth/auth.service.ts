@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Client } from 'src/clientes/entities/client.entity';
+import { Store } from 'src/stores/entities/store.entity';
 import { HashingService } from 'src/support/hashing.service';
 import { User } from 'src/users/entities/user.entity';
 import { Roles } from 'src/users/enums/roles.enum';
 import { Repository } from 'typeorm';
 import { RegisterClientDto } from './dto/register-client.dto';
+import { RegisterStoreDto } from './dto/register-store.dto';
 
 type RegisterResponse = {user: User; accessToken: string};
 
@@ -58,6 +60,25 @@ export class AuthService {
     user = await this.usersRepository.save(user);
 
     const {password, ...userWithoutPassword} = user;
+
+    return {
+      user,
+      accessToken: this.jwtService.sign({...userWithoutPassword}),
+    };
+  }
+
+  async registerStore({email, password, ...storeData}: RegisterStoreDto): Promise<RegisterResponse> {
+    let user = User.create({
+      email,
+      password: await this.hashingService.make(password),
+      role: Roles.STORE,
+    });
+
+    user.store = Store.create(storeData);
+
+    user = await this.usersRepository.save(user);
+
+    const {password: hashedPassword, ...userWithoutPassword} = user;
 
     return {
       user,
