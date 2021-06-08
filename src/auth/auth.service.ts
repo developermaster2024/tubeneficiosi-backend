@@ -5,7 +5,7 @@ import { Client } from 'src/clientes/entities/client.entity';
 import { Store } from 'src/stores/entities/store.entity';
 import { HashingService } from 'src/support/hashing.service';
 import { User } from 'src/users/entities/user.entity';
-import { Roles } from 'src/users/enums/roles.enum';
+import { Role } from 'src/users/enums/roles.enum';
 import { Repository } from 'typeorm';
 import { RegisterClientDto } from './dto/register-client.dto';
 import { RegisterStoreDto } from './dto/register-store.dto';
@@ -22,9 +22,9 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<Partial<User>> {
     const user = await this.usersRepository.findOne({
-      where: {email},
+      where: {email, role: Role.CLIENT},
       relations: ['client'],
-    })
+    });
 
     if (!user) {
       return null;
@@ -52,7 +52,7 @@ export class AuthService {
     let user = Object.assign(new User(), {
       ...registerUserDto,
       password: await this.hashingService.make(registerUserDto.password),
-      role: Roles.CLIENT,
+      role: Role.CLIENT,
     });
 
     user.client = Object.assign(new Client(), {name, phoneNumber});
@@ -71,7 +71,7 @@ export class AuthService {
     let user = User.create({
       email,
       password: await this.hashingService.make(password),
-      role: Roles.STORE,
+      role: Role.STORE,
     });
 
     user.store = Store.create(storeData);

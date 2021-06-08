@@ -1,7 +1,7 @@
 import { Client } from "src/clientes/entities/client.entity";
 import { Store } from "src/stores/entities/store.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Roles } from "../enums/roles.enum";
+import { Role } from "../enums/roles.enum";
 
 @Entity({
   name: 'users',
@@ -37,7 +37,7 @@ export class User {
     type: 'varchar',
     length: 50,
   })
-  role: Roles;
+  role: Role;
 
   @OneToOne(() => Client, client => client.user, {
     cascade: ['insert', 'update']

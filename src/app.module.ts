@@ -7,6 +7,7 @@ import { SupportModule } from './support/support.module';
 import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './profile/profile.module';
 import { ProfileAddressesModule } from './profile-addresses/profile-addresses.module';
+import { StoresProfileModule } from './stores-profile/stores-profile.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ProfileAddressesModule } from './profile-addresses/profile-addresses.mo
     AuthModule,
     ProfileModule,
     ProfileAddressesModule,
+    StoresProfileModule,
   ],
 })
 export class AppModule {}
