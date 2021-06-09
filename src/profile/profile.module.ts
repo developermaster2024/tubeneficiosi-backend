@@ -6,6 +6,7 @@ import { User } from 'src/users/entities/user.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { filenameGenerator } from 'src/support/file-uploads';
+import { SupportModule } from 'src/support/support.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { filenameGenerator } from 'src/support/file-uploads';
         filename: filenameGenerator,
       })
     }),
+    SupportModule,
   ],
   providers: [ProfileService],
   controllers: [ProfileController],

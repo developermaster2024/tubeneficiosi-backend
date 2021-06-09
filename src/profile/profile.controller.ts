@@ -7,6 +7,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { ReadClientDto } from 'src/clientes/dto/read-client.dto';
 import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-body.interceptor';
 import { Role } from 'src/users/enums/roles.enum';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ProfileService } from './profile.service';
 
@@ -33,5 +34,13 @@ export class ProfileController {
     @UploadedFile() img: Express.Multer.File
   ): Promise<ReadClientDto> {
     return plainToClass(ReadClientDto, await this.profileService.update(updateProfileDto, img.path));
+  }
+
+  @Put('password')
+  @Roles(Role.CLIENT)
+  @UseGuards(RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async updatePassword(@Body() updatePasswordDto: UpdatePasswordDto): Promise<ReadClientDto> {
+    return plainToClass(ReadClientDto, await this.profileService.updatePassword(updatePasswordDto));
   }
 }
