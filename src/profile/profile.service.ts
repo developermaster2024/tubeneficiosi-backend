@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ProfileNotFoundException } from 'src/stores-profile/errors/profile-not-found.exception';
 import { HashingService } from 'src/support/hashing.service';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/roles.enum';
@@ -8,6 +7,7 @@ import { Repository } from 'typeorm';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { PasswordDoesNotMatchException } from './exceptions/password-does-not-match.exception';
+import { ProfileNotFoundException } from './exceptions/profile-not-found.exception';
 
 @Injectable()
 export class ProfileService {
