@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './profile/profile.module';
 import { ProfileAddressesModule } from './profile-addresses/profile-addresses.module';
 import { StoresProfileModule } from './stores-profile/stores-profile.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { StoresProfileModule } from './stores-profile/stores-profile.module';
     ProfileModule,
     ProfileAddressesModule,
     StoresProfileModule,
+    CategoriesModule,
   ],
 })
 export class AppModule {}
