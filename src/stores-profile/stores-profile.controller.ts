@@ -4,6 +4,7 @@ import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { UpdatePasswordDto } from 'src/profile/dto/update-password.dto';
 import { ReadStoreDto } from 'src/stores/dto/read-store.dto';
 import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-body.interceptor';
 import { Role } from 'src/users/enums/roles.enum';
@@ -13,7 +14,7 @@ import { StoresProfileService } from './stores-profile.service';
 @Controller('stores-profile')
 @UseGuards(JwtAuthGuard)
 export class StoresProfileController {
-  constructor(private readonly storesProfile: StoresProfileService) {}
+  constructor(private readonly storesProfileService: StoresProfileService) {}
 
   @Put()
   @Roles(Role.STORE)
@@ -28,10 +29,18 @@ export class StoresProfileController {
     @Body() updateStoreProfile: UpdateStoreProfileDto,
     @UploadedFiles() images
   ): Promise<ReadStoreDto> {
-    return plainToClass(ReadStoreDto, await this.storesProfile.update(updateStoreProfile, {
+    return plainToClass(ReadStoreDto, await this.storesProfileService.update(updateStoreProfile, {
       banner: images?.banner?.[0]?.path,
       logo: images?.logo?.[0]?.path,
       frontImage: images?.frontImage?.[0]?.path,
     }))
+  }
+
+  @Put('password')
+  @Roles(Role.STORE)
+  @UseGuards(RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async updatePassword(@Body() updatePasswordDto: UpdatePasswordDto): Promise<ReadStoreDto> {
+    return plainToClass(ReadStoreDto, await this.storesProfileService.updatePassword(updatePasswordDto));
   }
 }
