@@ -1,4 +1,5 @@
 import { Exclude, Expose } from "class-transformer";
+import { Role } from "../enums/roles.enum";
 
 @Exclude()
 export class ReadUserDto {
@@ -6,17 +7,11 @@ export class ReadUserDto {
   readonly id: number;
 
   @Expose()
-  readonly name: string;
-
-  @Expose()
   readonly email: string;
 
   @Expose()
-  readonly phoneNumber: string;
-
-  @Expose()
-  readonly imgPath: string;
-
-  @Expose()
   readonly isActive: boolean;
+
+  @Expose()
+  readonly role: Role;
 }

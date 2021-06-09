@@ -1,4 +1,7 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Client } from "src/clientes/entities/client.entity";
+import { Store } from "src/stores/entities/store.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Role } from "../enums/roles.enum";
 
 @Entity({
   name: 'users',
@@ -10,31 +13,11 @@ export class User {
   readonly id: number;
 
   @Column({
-    name: 'name',
-    type: 'varchar',
-  })
-  name: string;
-
-  @Column({
     name: 'email',
     type: 'varchar',
     length: 150,
   })
   email: string;
-
-  @Column({
-    name: 'phone_number',
-    type: 'varchar',
-    length: 50,
-  })
-  phoneNumber: string;
-
-  @Column({
-    name: 'img_path',
-    type: 'varchar',
-    nullable: true,
-  })
-  imgPath: string;
 
   @Column({
     name: 'password',
@@ -48,6 +31,23 @@ export class User {
     default: true,
   })
   isActive: boolean;
+
+  @Column({
+    name: 'role',
+    type: 'varchar',
+    length: 50,
+  })
+  role: Role;
+
+  @OneToOne(() => Client, client => client.user, {
+    cascade: ['insert', 'update']
+  })
+  client: Client;
+
+  @OneToOne(() => Store, store => store.user, {
+    cascade: ['insert', 'update']
+  })
+  store: Store;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -66,4 +66,8 @@ export class User {
     select: false
   })
   deletedAt: Date;
+
+  static create(data: Partial<User>): User {
+    return Object.assign(new User(), data);
+  }
 }

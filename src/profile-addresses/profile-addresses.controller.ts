@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth-guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-body.interceptor';
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
 import { PaginationOptions } from 'src/support/pagination/pagination-options';

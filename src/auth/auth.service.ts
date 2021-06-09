@@ -1,23 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { plainToClass } from 'class-transformer';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Client } from 'src/clientes/entities/client.entity';
+import { Store } from 'src/stores/entities/store.entity';
 import { HashingService } from 'src/support/hashing.service';
-import { ReadUserDto } from 'src/users/dto/read-user.dto';
 import { User } from 'src/users/entities/user.entity';
-import { UsersService } from 'src/users/users.service';
-import { RegisterResponseDto } from './dto/register-response.dto';
-import { RegisterUserDto } from './dto/register-user.dto';
+import { Role } from 'src/users/enums/roles.enum';
+import { Repository } from 'typeorm';
+import { RegisterClientDto } from './dto/register-client.dto';
+import { RegisterStoreDto } from './dto/register-store.dto';
+
+type RegisterResponse = {user: User; accessToken: string};
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly usersService: UsersService,
+    @InjectRepository(User) private readonly usersRepository: Repository<User>,
     private readonly hashingService: HashingService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<Partial<User>> {
-    const user = await this.usersService.findOneByEmail(email);
+  async validateUser(email: string, password: string, role: Role): Promise<Partial<User>> {
+    const user = await this.usersRepository.findOne({
+      where: {email, role},
+      relations: ['client', 'store'],
+    });
 
     if (!user) {
       return null;
@@ -36,17 +43,46 @@ export class AuthService {
 
   login(user: User) {
     return {
-      ...user,
+      user,
       accessToken: this.jwtService.sign(user)
     };
   }
 
-  async register(registerUserDto: RegisterUserDto): Promise<RegisterResponseDto> {
-    const user = await this.usersService.create(registerUserDto);
+  async register({name, phoneNumber, ...registerUserDto}: RegisterClientDto): Promise<RegisterResponse> {
+    let user = Object.assign(new User(), {
+      ...registerUserDto,
+      password: await this.hashingService.make(registerUserDto.password),
+      role: Role.CLIENT,
+    });
+
+    user.client = Object.assign(new Client(), {name, phoneNumber});
+
+    user = await this.usersRepository.save(user);
+
+    const {password, ...userWithoutPassword} = user;
 
     return {
       user,
-      accessToken: this.jwtService.sign({...user}),
+      accessToken: this.jwtService.sign({...userWithoutPassword}),
+    };
+  }
+
+  async registerStore({email, password, ...storeData}: RegisterStoreDto): Promise<RegisterResponse> {
+    let user = User.create({
+      email,
+      password: await this.hashingService.make(password),
+      role: Role.STORE,
+    });
+
+    user.store = Store.create(storeData);
+
+    user = await this.usersRepository.save(user);
+
+    const {password: hashedPassword, ...userWithoutPassword} = user;
+
+    return {
+      user,
+      accessToken: this.jwtService.sign({...userWithoutPassword}),
     };
   }
 }

@@ -1,9 +1,14 @@
-import { Body, Controller, Header, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { AuthService } from './auth.service';
+import { LoginResponseDto } from './dto/login-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
-import { RegisterUserDto } from './dto/register-user.dto';
+import { RegisterClientDto } from './dto/register-client.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { RegisterStoreResponseDto } from './dto/register-store-response.dto';
+import { RegisterStoreDto } from './dto/register-store.dto';
+import { LoginStoreResponseDto } from './dto/login-store-response.dto';
+import { LocalAuthStoreGuard } from './guards/local-auth-store.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -11,16 +16,23 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('/login')
-  @Header('Content-Type', 'application/json')
-  @Header('Accept', 'application/json')
-  async login(@Request() req) {
-    return this.authService.login(req.user);
+  async login(@Request() req): Promise<LoginResponseDto> {
+    return plainToClass(LoginResponseDto, this.authService.login(req.user));
   }
 
   @Post('/register')
-  @Header('Content-Type', 'application/json')
-  @Header('Accept', 'application/json')
-  async register(@Body() registerUserDto: RegisterUserDto): Promise<RegisterResponseDto> {
+  async register(@Body() registerUserDto: RegisterClientDto): Promise<RegisterResponseDto> {
     return plainToClass(RegisterResponseDto, await this.authService.register(registerUserDto));
+  }
+
+  @UseGuards(LocalAuthStoreGuard)
+  @Post('/login-store')
+  async loginStore(@Request() req): Promise<LoginStoreResponseDto> {
+    return plainToClass(LoginStoreResponseDto, this.authService.login(req.user));
+  }
+
+  @Post('/register-store')
+  async registerStore(@Body() registerStoreDto: RegisterStoreDto): Promise<RegisterStoreResponseDto> {
+    return plainToClass(RegisterStoreResponseDto, await this.authService.registerStore(registerStoreDto));
   }
 }
