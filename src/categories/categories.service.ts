@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Store } from 'src/stores/entities/store.entity';
 import { StoreNotFoundException } from 'src/stores/erros/store-not-found.exception';
-import { PaginationOptions } from 'src/support/pagination/pagination-options';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
-import { In, Repository } from 'typeorm';
+import { FindConditions, In, Like, Repository } from 'typeorm';
+import { CategoryPaginationOptionsDto } from './dto/category-pagination-options.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
@@ -17,16 +17,25 @@ export class CategoriesService {
     @InjectRepository(Category) private readonly categoriesRepository: Repository<Category>
   ) {}
 
-  async paginate(options: PaginationOptions, userId: number): Promise<PaginationResult<Category>> {
+  async paginate({perPage, offset, filters}: CategoryPaginationOptionsDto, userId: number): Promise<PaginationResult<Category>> {
     const store = await this.findStoreByUserId(userId);
 
+    const where: FindConditions<Category> = {
+      store,
+    };
+
+    // @ts-ignore: set id filter
+    if (filters.id) where.id = +filters.id;
+
+    if (filters.name) where.name = Like(`%${filters.name}%`);
+
     const [categories, total] = await this.categoriesRepository.findAndCount({
-      take: options.perPage,
-      skip: options.offset,
-      where: {store: store}
+      take: perPage,
+      skip: offset,
+      where,
     });
 
-    return new PaginationResult(categories, total, options.perPage);
+    return new PaginationResult(categories, total, perPage);
   }
 
   async create({parentIds, userId, name}: CreateCategoryDto): Promise<Category> {

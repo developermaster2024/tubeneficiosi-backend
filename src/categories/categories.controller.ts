@@ -5,14 +5,13 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-body.interceptor';
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
-import { PaginationOptions } from 'src/support/pagination/pagination-options';
-import { PaginationPipe } from 'src/support/pagination/pagination-pipe';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { ReadCategoryDto } from './dto/read-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CategoryPaginationPipe } from './pipes/category-pagination.pipe';
 
 @Controller('stores/categories')
 @UseGuards(JwtAuthGuard)
@@ -25,7 +24,7 @@ export class CategoriesController {
   @UseInterceptors(new JwtUserToBodyInterceptor())
   async paginate(
     @Body('userId') userId: number,
-    @Query(PaginationPipe) options: PaginationOptions
+    @Query(CategoryPaginationPipe) options: any
   ): Promise<PaginationResult<ReadCategoryDto>> {
     return (await this.categoriesService.paginate(options, userId)).toClass(ReadCategoryDto);
   }

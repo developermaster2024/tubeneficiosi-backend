@@ -4,7 +4,6 @@ export class PaginationResult<T> {
   public numberOfPages: number;
 
   constructor(public results: T[], public total: number, private size: number) {
-    console.log({total, size})
     this.numberOfPages = Math.ceil(total / size);
   }
 

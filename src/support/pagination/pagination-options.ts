@@ -1,7 +1,7 @@
 const MAX_PER_PAGE = 200;
 
 export class PaginationOptions {
-  constructor(public page: number, private _perPage: number) {}
+  constructor(public page: number, protected _perPage: number) {}
 
   get perPage(): number {
     return this._perPage > MAX_PER_PAGE ? MAX_PER_PAGE : this._perPage;
