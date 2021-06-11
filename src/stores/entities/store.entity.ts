@@ -1,6 +1,6 @@
 import { StoreCategory } from "src/store-categories/entities/store-category.entity";
 import { User } from "src/users/entities/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { StoreProfile } from "./store-profile.entity";
 
 @Entity({
@@ -31,11 +31,12 @@ export class Store {
   })
   address: string;
 
+  @Index({spatial: true})
   @Column({
     name: 'location',
     type: 'point',
     spatialFeatureType: 'Point',
-    nullable: true,
+    select: false,
   })
   location: string;
 

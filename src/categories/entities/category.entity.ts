@@ -26,7 +26,7 @@ export class Category {
   })
   parentCategories: Category[];
 
-  @ManyToOne(() => Store, {nullable: false})
+  @ManyToOne(() => Store, {nullable: false, onDelete: 'CASCADE'})
   @JoinColumn({name: 'store_id'})
   store: Store;
 

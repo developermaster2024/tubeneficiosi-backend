@@ -1,4 +1,4 @@
-import { Body, Controller, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
@@ -15,6 +15,14 @@ import { StoresProfileService } from './stores-profile.service';
 @UseGuards(JwtAuthGuard)
 export class StoresProfileController {
   constructor(private readonly storesProfileService: StoresProfileService) {}
+
+  @Get()
+  @Roles(Role.STORE)
+  @UseGuards(RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async findOne(@Body('userId') userId: number): Promise<ReadStoreDto> {
+    return plainToClass(ReadStoreDto, await this.storesProfileService.findOne(userId));
+  }
 
   @Put()
   @Roles(Role.STORE)
