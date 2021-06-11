@@ -10,6 +10,7 @@ import { ProfileAddressesModule } from './profile-addresses/profile-addresses.mo
 import { StoresProfileModule } from './stores-profile/stores-profile.module';
 import { CategoriesModule } from './categories/categories.module';
 import { TagsModule } from './tags/tags.module';
+import { BrandsModule } from './brands/brands.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { TagsModule } from './tags/tags.module';
     StoresProfileModule,
     CategoriesModule,
     TagsModule,
+    BrandsModule,
   ],
 })
 export class AppModule {}
