@@ -15,8 +15,8 @@ type RegisterResponse = {user: User; accessToken: string};
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly jwtService: JwtService,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    private readonly jwtService: JwtService,
     private readonly hashingService: HashingService,
   ) {}
 
@@ -67,14 +67,19 @@ export class AuthService {
     };
   }
 
-  async registerStore({email, password, ...storeData}: RegisterStoreDto): Promise<RegisterResponse> {
+  async registerStore({email, password, latitude, longitude, ...storeData}: RegisterStoreDto): Promise<RegisterResponse> {
     let user = User.create({
       email,
       password: await this.hashingService.make(password),
       role: Role.STORE,
     });
 
-    user.store = Store.create(storeData);
+    user.store = Store.create({
+      ...storeData,
+      latitude,
+      longitude,
+      location: `POINT(${latitude} ${longitude})`,
+    });
 
     user = await this.usersRepository.save(user);
 

@@ -32,6 +32,14 @@ export class Store {
   address: string;
 
   @Column({
+    name: 'location',
+    type: 'point',
+    spatialFeatureType: 'Point',
+    nullable: true,
+  })
+  location: string;
+
+  @Column({
     name: 'latitude',
     type: 'decimal',
     scale: 6,
