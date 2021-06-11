@@ -9,6 +9,7 @@ import { ProfileModule } from './profile/profile.module';
 import { ProfileAddressesModule } from './profile-addresses/profile-addresses.module';
 import { StoresProfileModule } from './stores-profile/stores-profile.module';
 import { CategoriesModule } from './categories/categories.module';
+import { TagsModule } from './tags/tags.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CategoriesModule } from './categories/categories.module';
     ProfileAddressesModule,
     StoresProfileModule,
     CategoriesModule,
+    TagsModule,
   ],
 })
 export class AppModule {}
