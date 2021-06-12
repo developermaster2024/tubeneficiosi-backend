@@ -11,6 +11,7 @@ import { StoresProfileModule } from './stores-profile/stores-profile.module';
 import { CategoriesModule } from './categories/categories.module';
 import { TagsModule } from './tags/tags.module';
 import { BrandsModule } from './brands/brands.module';
+import { HelpCategoriesModule } from './help-categories/help-categories.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { BrandsModule } from './brands/brands.module';
     CategoriesModule,
     TagsModule,
     BrandsModule,
+    HelpCategoriesModule,
   ],
 })
 export class AppModule {}
