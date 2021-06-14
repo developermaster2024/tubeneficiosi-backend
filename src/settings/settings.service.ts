@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateBusinessInfoDto } from './dto/udpate-business-info.dto';
 import { UpdateAppSectionDto } from './dto/update-app-section.dto';
+import { UpdateNeededInfoDto } from './dto/update-needed-info.dto';
 import { UpdatePageColorsDto } from './dto/update-page-colors.dto';
 import { UpdatePageInfoDto } from './dto/update-page-info.dto';
 import { Setting } from './entities/setting.entity';
@@ -64,6 +65,21 @@ export class SettingsService {
       ...updateAppSectionDto,
       leftSideImage: updateAppSectionDto.leftSideImage.path,
       rightSideImage: updateAppSectionDto.rightSideImage.path,
+    };
+
+    return await this.settingsRepository.save(setting);
+  }
+
+  async updateNeededInfo(updateNeededInfoDto: UpdateNeededInfoDto): Promise<Setting> {
+    let setting = await this.settingsRepository.findOne({name: SettingEnum.NEEDED_INFO});
+
+    setting = setting ?? Setting.create({name: SettingEnum.NEEDED_INFO});
+
+    setting.value = {
+      ...updateNeededInfoDto,
+      leftSectionImage: updateNeededInfoDto.leftSectionImage.path,
+      middleSectionImage: updateNeededInfoDto.middleSectionImage.path,
+      rightSectionImage: updateNeededInfoDto.rightSectionImage.path,
     };
 
     return await this.settingsRepository.save(setting);

@@ -9,10 +9,12 @@ import { FilesToBodyInterceptor } from 'src/support/interceptors/files-to-body.i
 import { Role } from 'src/users/enums/roles.enum';
 import { ReadAppSectionDto } from './dto/read-app-section.dto';
 import { ReadBusinessInfoDto } from './dto/read-business-info.dto';
+import { ReadNeededInfoDto } from './dto/read-needed-info.dto';
 import { ReadPageColorsDto } from './dto/read-page-colors.dto';
 import { ReadPageInfoDto } from './dto/read-page-info.dto';
 import { UpdateBusinessInfoDto } from './dto/udpate-business-info.dto';
 import { UpdateAppSectionDto } from './dto/update-app-section.dto';
+import { UpdateNeededInfoDto } from './dto/update-needed-info.dto';
 import { UpdatePageColorsDto } from './dto/update-page-colors.dto';
 import { UpdatePageInfoDto } from './dto/update-page-info.dto';
 import { Setting } from './enums/setting.enum';
@@ -73,7 +75,7 @@ export class SettingsController {
   @Get('app-section')
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
-  async findUpdateAppSection(): Promise<ReadAppSectionDto> {
+  async findAppSection(): Promise<ReadAppSectionDto> {
     return plainToClass(ReadAppSectionDto, await this.settingsService.findOne(Setting.APP_SECTION));
   }
 
@@ -86,5 +88,27 @@ export class SettingsController {
   )
   async updateAppSection(@Body() updateAppSectionDto: UpdateAppSectionDto): Promise<ReadAppSectionDto> {
     return plainToClass(ReadAppSectionDto, await this.settingsService.updateAppSection(updateAppSectionDto));
+  }
+
+  @Get('needed-info')
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  async findNeededInfo(): Promise<ReadNeededInfoDto> {
+    return plainToClass(ReadNeededInfoDto, await this.settingsService.findOne(Setting.NEEDED_INFO));
+  }
+
+  @Put('needed-info')
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'leftSectionImage', maxCount: 1 },
+      { name: 'middleSectionImage', maxCount: 1 },
+      { name: 'rightSectionImage', maxCount: 1 }
+    ], {dest: '/uploads/settings/'}),
+    new FilesToBodyInterceptor(['leftSectionImage', 'middleSectionImage', 'rightSectionImage'])
+  )
+  async updateNeededInfo(@Body() updateNeededInfoDto: UpdateNeededInfoDto): Promise<ReadNeededInfoDto> {
+    return plainToClass(ReadNeededInfoDto, await this.settingsService.updateNeededInfo(updateNeededInfoDto));
   }
 }
