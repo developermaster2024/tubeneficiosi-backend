@@ -1,13 +1,16 @@
 import { Body, Controller, Get, Put, UseGuards, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { FileToBodyInterceptor } from 'src/support/interceptors/file-to-body.interceptor';
+import { FilesToBodyInterceptor } from 'src/support/interceptors/files-to-body.interceptor';
 import { Role } from 'src/users/enums/roles.enum';
+import { ReadBusinessInfoDto } from './dto/read-business-info.dto';
 import { ReadPageColorsDto } from './dto/read-page-colors.dto';
 import { ReadPageInfoDto } from './dto/read-page-info.dto';
+import { UpdateBusinessInfoDto } from './dto/udpate-business-info.dto';
 import { UpdatePageColorsDto } from './dto/update-page-colors.dto';
 import { UpdatePageInfoDto } from './dto/update-page-info.dto';
 import { Setting } from './enums/setting.enum';
@@ -45,5 +48,23 @@ export class SettingsController {
   @UseGuards(RolesGuard)
   async updatePageColors(@Body() updatePageColors: UpdatePageColorsDto): Promise<ReadPageColorsDto> {
     return plainToClass(ReadPageColorsDto, await this.settingsService.updatePageColors(updatePageColors));
+  }
+
+  @Get('business-info')
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  async findBusinessInfo(): Promise<ReadBusinessInfoDto> {
+    return plainToClass(ReadBusinessInfoDto, await this.settingsService.findOne(Setting.BUSINESS_INFO));
+  }
+
+  @Put('business-info')
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'leftSectionImage', maxCount: 1 }, { name: 'rightSectionImage', maxCount: 1 }], {dest: '/uploads/settings/'}),
+    new FilesToBodyInterceptor(['leftSectionImage', 'rightSectionImage'])
+  )
+  async updateBusinessInfo(@Body() updateBusinessInfoDto: UpdateBusinessInfoDto): Promise<ReadBusinessInfoDto> {
+    return plainToClass(ReadBusinessInfoDto, await this.settingsService.updateBusinessInfo(updateBusinessInfoDto));
   }
 }
