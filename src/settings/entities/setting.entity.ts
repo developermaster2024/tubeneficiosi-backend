@@ -32,4 +32,8 @@ export class Setting {
     select: false,
   })
   updatedAt: Date;
+
+  static create(data: Partial<Setting>): Setting {
+    return Object.assign(new Setting(), data);
+  }
 }
