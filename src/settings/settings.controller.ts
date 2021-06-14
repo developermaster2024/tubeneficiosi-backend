@@ -7,10 +7,12 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { FileToBodyInterceptor } from 'src/support/interceptors/file-to-body.interceptor';
 import { FilesToBodyInterceptor } from 'src/support/interceptors/files-to-body.interceptor';
 import { Role } from 'src/users/enums/roles.enum';
+import { ReadAppSectionDto } from './dto/read-app-section.dto';
 import { ReadBusinessInfoDto } from './dto/read-business-info.dto';
 import { ReadPageColorsDto } from './dto/read-page-colors.dto';
 import { ReadPageInfoDto } from './dto/read-page-info.dto';
 import { UpdateBusinessInfoDto } from './dto/udpate-business-info.dto';
+import { UpdateAppSectionDto } from './dto/update-app-section.dto';
 import { UpdatePageColorsDto } from './dto/update-page-colors.dto';
 import { UpdatePageInfoDto } from './dto/update-page-info.dto';
 import { Setting } from './enums/setting.enum';
@@ -66,5 +68,23 @@ export class SettingsController {
   )
   async updateBusinessInfo(@Body() updateBusinessInfoDto: UpdateBusinessInfoDto): Promise<ReadBusinessInfoDto> {
     return plainToClass(ReadBusinessInfoDto, await this.settingsService.updateBusinessInfo(updateBusinessInfoDto));
+  }
+
+  @Get('app-section')
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  async findUpdateAppSection(): Promise<ReadAppSectionDto> {
+    return plainToClass(ReadAppSectionDto, await this.settingsService.findOne(Setting.APP_SECTION));
+  }
+
+  @Put('app-section')
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'leftSideImage', maxCount: 1 }, { name: 'rightSideImage', maxCount: 1 }], {dest: '/uploads/settings/'}),
+    new FilesToBodyInterceptor(['leftSideImage', 'rightSideImage'])
+  )
+  async updateAppSection(@Body() updateAppSectionDto: UpdateAppSectionDto): Promise<ReadAppSectionDto> {
+    return plainToClass(ReadAppSectionDto, await this.settingsService.updateAppSection(updateAppSectionDto));
   }
 }
