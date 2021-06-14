@@ -13,6 +13,7 @@ import { TagsModule } from './tags/tags.module';
 import { BrandsModule } from './brands/brands.module';
 import { HelpCategoriesModule } from './help-categories/help-categories.module';
 import { HelpsModule } from './helps/helps.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { HelpsModule } from './helps/helps.module';
     BrandsModule,
     HelpCategoriesModule,
     HelpsModule,
+    SettingsModule,
   ],
 })
 export class AppModule {}
