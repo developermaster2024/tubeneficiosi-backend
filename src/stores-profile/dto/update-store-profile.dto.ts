@@ -1,6 +1,6 @@
 import { OmitType } from "@nestjs/mapped-types";
-import { Exclude, Expose } from "class-transformer";
-import { IsEmail, IsPhoneNumber, IsString, IsUrl, MaxLength, MinLength } from "class-validator";
+import { Exclude, Expose, Type } from "class-transformer";
+import { IsEmail, IsNumber, IsPhoneNumber, IsString, IsUrl, Max, MaxLength, Min, MinLength } from "class-validator";
 import { RegisterStoreDto } from "src/auth/dto/register-store.dto";
 import { User } from "src/users/entities/user.entity";
 import { IsUnique } from "src/validation/is-unique.constrain";
@@ -49,8 +49,16 @@ export class UpdateStoreProfileDto extends OmitType(RegisterStoreDto, ['password
   readonly description: string;
 
   @Expose()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(-90)
+  @Max(90)
   readonly latitude: number;
 
   @Expose()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
   readonly longitude: number;
 }
