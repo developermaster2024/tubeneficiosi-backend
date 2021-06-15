@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
@@ -124,5 +124,12 @@ export class SettingsController {
     @UploadedFiles() files: Express.Multer.File[]
   ): Promise<ReadFooterDto> {
     return plainToClass(ReadFooterDto, await this.settingsService.updateFooterSection(updateFooterSectionDto, files));
+  }
+
+  @Put('footer-sections/:id([1-4])/toggle-active-state')
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  async toggeFooterSection(@Param('id') id: string): Promise<ReadFooterDto> {
+    return plainToClass(ReadFooterDto, await this.settingsService.toggeFooterSection(id));
   }
 }

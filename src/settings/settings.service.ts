@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateBusinessInfoDto } from './dto/udpate-business-info.dto';
@@ -9,6 +9,21 @@ import { UpdatePageColorsDto } from './dto/update-page-colors.dto';
 import { UpdatePageInfoDto } from './dto/update-page-info.dto';
 import { Setting } from './entities/setting.entity';
 import { Setting as SettingEnum } from './enums/setting.enum';
+
+const getFooterSectioName = (id: string) => {
+  switch(id) {
+    case '1':
+      return 'firstSection';
+    case '2':
+      return 'secondSection';
+    case '3':
+      return 'thirdSection';
+    case '4':
+      return 'fourthSection';
+    default:
+      throw new HttpException(`Invalid footer section id <${id}>`, HttpStatus.UNPROCESSABLE_ENTITY);
+  }
+}
 
 @Injectable()
 export class SettingsService {
@@ -96,28 +111,33 @@ export class SettingsService {
       : widget
     );
 
-    let sectionName: string;
-
-    switch(id) {
-      case '1':
-        sectionName = 'firstSection';
-        break;
-      case '2':
-        sectionName = 'secondSection';
-        break;
-      case '3':
-        sectionName = 'thirdSection';
-        break;
-      case '4':
-        sectionName = 'fourthSection';
-        break;
-    }
+    const sectionName = getFooterSectioName(id);
 
     setting.value = {
       ...setting.value,
       [sectionName]: {
         ...updateFooterSectionDto,
         widgets: mappedWidgets,
+      },
+    };
+
+    return await this.settingsRepository.save(setting);
+  }
+
+  async toggeFooterSection(id: string): Promise<Setting> {
+    let setting = await this.settingsRepository.findOne({name: SettingEnum.FOOTER});
+
+    setting = setting ?? Setting.create({name: SettingEnum.FOOTER});
+
+    const sectionName = getFooterSectioName(id);
+
+    const footerSection = setting.value[sectionName];
+
+    setting.value = {
+      ...setting.value,
+      [sectionName]: {
+        ...footerSection,
+        isActive: !footerSection.isActive
       },
     };
 
