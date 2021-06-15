@@ -1,19 +1,22 @@
-import { Body, Controller, Get, Put, UseGuards, UseInterceptors } from '@nestjs/common';
-import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import { Body, Controller, Get, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { FileToBodyInterceptor } from 'src/support/interceptors/file-to-body.interceptor';
 import { FilesToBodyInterceptor } from 'src/support/interceptors/files-to-body.interceptor';
+import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
 import { Role } from 'src/users/enums/roles.enum';
 import { ReadAppSectionDto } from './dto/read-app-section.dto';
 import { ReadBusinessInfoDto } from './dto/read-business-info.dto';
+import { ReadFooterDto } from './dto/read-footer.dto';
 import { ReadNeededInfoDto } from './dto/read-needed-info.dto';
 import { ReadPageColorsDto } from './dto/read-page-colors.dto';
 import { ReadPageInfoDto } from './dto/read-page-info.dto';
 import { UpdateBusinessInfoDto } from './dto/udpate-business-info.dto';
 import { UpdateAppSectionDto } from './dto/update-app-section.dto';
+import { UpdateFooterSectionDto } from './dto/update-footer-section.dto';
 import { UpdateNeededInfoDto } from './dto/update-needed-info.dto';
 import { UpdatePageColorsDto } from './dto/update-page-colors.dto';
 import { UpdatePageInfoDto } from './dto/update-page-info.dto';
@@ -110,5 +113,16 @@ export class SettingsController {
   )
   async updateNeededInfo(@Body() updateNeededInfoDto: UpdateNeededInfoDto): Promise<ReadNeededInfoDto> {
     return plainToClass(ReadNeededInfoDto, await this.settingsService.updateNeededInfo(updateNeededInfoDto));
+  }
+
+  @Put('footer-sections/:id([1-4])')
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  @UseInterceptors(FilesInterceptor('images'), new ParamsToBodyInterceptor({id: 'id'}))
+  async updateFooterSection(
+    @Body() updateFooterSectionDto: UpdateFooterSectionDto,
+    @UploadedFiles() files: Express.Multer.File[]
+  ): Promise<ReadFooterDto> {
+    return plainToClass(ReadFooterDto, await this.settingsService.updateFooterSection(updateFooterSectionDto, files));
   }
 }

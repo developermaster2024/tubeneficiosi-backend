@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateBusinessInfoDto } from './dto/udpate-business-info.dto';
 import { UpdateAppSectionDto } from './dto/update-app-section.dto';
+import { UpdateFooterSectionDto } from './dto/update-footer-section.dto';
 import { UpdateNeededInfoDto } from './dto/update-needed-info.dto';
 import { UpdatePageColorsDto } from './dto/update-page-colors.dto';
 import { UpdatePageInfoDto } from './dto/update-page-info.dto';
@@ -80,6 +81,44 @@ export class SettingsService {
       leftSectionImage: updateNeededInfoDto.leftSectionImage.path,
       middleSectionImage: updateNeededInfoDto.middleSectionImage.path,
       rightSectionImage: updateNeededInfoDto.rightSectionImage.path,
+    };
+
+    return await this.settingsRepository.save(setting);
+  }
+
+  async updateFooterSection({id, widgets, ...updateFooterSectionDto}: UpdateFooterSectionDto, files: Express.Multer.File[]): Promise<Setting> {
+    let setting = await this.settingsRepository.findOne({name: SettingEnum.FOOTER});
+
+    setting = setting ?? Setting.create({name: SettingEnum.FOOTER});
+
+    const mappedWidgets = widgets.map(widget => widget.type === 'image'
+      ? {...widget, image: files?.splice(0, 1)?.[0]?.path}
+      : widget
+    );
+
+    let sectionName: string;
+
+    switch(id) {
+      case '1':
+        sectionName = 'firstSection';
+        break;
+      case '2':
+        sectionName = 'secondSection';
+        break;
+      case '3':
+        sectionName = 'thirdSection';
+        break;
+      case '4':
+        sectionName = 'fourthSection';
+        break;
+    }
+
+    setting.value = {
+      ...setting.value,
+      [sectionName]: {
+        ...updateFooterSectionDto,
+        widgets: mappedWidgets,
+      },
     };
 
     return await this.settingsRepository.save(setting);
