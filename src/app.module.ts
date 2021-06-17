@@ -16,6 +16,7 @@ import { HelpsModule } from './helps/helps.module';
 import { SettingsModule } from './settings/settings.module';
 import { LocationsModule } from './locations/locations.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { QuestionsModule } from './questions/questions.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     SettingsModule,
     LocationsModule,
     NotificationsModule,
+    QuestionsModule,
   ],
 })
 export class AppModule {}
