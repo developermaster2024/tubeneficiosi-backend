@@ -7,6 +7,7 @@ import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ReadAdminDto } from './dto/read-admin.dto';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from './enums/roles.enum';
 import { UserPaginationPipe } from './pipes/user-pagination.pipe';
@@ -44,6 +45,14 @@ export class UsersController {
   @UseInterceptors(new ParamsToBodyInterceptor({id: 'id'}))
   async update(@Body() updateUserDto: UpdateUserDto): Promise<ReadAdminDto> {
     return plainToClass(ReadAdminDto, await this.usersService.update(updateUserDto));
+  }
+
+  @Put(':id/password')
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  @UseInterceptors(new ParamsToBodyInterceptor({id: 'id'}))
+  async updatePassword(@Body() updateUserPasswordDto: UpdateUserPasswordDto): Promise<ReadAdminDto> {
+    return plainToClass(ReadAdminDto, await this.usersService.updatePassword(updateUserPasswordDto));
   }
 
   @Delete(':id')

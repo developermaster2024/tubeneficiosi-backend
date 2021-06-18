@@ -5,6 +5,7 @@ import { HashingService } from 'src/support/hashing.service';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { FindConditions, Like, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserPaginationOptionsDto } from './dto/user-pagination-options.dto';
 import { Admin } from './entities/admin.entity';
@@ -80,6 +81,14 @@ export class UsersService {
     Object.assign(user, {email});
 
     Object.assign(user.admin, adminData);
+
+    return await this.usersRepository.save(user);
+  }
+
+  async updatePassword({id, password}: UpdateUserPasswordDto): Promise<User> {
+    const user = await this.findOne(+id);
+
+    user.password = await this.hashingService.make(password);
 
     return await this.usersRepository.save(user);
   }
