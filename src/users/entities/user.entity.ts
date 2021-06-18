@@ -2,6 +2,7 @@ import { Client } from "src/clientes/entities/client.entity";
 import { Store } from "src/stores/entities/store.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Role } from "../enums/roles.enum";
+import { Admin } from "./admin.entity";
 
 @Entity({
   name: 'users',
@@ -48,6 +49,11 @@ export class User {
     cascade: ['insert', 'update']
   })
   store: Store;
+
+  @OneToOne(() => Admin, admin => admin.user, {
+    cascade: ['insert', 'update']
+  })
+  admin: Admin;
 
   @CreateDateColumn({
     name: 'created_at',

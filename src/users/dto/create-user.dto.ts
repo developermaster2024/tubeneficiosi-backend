@@ -1,5 +1,5 @@
 import { Exclude, Expose } from "class-transformer";
-import { IsEmail, IsPhoneNumber, IsString, MaxLength, MinLength } from "class-validator";
+import { IsEmail, IsString, MaxLength, MinLength } from "class-validator";
 import { IsUnique } from "src/validation/is-unique.constrain";
 import { User } from "../entities/user.entity";
 
@@ -16,11 +16,6 @@ export class CreateUserDto {
   @MaxLength(150)
   @IsUnique(User)
   readonly email: string;
-
-  @Expose()
-  @IsString()
-  @IsPhoneNumber()
-  readonly phoneNumber: string;
 
   @Expose()
   @IsString()

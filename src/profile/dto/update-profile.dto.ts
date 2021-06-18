@@ -1,6 +1,6 @@
 import { OmitType } from "@nestjs/mapped-types";
 import { Expose } from "class-transformer";
-import { IsEmail, MaxLength } from "class-validator";
+import { IsEmail, IsPhoneNumber, IsString, MaxLength } from "class-validator";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
 import { User } from "src/users/entities/user.entity";
 import { IsUnique } from "src/validation/is-unique.constrain";
@@ -17,4 +17,9 @@ export class UpdateProfileDto extends OmitType(CreateUserDto, ['password'] as co
     where: { email: value, id: Not(dto.userId) }
   }))
   readonly email: string;
+
+  @Expose()
+  @IsString()
+  @IsPhoneNumber()
+  readonly phoneNumber: string;
 }
