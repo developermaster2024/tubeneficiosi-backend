@@ -17,6 +17,8 @@ import { SettingsModule } from './settings/settings.module';
 import { LocationsModule } from './locations/locations.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { QuestionsModule } from './questions/questions.module';
+import { ProductsModule } from './products/products.module';
+import { ProductFeaturesModule } from './product-features/product-features.module';
 
 @Module({
   imports: [
@@ -40,6 +42,8 @@ import { QuestionsModule } from './questions/questions.module';
     LocationsModule,
     NotificationsModule,
     QuestionsModule,
+    ProductsModule,
+    ProductFeaturesModule,
   ],
 })
 export class AppModule {}
