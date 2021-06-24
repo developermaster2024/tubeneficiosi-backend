@@ -8,6 +8,8 @@ async function bootstrap() {
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
+  app.enableCors();
+
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
     transformOptions: { excludeExtraneousValues: true }
