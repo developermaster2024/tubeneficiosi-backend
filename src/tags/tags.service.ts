@@ -49,14 +49,14 @@ export class TagsService {
     return tag;
   }
 
-  async udpate({id, parentIds, name}: UpdateTagDto): Promise<Tag> {
+  async udpate({id, parentIds, ...updateTagDto}: UpdateTagDto): Promise<Tag> {
     const tag = await this.findOne(id);
 
     const parentTags = parentIds.length === 0 ? [] : await this.tagsRepository.find({
       where: {id: In(parentIds)}
     });
 
-    Object.assign(tag, {name, parentTags});
+    Object.assign(tag, {...updateTagDto, parentTags});
 
     return await this.tagsRepository.save(tag);
   }
