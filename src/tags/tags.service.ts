@@ -29,12 +29,12 @@ export class TagsService {
     return new PaginationResult(tags, total, perPage);
   }
 
-  async create({parentIds, name}: CreateTagDto): Promise<Tag> {
+  async create({parentIds, ...createTagDto}: CreateTagDto): Promise<Tag> {
     const parentTags = parentIds.length === 0 ? [] : await this.tagsRepository.find({
       where: {id: In(parentIds)}
     });
 
-    const tag = Tag.create({name, parentTags});
+    const tag = Tag.create({...createTagDto, parentTags});
 
     return await this.tagsRepository.save(tag);
   }

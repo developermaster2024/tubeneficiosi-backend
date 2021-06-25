@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { StoreCategory } from "src/store-categories/entities/store-category.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({
   name: 'tags'
@@ -24,6 +25,17 @@ export class Tag {
     name: 'tag_tag',
   })
   parentTags: Tag[];
+
+  @Column({
+    name: 'store_category_id',
+    type: 'int',
+    select: false,
+  })
+  storeCategoryId: number;
+
+  @ManyToOne(() => StoreCategory, {nullable: false, onDelete: 'CASCADE'})
+  @JoinColumn({name: 'store_category_id'})
+  storeCategory: StoreCategory;
 
   @CreateDateColumn({
     name: 'created_at',
