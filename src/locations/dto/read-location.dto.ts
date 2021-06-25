@@ -1,4 +1,4 @@
-import { Exclude, Expose } from "class-transformer";
+import { Exclude, Expose, Type } from "class-transformer";
 
 @Exclude()
 export class ReadLocationDto {
@@ -10,4 +10,8 @@ export class ReadLocationDto {
 
   @Expose()
   readonly area: string;
+
+  @Expose()
+  @Type(() => ReadLocationDto)
+  readonly parentLocation: ReadLocationDto;
 }

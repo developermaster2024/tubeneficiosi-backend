@@ -26,6 +26,7 @@ export class LocationsService {
       take: perPage,
       skip: offset,
       where,
+      relations: ['parentLocation']
     });
 
     return new PaginationResult(locations, total, perPage);

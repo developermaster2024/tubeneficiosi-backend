@@ -28,10 +28,11 @@ export class Location {
     name: 'parent_id',
     type: 'int',
     nullable: true,
+    select: false,
   })
   parentId: number;
 
-  @ManyToOne(() => Location, {nullable: true})
+  @ManyToOne(() => Location, {nullable: true, onDelete: 'CASCADE'})
   @JoinColumn({name: 'parent_id'})
   parentLocation: Location;
 
