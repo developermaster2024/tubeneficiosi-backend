@@ -14,13 +14,10 @@ import { ProductFeaturePaginationPipe } from './pipes/product-feature-pagination
 import { ProductFeaturesService } from './product-features.service';
 
 @Controller('product-features')
-@UseGuards(JwtAuthGuard)
 export class ProductFeaturesController {
   constructor(private readonly productFeaturesService: ProductFeaturesService) {}
 
   @Get()
-  @Roles(Role.STORE)
-  @UseGuards(RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor())
   async paginate(
     @Query(ProductFeaturePaginationPipe) options: any,
@@ -31,15 +28,13 @@ export class ProductFeaturesController {
 
   @Post()
   @Roles(Role.STORE)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor())
   async create(@Body() createProductFeatureDto: CreateProductFeatureDto): Promise<ReadProductFeatureDto> {
     return plainToClass(ReadProductFeatureDto, await this.productFeaturesService.create(createProductFeatureDto));
   }
 
   @Get(':id')
-  @Roles(Role.STORE)
-  @UseGuards(RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor())
   async findOne(
     @Param('id') id: string,
@@ -50,7 +45,7 @@ export class ProductFeaturesController {
 
   @Put(':id')
   @Roles(Role.STORE)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({id: 'id'}))
   async update(@Body() updateProductFeatureDto: UpdateProductFeatureDto): Promise<ReadProductFeatureDto> {
     return plainToClass(ReadProductFeatureDto, await this.productFeaturesService.update(updateProductFeatureDto));
@@ -58,7 +53,7 @@ export class ProductFeaturesController {
 
   @Delete(':id')
   @Roles(Role.STORE)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor())
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(

@@ -15,20 +15,17 @@ import { UpdateHelpCategoryDto } from './dto/update-help-category.dto';
 import { HelpCategoriesService } from './help-categories.service';
 
 @Controller('help-categories')
-@UseGuards(JwtAuthGuard)
 export class HelpCategoriesController {
   constructor(private readonly helpCategoriesService: HelpCategoriesService) {}
 
   @Get()
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   async paginate(@Query(PaginationPipe) options: any): Promise<PaginationResult<ReadHelpCategoryDto>> {
     return (await this.helpCategoriesService.paginate(options)).toClass(ReadHelpCategoryDto);
   }
 
   @Post()
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(FileInterceptor('icon', {dest: 'uploads/help-categories/'}), new FileToBodyInterceptor('icon'))
   async create(
     @Body() createHelpCategoryDto: CreateHelpCategoryDto
@@ -37,15 +34,13 @@ export class HelpCategoriesController {
   }
 
   @Get(':id')
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   async findOne(@Param('id') id: string): Promise<ReadHelpCategoryDto> {
     return plainToClass(ReadHelpCategoryDto, await this.helpCategoriesService.findOne(+id));
   }
 
   @Put(':id')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(
     new ParamsToBodyInterceptor({id: 'id'}),
     FileInterceptor('icon', {dest: 'uploads/help-categories/'}),
@@ -57,7 +52,7 @@ export class HelpCategoriesController {
 
   @Delete(':id')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@Param('id') id: string): Promise<void> {
     await this.helpCategoriesService.delete(+id);

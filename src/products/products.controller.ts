@@ -14,7 +14,6 @@ import { ProductPaginationPipe } from './pipes/product-pagination.pipe';
 import { ProductsService } from './products.service';
 
 @Controller('products')
-@UseGuards(JwtAuthGuard)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
@@ -25,7 +24,7 @@ export class ProductsController {
 
   @Post()
   @Roles(Role.STORE)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(FilesInterceptor('images'), new JwtUserToBodyInterceptor(), new SlugifierInterceptor({name: 'slug'}))
   async create(
     @Body() createProductDto: CreateProductDto,
@@ -41,7 +40,7 @@ export class ProductsController {
 
   @Delete(':id')
   @Roles(Role.STORE)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor())
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(

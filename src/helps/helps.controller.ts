@@ -13,34 +13,29 @@ import { HelpsService } from './helps.service';
 import { HelpPaginationPipe } from './pipes/help-pagination.pipe';
 
 @Controller('helps')
-@UseGuards(JwtAuthGuard)
 export class HelpsController {
   constructor(private readonly helpsService: HelpsService) {}
 
   @Get()
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   async paginate(@Query(HelpPaginationPipe) options: any): Promise<PaginationResult<ReadHelpDto>> {
     return (await this.helpsService.paginate(options)).toClass(ReadHelpDto);
   }
 
   @Post()
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async create(@Body() createHelpDto: CreateHelpDto): Promise<ReadHelpDto> {
     return plainToClass(ReadHelpDto, await this.helpsService.create(createHelpDto));
   }
 
   @Get(':id')
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   async findOne(@Param('id') id: string): Promise<ReadHelpDto> {
     return plainToClass(ReadHelpDto, await this.helpsService.findOne(+id));
   }
 
   @Put(':id')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new ParamsToBodyInterceptor({id: 'id'}))
   async update(@Body() updateHelpDto: UpdateHelpDto): Promise<ReadHelpDto> {
     return plainToClass(ReadHelpDto, await this.helpsService.update(updateHelpDto));
@@ -48,7 +43,7 @@ export class HelpsController {
 
   @Delete(':id')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async delete(@Param('id') id: string): Promise<void> {
     await this.helpsService.delete(+id);
   }

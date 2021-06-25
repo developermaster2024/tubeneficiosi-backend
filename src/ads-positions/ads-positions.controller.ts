@@ -4,7 +4,6 @@ import { PaginationPipe } from 'src/support/pagination/pagination-pipe';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { AdsPositionsService } from './ads-positions.service';
 import { ReadAdsPositionDto } from './dto/read-ads-position.dto';
-import { AdsPosition } from './entities/ads-position.entity';
 
 @Controller('ads-positions')
 export class AdsPositionsController {

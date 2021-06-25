@@ -14,13 +14,10 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryPaginationPipe } from './pipes/category-pagination.pipe';
 
 @Controller('stores/categories')
-@UseGuards(JwtAuthGuard)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Get()
-  @Roles(Role.STORE)
-  @UseGuards(RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor())
   async paginate(
     @Body('userId') userId: number,
@@ -31,15 +28,13 @@ export class CategoriesController {
 
   @Post()
   @Roles(Role.STORE)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor())
   async create(@Body() createCategoryDto: CreateCategoryDto): Promise<ReadCategoryDto> {
     return plainToClass(ReadCategoryDto, await this.categoriesService.create(createCategoryDto));
   }
 
   @Get(':id')
-  @Roles(Role.STORE)
-  @UseGuards(RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor())
   async findOne(
     @Param('id') id: string,
@@ -50,7 +45,7 @@ export class CategoriesController {
 
   @Put(':id')
   @Roles(Role.STORE)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({id: 'id'}))
   async update(@Body() updateCategoryDto: UpdateCategoryDto): Promise<ReadCategoryDto> {
     return plainToClass(ReadCategoryDto, await this.categoriesService.udpate(updateCategoryDto));
@@ -58,7 +53,7 @@ export class CategoriesController {
 
   @Delete(':id')
   @Roles(Role.STORE)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseInterceptors(new JwtUserToBodyInterceptor())
   async delete(

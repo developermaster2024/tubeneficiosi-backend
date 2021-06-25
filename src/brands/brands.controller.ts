@@ -13,34 +13,29 @@ import { UpdateBrandDto } from './dto/update-brand.dto';
 import { BrandPaginationPipe } from './pipes/brand-pagination.pipe';
 
 @Controller('brands')
-@UseGuards(JwtAuthGuard)
 export class BrandsController {
   constructor(private readonly brandsService: BrandsService) {}
 
   @Get()
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   async paginate(@Query(BrandPaginationPipe) options: any): Promise<PaginationResult<ReadBrandDto>> {
     return (await this.brandsService.paginate(options)).toClass(ReadBrandDto);
   }
 
   @Post()
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async create(@Body() createBrandDto: CreateBrandDto): Promise<ReadBrandDto> {
     return plainToClass(ReadBrandDto, await this.brandsService.create(createBrandDto));
   }
 
   @Get(':id')
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   async findOne(@Param('id') id: string): Promise<ReadBrandDto> {
     return plainToClass(ReadBrandDto, await this.brandsService.findOne(+id));
   }
 
   @Put(':id')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new ParamsToBodyInterceptor({id: 'id'}))
   async update(@Body() updateBrandDto: UpdateBrandDto): Promise<ReadBrandDto> {
     return plainToClass(ReadBrandDto, await this.brandsService.update(updateBrandDto));
@@ -48,7 +43,7 @@ export class BrandsController {
 
   @Delete(':id')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@Param('id') id: string): Promise<void> {
     await this.brandsService.delete(+id);

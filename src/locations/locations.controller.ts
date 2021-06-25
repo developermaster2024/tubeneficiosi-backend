@@ -13,34 +13,29 @@ import { LocationsService } from './locations.service';
 import { LocationPaginationPipe } from './pipes/location-pagination.pipe';
 
 @Controller('locations')
-@UseGuards(JwtAuthGuard)
 export class LocationsController {
   constructor(private readonly locationsService: LocationsService) {}
 
   @Get()
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   async paginate(@Query(LocationPaginationPipe) options: any): Promise<PaginationResult<ReadLocationDto>> {
     return (await this.locationsService.paginate(options)).toClass(ReadLocationDto);
   }
 
   @Post()
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async create(@Body() createLocationDto: CreateLocationDto): Promise<ReadLocationDto> {
     return plainToClass(ReadLocationDto, await this.locationsService.create(createLocationDto));
   }
 
   @Get(':id')
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   async findOne(@Param('id') id: string): Promise<ReadLocationDto> {
     return plainToClass(ReadLocationDto, await this.locationsService.findOne(+id));
   }
 
   @Put(':id')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new ParamsToBodyInterceptor({id: 'id'}))
   async update(@Body() updateLocationDto: UpdateLocationDto): Promise<ReadLocationDto> {
     return plainToClass(ReadLocationDto, await this.locationsService.update(updateLocationDto));
@@ -48,7 +43,7 @@ export class LocationsController {
 
   @Delete(':id')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@Param('id') id: string): Promise<void> {
     await this.locationsService.delete(+id);

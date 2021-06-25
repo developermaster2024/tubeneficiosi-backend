@@ -24,49 +24,42 @@ import { Setting } from './enums/setting.enum';
 import { SettingsService } from './settings.service';
 
 @Controller('settings')
-@UseGuards(JwtAuthGuard)
 export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 
   @Get('page-info')
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   async findPageInfo(): Promise<ReadPageInfoDto> {
     return plainToClass(ReadPageInfoDto, await this.settingsService.findOne(Setting.PAGE_INFO));
   }
 
   @Put('page-info')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(FileInterceptor('logo', {dest: 'uploads/settings/'}), new FileToBodyInterceptor('logo'))
   async udpatePageInfo(@Body() updatePageInfoDto: UpdatePageInfoDto): Promise<ReadPageInfoDto> {
     return plainToClass(ReadPageInfoDto, await this.settingsService.udpatePageInfo(updatePageInfoDto));
   }
 
   @Get('colors')
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   async findPageColors(): Promise<ReadPageColorsDto> {
     return plainToClass(ReadPageColorsDto, await this.settingsService.findOne(Setting.COLORS));
   }
 
   @Put('colors')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async updatePageColors(@Body() updatePageColors: UpdatePageColorsDto): Promise<ReadPageColorsDto> {
     return plainToClass(ReadPageColorsDto, await this.settingsService.updatePageColors(updatePageColors));
   }
 
   @Get('business-info')
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   async findBusinessInfo(): Promise<ReadBusinessInfoDto> {
     return plainToClass(ReadBusinessInfoDto, await this.settingsService.findOne(Setting.BUSINESS_INFO));
   }
 
   @Put('business-info')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'leftSectionImage', maxCount: 1 }, { name: 'rightSectionImage', maxCount: 1 }], {dest: '/uploads/settings/'}),
     new FilesToBodyInterceptor(['leftSectionImage', 'rightSectionImage'])
@@ -76,15 +69,13 @@ export class SettingsController {
   }
 
   @Get('app-section')
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   async findAppSection(): Promise<ReadAppSectionDto> {
     return plainToClass(ReadAppSectionDto, await this.settingsService.findOne(Setting.APP_SECTION));
   }
 
   @Put('app-section')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'leftSideImage', maxCount: 1 }, { name: 'rightSideImage', maxCount: 1 }], {dest: '/uploads/settings/'}),
     new FilesToBodyInterceptor(['leftSideImage', 'rightSideImage'])
@@ -94,15 +85,13 @@ export class SettingsController {
   }
 
   @Get('needed-info')
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   async findNeededInfo(): Promise<ReadNeededInfoDto> {
     return plainToClass(ReadNeededInfoDto, await this.settingsService.findOne(Setting.NEEDED_INFO));
   }
 
   @Put('needed-info')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'leftSectionImage', maxCount: 1 },
@@ -117,7 +106,7 @@ export class SettingsController {
 
   @Put('footer-sections/:id([1-4])')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(FilesInterceptor('images'), new ParamsToBodyInterceptor({id: 'id'}))
   async updateFooterSection(
     @Body() updateFooterSectionDto: UpdateFooterSectionDto,
@@ -128,7 +117,7 @@ export class SettingsController {
 
   @Put('footer-sections/:id([1-4])/toggle-active-state')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async toggeFooterSection(@Param('id') id: string): Promise<ReadFooterDto> {
     return plainToClass(ReadFooterDto, await this.settingsService.toggeFooterSection(id));
   }
