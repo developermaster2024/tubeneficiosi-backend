@@ -19,6 +19,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { QuestionsModule } from './questions/questions.module';
 import { ProductsModule } from './products/products.module';
 import { ProductFeaturesModule } from './product-features/product-features.module';
+import { MainBannerAdsModule } from './main-banner-ads/main-banner-ads.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { ProductFeaturesModule } from './product-features/product-features.modul
     QuestionsModule,
     ProductsModule,
     ProductFeaturesModule,
+    MainBannerAdsModule,
   ],
 })
 export class AppModule {}
