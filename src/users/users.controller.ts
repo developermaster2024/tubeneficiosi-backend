@@ -13,7 +13,7 @@ import { Role } from './enums/roles.enum';
 import { UserPaginationPipe } from './pipes/user-pagination.pipe';
 import { UsersService } from './users.service';
 
-@Controller('users')
+@Controller('admins')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
