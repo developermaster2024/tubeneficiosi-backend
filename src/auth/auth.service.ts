@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Client } from 'src/clientes/entities/client.entity';
+import { Client } from 'src/clients/entities/client.entity';
 import { Store } from 'src/stores/entities/store.entity';
 import { HashingService } from 'src/support/hashing.service';
 import { User } from 'src/users/entities/user.entity';

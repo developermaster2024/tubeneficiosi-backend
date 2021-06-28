@@ -1,4 +1,4 @@
-import { Client } from "src/clientes/entities/client.entity";
+import { Client } from "src/clients/entities/client.entity";
 import { Store } from "src/stores/entities/store.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Role } from "../enums/roles.enum";

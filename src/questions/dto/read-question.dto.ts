@@ -1,6 +1,6 @@
 import { Exclude, Expose, Transform, Type } from "class-transformer";
 import { format } from "date-fns";
-import { ReadClientDto } from "src/clientes/dto/read-client.dto";
+import { ReadClientDto } from "src/clients/dto/read-client.dto";
 
 @Exclude()
 export class ReadQuestionDto {

@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { ReadClientDto } from "src/clientes/dto/read-client.dto";
+import { ReadClientDto } from "src/clients/dto/read-client.dto";
 
 @Exclude()
 export class RegisterResponseDto {
