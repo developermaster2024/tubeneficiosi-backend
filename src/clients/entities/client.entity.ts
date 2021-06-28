@@ -33,4 +33,8 @@ export class Client {
     nullable: true,
   })
   imgPath: string;
+
+  static create(data: Partial<Client>): Client {
+    return Object.assign(new Client(), data);
+  }
 }
