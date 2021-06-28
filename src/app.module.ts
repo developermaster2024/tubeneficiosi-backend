@@ -22,6 +22,7 @@ import { ProductFeaturesModule } from './product-features/product-features.modul
 import { MainBannerAdsModule } from './main-banner-ads/main-banner-ads.module';
 import { AdsPositionsModule } from './ads-positions/ads-positions.module';
 import { AdsModule } from './ads/ads.module';
+import { FeaturedAdsModule } from './featured-ads/featured-ads.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { AdsModule } from './ads/ads.module';
     MainBannerAdsModule,
     AdsPositionsModule,
     AdsModule,
+    FeaturedAdsModule,
   ],
 })
 export class AppModule {}
