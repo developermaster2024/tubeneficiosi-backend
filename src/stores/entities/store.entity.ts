@@ -56,6 +56,13 @@ export class Store {
   })
   longitude: number;
 
+  @Column({
+    name: 'user_id',
+    type: 'int',
+    select: false,
+  })
+  userId: number;
+
   @OneToOne(() => User, {nullable: true, onDelete: 'CASCADE'})
   @JoinColumn({name: 'user_id'})
   user: User;

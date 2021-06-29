@@ -7,10 +7,9 @@ import { HashingService } from 'src/support/hashing.service';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/roles.enum';
 import { Repository } from 'typeorm';
+import { StoreImages } from './dto/store-images';
 import { UpdateStoreProfileDto } from './dto/update-store-profile.dto';
 import { StoreProfileNotFoundException } from './errors/store-profile-not-found.exception';
-
-type StoreImages = {banner?: string; logo?: string; frontImage?: string};
 
 @Injectable()
 export class StoresProfileService {

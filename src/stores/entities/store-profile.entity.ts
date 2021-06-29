@@ -72,4 +72,8 @@ export class StoreProfile {
     nullable: true,
   })
   logo: string;
+
+  static create(data: Partial<StoreProfile>): StoreProfile {
+    return Object.assign(new StoreProfile(), data);
+  }
 }
