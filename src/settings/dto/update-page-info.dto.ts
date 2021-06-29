@@ -19,8 +19,7 @@ export class UpdatePageInfoDto {
   readonly description: string;
 
   @Expose()
-  @IsString()
-  @MaxLength(150)
+  @MaxLength(2500)
   readonly copyrightText: string;
 
   @Expose()
