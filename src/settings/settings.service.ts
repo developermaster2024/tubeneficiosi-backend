@@ -37,13 +37,19 @@ export class SettingsService {
     return setting;
   }
 
-  async udpatePageInfo(updatePageInfoDto: UpdatePageInfoDto): Promise<Setting> {
-    const setting = new Setting();
-    setting.name = SettingEnum.PAGE_INFO;
+  async udpatePageInfo({logo, ...updatePageInfoDto}: UpdatePageInfoDto): Promise<Setting> {
+    let setting = await this.settingsRepository.findOne({name: SettingEnum.PAGE_INFO});
+
+    setting = setting ?? Setting.create({name: SettingEnum.COLORS});
+
     setting.value = {
+      ...setting.value,
       ...updatePageInfoDto,
-      logo: updatePageInfoDto.logo.path,
     };
+
+    if (logo) {
+      setting.value = {...setting.value, logo: logo.path};
+    }
 
     return await this.settingsRepository.save(setting);
   }
