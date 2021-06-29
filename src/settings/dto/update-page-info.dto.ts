@@ -1,10 +1,11 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { IsString, Max, MaxLength, Min } from "class-validator";
+import { IsString, Max, MaxLength, Min, ValidateIf } from "class-validator";
 import { IsMimeType } from "src/validation/mime-type.constrain";
 
 @Exclude()
 export class UpdatePageInfoDto {
   @Expose()
+  @ValidateIf(obj => obj.logo)
   @IsMimeType(['image/jpeg', 'image/png'])
   readonly logo: Express.Multer.File;
 
