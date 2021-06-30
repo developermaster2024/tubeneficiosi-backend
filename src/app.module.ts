@@ -26,6 +26,7 @@ import { FeaturedAdsModule } from './featured-ads/featured-ads.module';
 import { ClientsModule } from './clients/clients.module';
 import { StoresModule } from './stores/stores.module';
 import { BanksModule } from './banks/banks.module';
+import { BankAccountTypesModule } from './bank-account-types/bank-account-types.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { BanksModule } from './banks/banks.module';
     ClientsModule,
     StoresModule,
     BanksModule,
+    BankAccountTypesModule,
   ],
 })
 export class AppModule {}
