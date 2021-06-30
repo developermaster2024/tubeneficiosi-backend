@@ -1,30 +1,31 @@
 import { Exclude, Expose } from "class-transformer";
-import { IsHexColor, MaxLength } from "class-validator";
+import { ValidateIf } from "class-validator";
 import { IsMimeType } from "src/validation/mime-type.constrain";
 
 @Exclude()
 export class UpdateAppSectionDto {
   @Expose()
-  @MaxLength(30)
   readonly title: string;
 
   @Expose()
-  @IsHexColor()
   readonly titleColor: string;
 
   @Expose()
-  @MaxLength(500)
   readonly description: string;
 
   @Expose()
-  @IsHexColor()
+  readonly backgroundColor: string;
+
+  @Expose()
   readonly descriptionColor: string;
 
   @Expose()
+  @ValidateIf(obj => obj.leftSideImage)
   @IsMimeType(['image/png','image/jpeg'])
   readonly leftSideImage: Express.Multer.File;
 
   @Expose()
+  @ValidateIf(obj => obj.rightSideImage)
   @IsMimeType(['image/png','image/jpeg'])
   readonly rightSideImage: Express.Multer.File;
 }

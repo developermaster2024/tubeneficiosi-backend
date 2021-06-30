@@ -78,16 +78,19 @@ export class SettingsService {
     return await this.settingsRepository.save(setting);
   }
 
-  async updateAppSection(updateAppSectionDto: UpdateAppSectionDto): Promise<Setting> {
+  async updateAppSection({leftSideImage, rightSideImage, ...updateAppSectionDto}: UpdateAppSectionDto): Promise<Setting> {
     let setting = await this.settingsRepository.findOne({name: SettingEnum.APP_SECTION});
 
     setting = setting ?? Setting.create({name: SettingEnum.APP_SECTION});
 
     setting.value = {
+      ...setting.value,
       ...updateAppSectionDto,
-      leftSideImage: updateAppSectionDto.leftSideImage.path,
-      rightSideImage: updateAppSectionDto.rightSideImage.path,
     };
+
+    if (leftSideImage) setting.value = {...setting.value, leftSideImage: leftSideImage.path};
+
+    if (rightSideImage) setting.value = {...setting.value, rightSideImage: rightSideImage.path};
 
     return await this.settingsRepository.save(setting);
   }

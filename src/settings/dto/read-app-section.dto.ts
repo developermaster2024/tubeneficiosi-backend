@@ -11,6 +11,10 @@ export class ReadAppSectionDto {
   readonly titleColor: string;
 
   @Expose()
+  @Transform(({obj}) => obj.value.backgroundColor)
+  readonly backgroundColor: string;
+
+  @Expose()
   @Transform(({obj}) => obj.value.description)
   readonly description: string;
 
