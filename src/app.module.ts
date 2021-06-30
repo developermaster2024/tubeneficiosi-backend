@@ -25,6 +25,7 @@ import { AdsModule } from './ads/ads.module';
 import { FeaturedAdsModule } from './featured-ads/featured-ads.module';
 import { ClientsModule } from './clients/clients.module';
 import { StoresModule } from './stores/stores.module';
+import { BanksModule } from './banks/banks.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { StoresModule } from './stores/stores.module';
     FeaturedAdsModule,
     ClientsModule,
     StoresModule,
+    BanksModule,
   ],
 })
 export class AppModule {}
