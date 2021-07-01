@@ -104,6 +104,11 @@ export class SettingsController {
     return plainToClass(ReadNeededInfoDto, await this.settingsService.updateNeededInfo(updateNeededInfoDto));
   }
 
+  @Get('footer-sections')
+  async findFooterSection(): Promise<ReadFooterDto> {
+    return plainToClass(ReadFooterDto, await this.settingsService.findOne(Setting.FOOTER));
+  }
+
   @Put('footer-sections/:id([1-4])')
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
