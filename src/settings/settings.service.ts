@@ -132,6 +132,7 @@ export class SettingsService {
     setting.value = {
       ...setting.value,
       [sectionName]: {
+        id,
         ...updateFooterSectionDto,
         widgets: mappedWidgets,
       },
