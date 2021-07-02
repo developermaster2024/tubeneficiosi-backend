@@ -21,7 +21,7 @@ import { UpdateNeededInfoDto } from './dto/update-needed-info.dto';
 import { UpdatePageColorsDto } from './dto/update-page-colors.dto';
 import { UpdatePageInfoDto } from './dto/update-page-info.dto';
 import { Setting } from './enums/setting.enum';
-import { SettingsService } from './settings.service';
+import { getFooterSectioName, SettingsService } from './settings.service';
 
 @Controller('settings')
 export class SettingsController {
@@ -107,6 +107,12 @@ export class SettingsController {
   @Get('footer-sections')
   async findFooterSection(): Promise<ReadFooterDto> {
     return plainToClass(ReadFooterDto, await this.settingsService.findOne(Setting.FOOTER));
+  }
+
+  @Get('footer-sections/:id([1-4])')
+  async findFooterSectionById(@Param('id') id: string): Promise<any> {
+    const footer = plainToClass(ReadFooterDto, await this.settingsService.findOne(Setting.FOOTER));
+    return footer[getFooterSectioName(id)];
   }
 
   @Put('footer-sections/:id([1-4])')

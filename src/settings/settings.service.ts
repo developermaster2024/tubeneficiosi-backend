@@ -10,7 +10,7 @@ import { UpdatePageInfoDto } from './dto/update-page-info.dto';
 import { Setting } from './entities/setting.entity';
 import { Setting as SettingEnum } from './enums/setting.enum';
 
-const getFooterSectioName = (id: string) => {
+export const getFooterSectioName = (id: string) => {
   switch(id) {
     case '1':
       return 'firstSection';
