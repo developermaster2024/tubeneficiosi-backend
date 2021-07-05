@@ -29,6 +29,7 @@ import { BanksModule } from './banks/banks.module';
 import { BankAccountTypesModule } from './bank-account-types/bank-account-types.module';
 import { BankAccountsModule } from './bank-accounts/bank-accounts.module';
 import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
+import { StoreAdsModule } from './store-ads/store-ads.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
     BankAccountTypesModule,
     BankAccountsModule,
     PaymentMethodsModule,
+    StoreAdsModule,
   ],
 })
 export class AppModule {}
