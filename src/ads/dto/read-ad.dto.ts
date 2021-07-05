@@ -27,6 +27,9 @@ export class ReadAdDto {
   readonly until: Date;
 
   @Expose()
+  readonly priority: number;
+
+  @Expose()
   readonly price: number;
 
   @Expose()

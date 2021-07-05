@@ -39,6 +39,12 @@ export class CreateAdDto {
   @Type(() => Number)
   @IsNumber()
   @Min(0)
+  readonly priority: number;
+
+  @Expose()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
   readonly price: number;
 
   @Expose()

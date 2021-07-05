@@ -36,6 +36,12 @@ export class Ad {
   url: string;
 
   @Column({
+    name: 'priority',
+    type: 'int'
+  })
+  priority: number;
+
+  @Column({
     name: 'from',
     type: 'datetime',
   })
