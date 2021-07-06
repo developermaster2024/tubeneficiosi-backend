@@ -1,4 +1,5 @@
 import { User } from "src/users/entities/user.entity";
+import { Role } from "src/users/enums/roles.enum";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { UserToNotification } from "./user-to-notification.entity";
 
@@ -23,6 +24,13 @@ export class Notification {
     default: () => 'CURRENT_TIMESTAMP',
   })
   date: Date;
+
+  @Column({
+    name: 'role',
+    type: 'varchar',
+    length: 50,
+  })
+  role: Role;
 
   @OneToMany(() => UserToNotification, userToNotification => userToNotification.notification)
   userToNotifications: UserToNotification[];

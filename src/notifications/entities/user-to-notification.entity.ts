@@ -24,15 +24,16 @@ export class UserToNotification {
   })
   userId: number;
 
-  @Column({
-    name: 'notification_id',
-    type: 'int',
-  })
-  notificationId: number;
-
   @ManyToOne(() => User, {onDelete: 'CASCADE'})
   @JoinColumn({name: 'user_id'})
   user: User;
+
+  @Column({
+    name: 'notification_id',
+    type: 'int',
+    select: false,
+  })
+  notificationId: number;
 
   @ManyToOne(() => Notification, notification => notification.userToNotifications, {
     cascade: ['insert', 'update'],

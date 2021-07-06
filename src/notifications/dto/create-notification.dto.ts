@@ -10,5 +10,5 @@ export class CreateNotificationDto {
 
   @Expose()
   @IsIn([Role.CLIENT, Role.ADMIN, Role.STORE])
-  readonly role: string;
+  readonly role: Role;
 }

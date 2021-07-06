@@ -40,8 +40,9 @@ export class NotificationsService {
     const userToNotifications = users.map(user => UserToNotification.create({user}));
 
     const notification = Notification.create({
+      message,
+      role,
       userToNotifications,
-      message
     });
 
     return await this.notificationsRepository.save(notification);
