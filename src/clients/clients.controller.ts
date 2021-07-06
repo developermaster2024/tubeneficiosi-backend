@@ -11,6 +11,7 @@ import { Role } from 'src/users/enums/roles.enum';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { ReadClientDto } from './dto/read-client.dto';
+import { UpdateClientPasswordDto } from './dto/update-client-password.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { ClientPaginationPipe } from './pipes/client-pagination.pipe';
 
@@ -47,6 +48,14 @@ export class ClientsController {
   @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'), new ParamsToBodyInterceptor({id: 'id'}))
   async update(@Body() updateClientDto: UpdateClientDto): Promise<ReadClientDto> {
     return plainToClass(ReadClientDto, await this.clientsService.update(updateClientDto));
+  }
+
+  @Put(':id/password')
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  @UseInterceptors(new ParamsToBodyInterceptor({id: 'id'}))
+  async updatePassword(@Body() updateClientPasswordDto: UpdateClientPasswordDto): Promise<ReadClientDto> {
+    return plainToClass(ReadClientDto, await this.clientsService.updatePassword(updateClientPasswordDto));
   }
 
   @Delete(':id')

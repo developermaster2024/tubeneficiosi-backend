@@ -7,6 +7,7 @@ import { Role } from 'src/users/enums/roles.enum';
 import { Repository } from 'typeorm';
 import { ClientPaginationOptionsDto } from './dto/client-pagination-options.dto';
 import { CreateClientDto } from './dto/create-client.dto';
+import { UpdateClientPasswordDto } from './dto/update-client-password.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { Client } from './entities/client.entity';
 import { ClientNotFoundException } from './errors/client-not-found.exception';
@@ -76,6 +77,14 @@ export class ClientsService {
     if (image) {
       user.client.imgPath = image.path;
     }
+
+    return await this.usersRepository.save(user);
+  }
+
+  async updatePassword({id, password}: UpdateClientPasswordDto): Promise<User> {
+    const user = await this.findOne(+id);
+
+    user.password = await this.hashingService.make(password);
 
     return await this.usersRepository.save(user);
   }
