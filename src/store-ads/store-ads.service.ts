@@ -14,6 +14,9 @@ export class StoreAdsService {
 
   async paginate({perPage, offset, filters}: StoreAdPaginationOptionsDto): Promise<PaginationResult<StoreAd>> {
     const queryBuilder = this.storeAdsRepository.createQueryBuilder('storeAd')
+      .leftJoinAndSelect('storeAd.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('store.products', 'product')
       .take(perPage)
       .skip(offset);
 
@@ -33,7 +36,10 @@ export class StoreAdsService {
   }
 
   async findOne(id: number): Promise<StoreAd> {
-    const storeAd = await this.storeAdsRepository.findOne(id);
+    const storeAd = await this.storeAdsRepository.findOne({
+      where: {id},
+      relations: ['store', 'store.storeProfile', 'store.products'],
+    });
 
     if (!storeAd) {
       throw new StoreAdNotFoundException();
