@@ -20,6 +20,8 @@ export class TagsService {
 
     if (filters.name) where.name = Like(`%${filters.name}%`);
 
+    if (filters.storeCategoryId) where.storeCategoryId = +filters.storeCategoryId;
+
     const [tags, total] = await this.tagsRepository.findAndCount({
       take: perPage,
       skip: offset,

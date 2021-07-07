@@ -3,6 +3,7 @@ import { PaginationOptions } from "src/support/pagination/pagination-options";
 type TagFilters = {
   id: string;
   name: string;
+  storeCategoryId: string;
 };
 
 export class TagPaginationOptionsDto extends PaginationOptions {
@@ -16,7 +17,8 @@ export class TagPaginationOptionsDto extends PaginationOptions {
       perPage = 10,
       id,
       name,
+      storeCategoryId,
     } = query;
-    return new TagPaginationOptionsDto(+page, +perPage, {id, name});
+    return new TagPaginationOptionsDto(+page, +perPage, {id, name, storeCategoryId});
   }
 }
