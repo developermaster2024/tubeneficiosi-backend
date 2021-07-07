@@ -1,5 +1,5 @@
 import { Exclude, Expose } from "class-transformer";
-import { IsString, MaxLength } from "class-validator";
+import { IsArray, IsString, MaxLength } from "class-validator";
 import { StoreCategory } from "src/store-categories/entities/store-category.entity";
 import { Exists } from "src/validation/exists.constrain";
 import { IsUnique } from "src/validation/is-unique.constrain";
@@ -14,6 +14,7 @@ export class CreateTagDto {
   readonly name: string;
 
   @Expose()
+  @IsArray()
   readonly parentIds: number[];
 
   @Expose()
