@@ -1,4 +1,5 @@
-import { Exclude, Expose } from "class-transformer";
+import { Exclude, Expose, Type } from "class-transformer";
+import { ReadStoreCategoryDto } from "src/store-categories/dto/read-store-categories.dto";
 
 @Exclude()
 export class ReadTagDto {
@@ -7,4 +8,8 @@ export class ReadTagDto {
 
   @Expose()
   readonly name: string;
+
+  @Expose()
+  @Type(() => ReadStoreCategoryDto)
+  readonly storeCategory: ReadStoreCategoryDto;
 }

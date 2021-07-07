@@ -26,6 +26,7 @@ export class TagsService {
       take: perPage,
       skip: offset,
       where,
+      relations: ['storeCategory'],
     });
 
     return new PaginationResult(tags, total, perPage);
@@ -42,7 +43,10 @@ export class TagsService {
   }
 
   async findOne(id: number): Promise<Tag> {
-    const tag = await this.tagsRepository.findOne(id);
+    const tag = await this.tagsRepository.findOne({
+      where: {id},
+      relations: ['storeCategory'],
+    });
 
     if (!tag) {
       throw new TagNotFoundException();
