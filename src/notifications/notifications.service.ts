@@ -8,12 +8,14 @@ import { NotificationPaginationOptionsDto } from './dto/notification-pagination-
 import { Notification } from './entities/notification.entity';
 import { UserToNotification } from './entities/user-to-notification.entity';
 import { NotificationNotFoundException } from './errors/notification-not-found.exception';
+import { NotificationsGateway } from './notifications.gateway';
 
 @Injectable()
 export class NotificationsService {
   constructor(
     @InjectRepository(Notification) private readonly notificationsRepository: Repository<Notification>,
-    @InjectRepository(User) private readonly usersRepository: Repository<User>
+    @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    private readonly notificationsGateway: NotificationsGateway
   ) {}
 
   async paginate({offset, perPage, filters}: NotificationPaginationOptionsDto): Promise<PaginationResult<Notification>> {
@@ -39,13 +41,17 @@ export class NotificationsService {
 
     const userToNotifications = users.map(user => UserToNotification.create({user}));
 
-    const notification = Notification.create({
+    let notification = Notification.create({
       message,
       role,
       userToNotifications,
     });
 
-    return await this.notificationsRepository.save(notification);
+    notification = await this.notificationsRepository.save(notification);
+
+    this.notificationsGateway.server.emit(role, notification);
+
+    return notification;
   }
 
   async findOne(id: number): Promise<Notification> {
