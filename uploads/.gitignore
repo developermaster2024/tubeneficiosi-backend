@@ -5,6 +5,7 @@
 !payment-methods/
 !products/
 !settings/
+!store-categories/
 !users/
 !stores/
 !.gitignore
