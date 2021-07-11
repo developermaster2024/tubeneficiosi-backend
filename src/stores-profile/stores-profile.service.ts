@@ -39,7 +39,6 @@ export class StoresProfileService {
     address,
     latitude,
     longitude,
-    storeCategoryId,
     ...updateStoreProfile
   }: UpdateStoreProfileDto, images: StoreImages): Promise<User> {
     const user = await this.usersRepository.findOne({
@@ -54,7 +53,6 @@ export class StoresProfileService {
     user.store.address = address;
     user.store.latitude = latitude;
     user.store.longitude = longitude;
-    user.store.storeCategoryId = storeCategoryId;
 
     if (!user.store.storeProfile) {
       user.store.storeProfile = new StoreProfile();

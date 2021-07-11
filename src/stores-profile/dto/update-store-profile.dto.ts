@@ -7,7 +7,7 @@ import { IsUnique } from "src/validation/is-unique.constrain";
 import { Not } from "typeorm";
 
 @Exclude()
-export class UpdateStoreProfileDto extends OmitType(RegisterStoreDto, ['password', 'email', 'latitude', 'longitude']) {
+export class UpdateStoreProfileDto extends OmitType(RegisterStoreDto, ['password', 'email', 'latitude', 'longitude', 'storeCategoryId']) {
   @Expose()
   readonly userId: number;
 
@@ -24,19 +24,15 @@ export class UpdateStoreProfileDto extends OmitType(RegisterStoreDto, ['password
   readonly whatsapp: string;
 
   @Expose()
-  @IsUrl()
+  @IsString()
   readonly instagram: string;
 
   @Expose()
-  @IsUrl()
+  @IsString()
   readonly facebook: string;
 
   @Expose()
-  @IsUrl()
-  readonly youtube: string;
-
-  @Expose()
-  @IsUrl()
+  @IsString()
   readonly videoUrl: string;
 
   @Expose()

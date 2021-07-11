@@ -29,12 +29,6 @@ export class StoreProfile {
   facebook: string;
 
   @Column({
-    name: 'youtube',
-    type: 'varchar',
-  })
-  youtube: string;
-
-  @Column({
     name: 'video_url',
     type: 'varchar',
   })
