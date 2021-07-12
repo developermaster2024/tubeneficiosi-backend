@@ -24,6 +24,7 @@ export class StoresService {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.store', 'store')
       .innerJoinAndSelect('store.storeProfile', 'storeProfile')
+      .innerJoinAndSelect('store.storeCategory', 'storeCategory')
       .take(perPage)
       .skip(offset);
 
@@ -93,7 +94,7 @@ export class StoresService {
   async findOne(id: number): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: {id, role: Role.STORE},
-      relations: ['store', 'store.storeProfile'],
+      relations: ['store', 'store.storeProfile', 'store.storeCategory'],
     });
 
     if (!user) {
