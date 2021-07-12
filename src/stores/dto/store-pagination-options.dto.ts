@@ -6,6 +6,7 @@ type StoreFilters = {
   email: string;
   status: string;
   phoneNumber: string;
+  storeCategoryId: string;
 };
 
 export class StorePaginationOptionsDto extends PaginationOptions {
@@ -22,7 +23,8 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       email,
       status,
       phoneNumber,
+      storeCategoryId
     } = query;
-    return new StorePaginationOptionsDto(+page, +perPage, {id, name, email, status, phoneNumber});
+    return new StorePaginationOptionsDto(+page, +perPage, {id, name, email, status, phoneNumber, storeCategoryId});
   }
 }

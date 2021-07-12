@@ -34,6 +34,8 @@ export class StoresService {
 
     if (filters.name) queryBuilder.andWhere('store.name LIKE :name', {name: `%${filters.name}%`});
 
+    if (filters.storeCategoryId) queryBuilder.andWhere('store.storeCategoryId = :storeCategoryId', {storeCategoryId: filters.storeCategoryId});
+
     if (filters.phoneNumber) queryBuilder.andWhere('store.phoneNumber LIKE :phoneNumber', {phoneNumber: `%${filters.phoneNumber}%`});
 
     // @TODO: Add status filter
