@@ -6,20 +6,20 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { FileToBodyInterceptor } from 'src/support/interceptors/file-to-body.interceptor';
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
-import { PaginationPipe } from 'src/support/pagination/pagination-pipe';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
 import { CreateHelpCategoryDto } from './dto/create-help-category.dto';
 import { ReadHelpCategoryDto } from './dto/read-help-category.dto';
 import { UpdateHelpCategoryDto } from './dto/update-help-category.dto';
 import { HelpCategoriesService } from './help-categories.service';
+import { HelpCategoryPaginationPipe } from './pipes/help-category-pagination.pipe';
 
 @Controller('help-categories')
 export class HelpCategoriesController {
   constructor(private readonly helpCategoriesService: HelpCategoriesService) {}
 
   @Get()
-  async paginate(@Query(PaginationPipe) options: any): Promise<PaginationResult<ReadHelpCategoryDto>> {
+  async paginate(@Query(HelpCategoryPaginationPipe) options: any): Promise<PaginationResult<ReadHelpCategoryDto>> {
     return (await this.helpCategoriesService.paginate(options)).toClass(ReadHelpCategoryDto);
   }
 

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginationOptions } from 'src/support/pagination/pagination-options';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
-import { Repository } from 'typeorm';
+import { FindConditions, Like, Repository } from 'typeorm';
 import { CreateHelpCategoryDto } from './dto/create-help-category.dto';
+import { HelpCategoryPaginationOptionsDto } from './dto/help-category-pagination-options.dto';
 import { UpdateHelpCategoryDto } from './dto/update-help-category.dto';
 import { HelpCategory } from './entities/help-category.entity';
 import { HelpCategoryNotFoundException } from './errors/help-category-not-found.exception';
@@ -12,13 +12,21 @@ import { HelpCategoryNotFoundException } from './errors/help-category-not-found.
 export class HelpCategoriesService {
   constructor(@InjectRepository(HelpCategory) private readonly helpCategoriesRepository: Repository<HelpCategory>) {}
 
-  async paginate(options: PaginationOptions): Promise<PaginationResult<HelpCategory>> {
+  async paginate({offset, perPage, filters}: HelpCategoryPaginationOptionsDto): Promise<PaginationResult<HelpCategory>> {
+    const where: FindConditions<HelpCategory> = {};
+
+    // @ts-ignore
+    if (filters.id) where.id = +filters.id;
+
+    if (filters.name) where.name = Like(`%${filters.name}%`);
+
     const [helpCategories, total] = await this.helpCategoriesRepository.findAndCount({
-      take: options.perPage,
-      skip: options.offset,
+      take: perPage,
+      skip: offset,
+      where,
     });
 
-    return new PaginationResult(helpCategories, total, options.perPage);
+    return new PaginationResult(helpCategories, total, perPage);
   }
 
   async create({icon, ...createHelpCategoryDto}: CreateHelpCategoryDto): Promise<HelpCategory> {
