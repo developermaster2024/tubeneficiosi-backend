@@ -1,10 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { InjectEntityManager } from "@nestjs/typeorm";
 import { registerDecorator, ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
-import { EntityManager, ObjectType } from "typeorm";
+import { EntityManager, FindOneOptions, ObjectType } from "typeorm";
+
+type FindOptionsFactory = (value: any, object: Object) => FindOneOptions;
 
 interface ExistsValidationArguments<T> extends ValidationArguments {
-  constraints: [ObjectType<T>, string?];
+  constraints: [ObjectType<T>, string?, FindOptionsFactory?];
 }
 
 @ValidatorConstraint({
@@ -18,14 +20,16 @@ export class ExistsConstrain implements ValidatorConstraintInterface {
     private entityManager: EntityManager
   ) {}
 
-  async validate<T>(value: any, { property, constraints }: ExistsValidationArguments<T>): Promise<boolean> {
-    const [EntityType, entityPropertyName = 'id'] = constraints;
+  async validate<T>(value: any, { constraints, object }: ExistsValidationArguments<T>): Promise<boolean> {
+    const [EntityType, entityPropertyName = 'id', findConditionsFactory] = constraints;
+
+    const findConditions = typeof findConditionsFactory === 'function'
+      ? findConditionsFactory(value, object)
+      : { [entityPropertyName]: value };
 
     const count = await this.entityManager
       .getRepository(EntityType)
-      .count({
-        [entityPropertyName]: value
-      });
+      .count(findConditions);
 
     return count > 0;
   }
@@ -35,13 +39,13 @@ export class ExistsConstrain implements ValidatorConstraintInterface {
   }
 }
 
-export const Exists = <T>(entityType: ObjectType<T>, entityPropertyName?: string, validationOptions?: ValidationOptions) => {
+export const Exists = <T>(entityType: ObjectType<T>, entityPropertyName?: string, findConditionsFactory?: FindOptionsFactory, validationOptions?: ValidationOptions) => {
   return (object: Object, propertyName: string) => {
     registerDecorator({
       target: object.constructor,
       propertyName,
       options: validationOptions,
-      constraints: [entityType, entityPropertyName],
+      constraints: [entityType, entityPropertyName, findConditionsFactory],
       validator: ExistsConstrain,
     });
   };

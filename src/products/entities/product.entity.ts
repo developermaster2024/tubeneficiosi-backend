@@ -71,6 +71,13 @@ export class Product {
   @JoinColumn({name: 'brand_id'})
   brand: Brand;
 
+  @Column({
+    name: 'store_id',
+    type: 'int',
+    select: false,
+  })
+  storeId: number;
+
   @ManyToOne(() => Store, {nullable: false})
   @JoinColumn({name: 'store_id'})
   store: Store;
@@ -128,6 +135,10 @@ export class Product {
     select: false
   })
   deletedAt: Date;
+
+  get finalPrice(): number {
+    return this.price;
+  }
 
   static create(data: Partial<Product>): Product {
     return Object.assign(new Product(), data);
