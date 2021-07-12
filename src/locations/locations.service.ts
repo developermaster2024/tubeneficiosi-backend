@@ -18,7 +18,7 @@ export class LocationsService {
     // @ts-ignore
     if (filters.id) where.id = +filters.id;
 
-    if (filters.name) where.name = Like(`%${where.name}%`);
+    if (filters.name) where.name = Like(`%${filters.name}%`);
 
     if (filters.parentId) where.parentId = +filters.parentId;
 
