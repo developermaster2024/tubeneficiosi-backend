@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { parse } from 'date-fns';
 import { Client } from 'src/clients/entities/client.entity';
+import { StoreHour } from 'src/store-hours/entities/store-hour.entity';
 import { Store } from 'src/stores/entities/store.entity';
 import { HashingService } from 'src/support/hashing.service';
+import { Days } from 'src/support/types/days.enum';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/roles.enum';
 import { Repository } from 'typeorm';
@@ -16,6 +19,7 @@ type RegisterResponse = {user: User; accessToken: string};
 export class AuthService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    @InjectRepository(StoreHour) private readonly storeHourRepository: Repository<StoreHour>,
     private readonly jwtService: JwtService,
     private readonly hashingService: HashingService,
   ) {}
@@ -82,6 +86,16 @@ export class AuthService {
     });
 
     user = await this.usersRepository.save(user);
+
+    const storeHours = Object.keys(Days).filter(key => key !== Days.SATURDAY && key !== Days.SUNDAY).map(key => StoreHour.create({
+      day: Days[key],
+      isWorkingDay: true,
+      startTime: parse('08:00:00', 'HH:mm:ss', new Date()),
+      endTime: parse('16:30:00', 'HH:mm:ss', new Date()),
+      store: user.store,
+    }));
+
+    await this.storeHourRepository.save(storeHours);
 
     const {password: hashedPassword, ...userWithoutPassword} = user;
 

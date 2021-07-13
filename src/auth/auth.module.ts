@@ -11,10 +11,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { LocalStoreStrategy } from './passport-strategies/local-store.strategy';
 import { LocalAdminStrategy } from './passport-strategies/local-admin.strategy';
+import { StoreHour } from 'src/store-hours/entities/store-hour.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, StoreHour]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
