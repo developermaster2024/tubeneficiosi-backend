@@ -7,3 +7,5 @@ export enum Days {
   SATURDAY = 'SATURDAY',
   SUNDAY = 'SUNDAY',
 }
+
+export const DaysValues = Object.values(Days);

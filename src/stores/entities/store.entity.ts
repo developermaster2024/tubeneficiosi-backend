@@ -1,5 +1,6 @@
 import { Product } from "src/products/entities/product.entity";
 import { StoreCategory } from "src/store-categories/entities/store-category.entity";
+import { StoreHour } from "src/store-hours/entities/store-hour.entity";
 import { User } from "src/users/entities/user.entity";
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { StoreProfile } from "./store-profile.entity";
@@ -87,6 +88,9 @@ export class Store {
 
   @OneToMany(() => Product, product => product.store)
   products: Product[];
+
+  @OneToMany(() => StoreHour, storeHour => storeHour.store, {cascade: ['insert', 'update']})
+  storeHours: StoreHour[];
 
   static create(data: Partial<Store>): Store {
     return Object.assign(new Store, data);
