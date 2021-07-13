@@ -20,11 +20,11 @@ export class ReadStoreDto extends OmitType(ReadUserDto, ['role']) {
   readonly address: string;
 
   @Expose()
-  @Transform(({obj}: {obj: User}) => obj.store.latitude)
+  @Transform(({obj}: {obj: User}) => Number(obj.store.latitude))
   readonly latitude: string;
 
   @Expose()
-  @Transform(({obj}: {obj: User}) => obj.store.longitude)
+  @Transform(({obj}: {obj: User}) => Number(obj.store.longitude))
   readonly longitude: string;
 
   @Expose()
