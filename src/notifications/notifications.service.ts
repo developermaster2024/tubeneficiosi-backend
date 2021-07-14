@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { User } from 'src/users/entities/user.entity';
-import { FindConditions, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { NotificationPaginationOptionsDto } from './dto/notification-pagination-options.dto';
 import { Notification } from './entities/notification.entity';
@@ -19,16 +19,17 @@ export class NotificationsService {
   ) {}
 
   async paginate({offset, perPage, filters}: NotificationPaginationOptionsDto): Promise<PaginationResult<Notification>> {
-    const where: FindConditions<Notification> = {};
+    const queryBuilder = this.notificationsRepository.createQueryBuilder('notification')
+      .take(perPage)
+      .skip(offset);
 
-    // @ts-ignore
-    if (filters.id) where.id = +filters.id;
+    if (filters.id) queryBuilder.andWhere('notification.id = :id', {id: filters.id});
 
-    const [notifications, total] = await this.notificationsRepository.findAndCount({
-      take: perPage,
-      skip: offset,
-      where,
-    });
+    if (filters.from) queryBuilder.andWhere('notification.createdAt >= :from', {from: filters.from});
+
+    if (filters.until) queryBuilder.andWhere('notification.createdAt <= :until', {until: filters.until});
+
+    const [notifications, total] = await queryBuilder.getManyAndCount();
 
     return new PaginationResult(notifications, total, perPage);
   }
