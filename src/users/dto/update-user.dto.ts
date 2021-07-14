@@ -22,7 +22,7 @@ export class UpdateUserDto extends OmitType(CreateUserDto, ['email', 'password']
   @Expose()
   @MaxLength(255)
   @IsPhoneNumber()
-  readonly phoneNombre: string;
+  readonly phoneNumber: string;
 
   @Expose()
   @MaxLength(255)

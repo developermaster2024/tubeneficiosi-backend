@@ -46,14 +46,14 @@ export class UsersService {
     return new PaginationResult(users, total, perPage);
   }
 
-  async create({name, password, ...createUserDto}: CreateUserDto): Promise<User> {
+  async create({name, image, password, ...createUserDto}: CreateUserDto): Promise<User> {
     const user = plainToClass(User, {
       ...createUserDto,
       role: Role.ADMIN,
-      password: await this.hashingService.make(password)
+      password: await this.hashingService.make(password),
     });
 
-    user.admin = Admin.create({name});
+    user.admin = Admin.create({name, imgPath: image.path});
 
     return await this.usersRepository.save(user);
   }
@@ -77,12 +77,16 @@ export class UsersService {
     return user;
   }
 
-  async update({id, email, ...adminData}: UpdateUserDto): Promise<User> {
+  async update({id, email, image, ...adminData}: UpdateUserDto): Promise<User> {
     const user = await this.findOne(+id);
 
     Object.assign(user, {email});
 
     Object.assign(user.admin, adminData);
+
+    if (image) {
+      user.admin.imgPath = image.path;
+    }
 
     return await this.usersRepository.save(user);
   }

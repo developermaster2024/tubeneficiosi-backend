@@ -15,4 +15,8 @@ export class ReadAdminDto extends OmitType(ReadUserDto, [] as const) {
   @Expose()
   @Transform(({obj}) => obj.admin ? obj.admin.address : null)
   readonly address: string;
+
+  @Expose()
+  @Transform(({obj}) => obj.admin ? obj.admin.imgPath : null)
+  readonly imgPath: string;
 }

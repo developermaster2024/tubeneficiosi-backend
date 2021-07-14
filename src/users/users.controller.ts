@@ -1,8 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { FileToBodyInterceptor } from 'src/support/interceptors/file-to-body.interceptor';
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -28,6 +30,7 @@ export class UsersController {
   @Post()
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
+  @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'))
   async create(@Body() createUserDto: CreateUserDto): Promise<ReadAdminDto> {
     return plainToClass(ReadAdminDto, await this.usersService.create(createUserDto));
   }
@@ -42,7 +45,7 @@ export class UsersController {
   @Put(':id')
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
-  @UseInterceptors(new ParamsToBodyInterceptor({id: 'id'}))
+  @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'), new ParamsToBodyInterceptor({id: 'id'}))
   async update(@Body() updateUserDto: UpdateUserDto): Promise<ReadAdminDto> {
     return plainToClass(ReadAdminDto, await this.usersService.update(updateUserDto));
   }

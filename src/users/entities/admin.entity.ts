@@ -29,6 +29,13 @@ export class Admin {
   })
   address: string;
 
+  @Column({
+    name: 'img_path',
+    type: 'varchar',
+    nullable: true,
+  })
+  imgPath: string;
+
   static create(data: Partial<Admin>): Admin {
     return Object.assign(new Admin(), data);
   }
