@@ -8,7 +8,7 @@ import { Store } from "../entities/store.entity";
 import { CreateStoreDto } from "./create-store.dto";
 
 @Exclude()
-export class UpdateStoreDto extends OmitType(CreateStoreDto, ['email', 'name', 'password'] as const) {
+export class UpdateStoreDto extends OmitType(CreateStoreDto, ['email', 'name', 'password', 'storeCategoryId'] as const) {
   @Expose()
   readonly id: string;
 
