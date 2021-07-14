@@ -1,7 +1,9 @@
 import { Exclude, Expose, Transform, Type } from "class-transformer";
 import { IsEmail, IsNumber, IsPhoneNumber, IsString, IsUrl, Max, MaxLength, Min, MinLength } from "class-validator";
 import { StoreCategory } from "src/store-categories/entities/store-category.entity";
+import { UserStatus } from "src/users/entities/user-status.entity";
 import { User } from "src/users/entities/user.entity";
+import { UserStatuses } from "src/users/enums/user-statuses.enum";
 import { Exists } from "src/validation/exists.constrain";
 import { IsUnique } from "src/validation/is-unique.constrain";
 import { Store } from "../entities/store.entity";
@@ -20,8 +22,8 @@ export class CreateStoreDto {
   readonly password: string;
 
   @Expose()
-  @Transform(({value}) => value === 'on')
-  readonly isActive: boolean;
+  @Exists(UserStatus, 'code')
+  readonly userStatusCode: UserStatuses;
 
   @Expose()
   @IsString()

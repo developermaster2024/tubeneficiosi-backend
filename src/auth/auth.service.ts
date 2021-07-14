@@ -9,6 +9,7 @@ import { HashingService } from 'src/support/hashing.service';
 import { Days } from 'src/support/types/days.enum';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/roles.enum';
+import { UserStatuses } from 'src/users/enums/user-statuses.enum';
 import { Repository } from 'typeorm';
 import { RegisterClientDto } from './dto/register-client.dto';
 import { RegisterStoreDto } from './dto/register-store.dto';
@@ -27,7 +28,7 @@ export class AuthService {
   async validateUser(email: string, password: string, role: Role): Promise<Partial<User>> {
     const user = await this.usersRepository.findOne({
       where: {email, role},
-      relations: ['client', 'store'],
+      relations: ['client', 'store', 'userStatus'],
     });
 
     if (!user) {
@@ -57,6 +58,7 @@ export class AuthService {
       ...registerUserDto,
       password: await this.hashingService.make(registerUserDto.password),
       role: Role.CLIENT,
+      userStatusCode: UserStatuses.ACTIVE,
     });
 
     user.client = Object.assign(new Client(), {name, phoneNumber});
@@ -76,6 +78,7 @@ export class AuthService {
       email,
       password: await this.hashingService.make(password),
       role: Role.STORE,
+      userStatusCode: UserStatuses.ACTIVE,
     });
 
     user.store = Store.create({

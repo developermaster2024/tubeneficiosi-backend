@@ -6,6 +6,7 @@ type ClientFilters = {
   email: string;
   status: string;
   phoneNumber: string;
+  userStatusCode: string;
 };
 
 export class ClientPaginationOptionsDto extends PaginationOptions {
@@ -22,7 +23,8 @@ export class ClientPaginationOptionsDto extends PaginationOptions {
       email,
       status,
       phoneNumber,
+      userStatusCode,
     } = query;
-    return new ClientPaginationOptionsDto(+page, +perPage, {id, name, email, status, phoneNumber});
+    return new ClientPaginationOptionsDto(+page, +perPage, {id, name, email, status, phoneNumber, userStatusCode});
   }
 }

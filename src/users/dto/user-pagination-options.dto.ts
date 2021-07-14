@@ -5,6 +5,7 @@ type UserFilters = {
   email: string;
   status: string;
   name: string;
+  userStatusCode: string;
 };
 
 export class UserPaginationOptionsDto extends PaginationOptions {
@@ -20,7 +21,8 @@ export class UserPaginationOptionsDto extends PaginationOptions {
       email,
       name,
       status,
+      userStatusCode,
     } = query;
-    return new UserPaginationOptionsDto(+page, +perPage, {id, email, name, status});
+    return new UserPaginationOptionsDto(+page, +perPage, {id, email, name, status, userStatusCode});
   }
 }

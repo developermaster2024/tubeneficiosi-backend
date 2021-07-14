@@ -1,8 +1,9 @@
 import { Client } from "src/clients/entities/client.entity";
 import { Store } from "src/stores/entities/store.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Role } from "../enums/roles.enum";
 import { Admin } from "./admin.entity";
+import { UserStatus } from "./user-status.entity";
 
 @Entity({
   name: 'users',
@@ -27,18 +28,23 @@ export class User {
   password: string;
 
   @Column({
-    name: 'is_active',
-    type: 'boolean',
-    default: true,
-  })
-  isActive: boolean;
-
-  @Column({
     name: 'role',
     type: 'varchar',
     length: 50,
   })
   role: Role;
+
+  @Column({
+    name: 'user_status_code',
+    type: 'varchar',
+    length: 20,
+    select: false,
+  })
+  userStatusCode: string;
+
+  @ManyToOne(() => UserStatus, {nullable: false, onDelete: 'CASCADE', eager: true})
+  @JoinColumn({name: 'user_status_code'})
+  userStatus: UserStatus;
 
   @OneToOne(() => Client, client => client.user, {
     cascade: ['insert', 'update']

@@ -1,6 +1,9 @@
 import { Exclude, Expose, Transform } from "class-transformer";
 import { IsEmail, IsPhoneNumber, IsString, MaxLength, MinLength } from "class-validator";
+import { UserStatus } from "src/users/entities/user-status.entity";
 import { User } from "src/users/entities/user.entity";
+import { UserStatuses } from "src/users/enums/user-statuses.enum";
+import { Exists } from "src/validation/exists.constrain";
 import { IsUnique } from "src/validation/is-unique.constrain";
 import { IsMimeType } from "src/validation/mime-type.constrain";
 
@@ -24,8 +27,8 @@ export class CreateClientDto {
   readonly name: string;
 
   @Expose()
-  @Transform(({value}) => value === 'on')
-  readonly isActive: boolean;
+  @Exists(UserStatus, 'code')
+  readonly userStatusCode: UserStatuses;
 
   @Expose()
   @IsPhoneNumber()

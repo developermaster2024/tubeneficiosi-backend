@@ -1,4 +1,5 @@
 import { Exclude, Expose } from "class-transformer";
+import { UserStatus } from "../entities/user-status.entity";
 import { Role } from "../enums/roles.enum";
 
 @Exclude()
@@ -14,4 +15,7 @@ export class ReadUserDto {
 
   @Expose()
   readonly role: Role;
+
+  @Expose()
+  readonly userStatus: UserStatus;
 }

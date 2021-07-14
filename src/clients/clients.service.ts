@@ -22,10 +22,13 @@ export class ClientsService {
   async paginate({offset, perPage, filters}: ClientPaginationOptionsDto): Promise<PaginationResult<User>> {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.client', 'client')
+      .innerJoinAndSelect('user.userStatus', 'userStatus')
       .take(perPage)
       .skip(offset);
 
     if (filters.id) queryBuilder.andWhere('user.id = :id', {id: filters.id});
+
+    if (filters.userStatusCode) queryBuilder.andWhere('user.userStatusCode = :userStatusCode', {userStatusCode: filters.userStatusCode});
 
     if (filters.email) queryBuilder.andWhere('user.email LIKE :email', {email: `%${filters.email}%`});
 
@@ -57,7 +60,7 @@ export class ClientsService {
   async findOne(id: number): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: {id, role: Role.CLIENT},
-      relations: ['client'],
+      relations: ['client', 'userStatus'],
     });
 
     if (!user) {

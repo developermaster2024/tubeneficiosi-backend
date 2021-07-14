@@ -28,6 +28,8 @@ export class UsersService {
     // @ts-ignore
     if (filters.id) where.id = +filters.id;
 
+    if (filters.userStatusCode) where.userStatusCode = filters.userStatusCode;
+
     if (filters.email) where.email = Like(`%${filters.email}%`);
 
     if (filters.name) where.admin = {name: Like(`%${filters.name}%`)};
@@ -44,9 +46,9 @@ export class UsersService {
     return new PaginationResult(users, total, perPage);
   }
 
-  async create({name, email, password}: CreateUserDto): Promise<User> {
+  async create({name, password, ...createUserDto}: CreateUserDto): Promise<User> {
     const user = plainToClass(User, {
-      email,
+      ...createUserDto,
       role: Role.ADMIN,
       password: await this.hashingService.make(password)
     });

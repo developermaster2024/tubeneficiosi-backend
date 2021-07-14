@@ -23,6 +23,7 @@ export class StoresService {
 
   async paginate({offset, perPage, filters}: StorePaginationOptionsDto): Promise<PaginationResult<User>> {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
+      .innerJoinAndSelect('user.userStatus', 'userStatus')
       .innerJoinAndSelect('user.store', 'store')
       .innerJoinAndSelect('store.storeProfile', 'storeProfile')
       .innerJoinAndSelect('store.storeCategory', 'storeCategory')
@@ -30,6 +31,8 @@ export class StoresService {
       .skip(offset);
 
     if (filters.id) queryBuilder.andWhere('user.id = :id', {id: filters.id});
+
+    if (filters.userStatusCode) queryBuilder.andWhere('user.userStatusCode = :userStatusCode', {userStatusCode: filters.userStatusCode});
 
     if (filters.email) queryBuilder.andWhere('user.email LIKE :email', {email: `%${filters.email}%`});
 
@@ -51,7 +54,7 @@ export class StoresService {
     {
       email,
       password,
-      isActive,
+      userStatusCode,
       name,
       phoneNumber,
       address,
@@ -65,7 +68,7 @@ export class StoresService {
     const user = User.create({
       email,
       password: await this.hashingService.make(password),
-      isActive,
+      userStatusCode,
       role: Role.STORE,
     });
 
@@ -99,7 +102,7 @@ export class StoresService {
   async findOne(id: number): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: {id, role: Role.STORE},
-      relations: ['store', 'store.storeProfile', 'store.storeCategory'],
+      relations: ['userStatus', 'store', 'store.storeProfile', 'store.storeCategory'],
     });
 
     if (!user) {
@@ -113,7 +116,7 @@ export class StoresService {
     {
       id,
       email,
-      isActive,
+      userStatusCode,
       name,
       phoneNumber,
       address,
@@ -125,7 +128,7 @@ export class StoresService {
   ): Promise<User> {
     const user = await this.findOne(+id);
 
-    Object.assign(user, {email, isActive});
+    Object.assign(user, {email, userStatusCode});
 
     Object.assign(user.store, {
       name,
