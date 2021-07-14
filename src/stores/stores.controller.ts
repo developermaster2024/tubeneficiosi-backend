@@ -9,6 +9,7 @@ import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { ReadStoreDto } from './dto/read-store.dto';
+import { UpdateStorePasswordDto } from './dto/update-store-password.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
 import { StorePaginationPipe } from './pipes/store-pagination.pipe';
 import { StoresService } from './stores.service';
@@ -71,6 +72,14 @@ export class StoresController {
       logo: images?.logo?.[0]?.path,
       frontImage: images?.frontImage?.[0]?.path,
     }));
+  }
+
+  @Put(':id/password')
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  @UseInterceptors(new ParamsToBodyInterceptor({id: 'id'}))
+  async updatePassword(@Body() updateStorePasswordDto: UpdateStorePasswordDto): Promise<ReadStoreDto> {
+    return plainToClass(ReadStoreDto, await this.storesService.updatePassword(updateStorePasswordDto));
   }
 
   @Delete(':id')

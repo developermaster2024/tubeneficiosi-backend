@@ -8,6 +8,7 @@ import { Role } from 'src/users/enums/roles.enum';
 import { Repository } from 'typeorm';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { StorePaginationOptionsDto } from './dto/store-pagination-options.dto';
+import { UpdateStorePasswordDto } from './dto/update-store-password.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
 import { StoreProfile } from './entities/store-profile.entity';
 import { Store } from './entities/store.entity';
@@ -152,6 +153,14 @@ export class StoresService {
     if (images.frontImage) {
       user.store.storeProfile.frontImage = images.frontImage;
     }
+
+    return await this.usersRepository.save(user);
+  }
+
+  async updatePassword({id, ...updateStorePasswordDto}: UpdateStorePasswordDto): Promise<User> {
+    const user = await this.findOne(+id);
+
+    user.password = await this.hashingService.make(updateStorePasswordDto.password);
 
     return await this.usersRepository.save(user);
   }
