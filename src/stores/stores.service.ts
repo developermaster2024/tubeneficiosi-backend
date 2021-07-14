@@ -45,6 +45,7 @@ export class StoresService {
     return new PaginationResult(stores, total, perPage);
   }
 
+  // @TODO - ESTO ESTA ROTO
   async create(
     {
       email,
@@ -76,6 +77,7 @@ export class StoresService {
       location: `POINT(${latitude} ${longitude})`,
       storeCategoryId,
       storeProfile: StoreProfile.create(createStoreProfileData)
+      // @TODO - Agregar horarios
     });
 
     if (images.banner) {
