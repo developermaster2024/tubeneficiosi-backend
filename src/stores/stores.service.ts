@@ -116,7 +116,6 @@ export class StoresService {
       address,
       latitude,
       longitude,
-      storeCategoryId,
       ...updateStoreProfileData
     }: UpdateStoreDto,
     images: StoreImages
@@ -132,7 +131,6 @@ export class StoresService {
       latitude,
       longitude,
       location: `POINT(${latitude} ${longitude})`,
-      storeCategoryId,
     });
 
     if (!user.store.storeProfile) {

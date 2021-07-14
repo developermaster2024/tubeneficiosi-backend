@@ -57,10 +57,6 @@ export class CreateStoreDto {
 
   @Expose()
   @IsUrl()
-  readonly youtube: string;
-
-  @Expose()
-  @IsUrl()
   readonly videoUrl: string;
 
   @Expose()
