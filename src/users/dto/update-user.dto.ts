@@ -1,6 +1,6 @@
 import { OmitType } from "@nestjs/mapped-types";
 import { Exclude, Expose } from "class-transformer";
-import { IsEmail, IsPhoneNumber, MaxLength } from "class-validator";
+import { IsEmail, IsPhoneNumber, MaxLength, ValidateIf } from "class-validator";
 import { Exists } from "src/validation/exists.constrain";
 import { IsUnique } from "src/validation/is-unique.constrain";
 import { IsMimeType } from "src/validation/mime-type.constrain";
@@ -37,6 +37,7 @@ export class UpdateUserDto extends OmitType(CreateUserDto, ['email', 'password']
   readonly userStatusCode: UserStatuses;
 
   @Expose()
+  @ValidateIf((obj) => obj.image)
   @IsMimeType(['image/jpeg', 'image/png'])
   readonly image: Express.Multer.File;
 }
