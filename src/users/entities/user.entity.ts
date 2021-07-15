@@ -3,7 +3,7 @@ import { Store } from "src/stores/entities/store.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Role } from "../enums/roles.enum";
 import { Admin } from "./admin.entity";
-import { UserStatus } from "./user-status.entity";
+import { UserStatus } from "../../user-statuses/entities/user-status.entity";
 
 @Entity({
   name: 'users',

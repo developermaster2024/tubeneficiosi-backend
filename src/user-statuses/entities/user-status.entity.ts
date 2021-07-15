@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
-import { UserStatuses } from "../enums/user-statuses.enum";
+import { UserStatuses } from "../../users/enums/user-statuses.enum";
 
 @Entity({
   name: 'user_statuses',

@@ -33,6 +33,7 @@ import { StoreAdsModule } from './store-ads/store-ads.module';
 import { StoreCategoriesModule } from './store-categories/store-categories.module';
 import { CartsModule } from './carts/carts.module';
 import { StoreHoursModule } from './store-hours/store-hours.module';
+import { UserStatusesModule } from './user-statuses/user-statuses.module';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { StoreHoursModule } from './store-hours/store-hours.module';
     StoreCategoriesModule,
     CartsModule,
     StoreHoursModule,
+    UserStatusesModule,
   ],
 })
 export class AppModule {}

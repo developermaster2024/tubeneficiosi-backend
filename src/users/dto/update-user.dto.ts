@@ -5,7 +5,7 @@ import { Exists } from "src/validation/exists.constrain";
 import { IsUnique } from "src/validation/is-unique.constrain";
 import { IsMimeType } from "src/validation/mime-type.constrain";
 import { Not } from "typeorm";
-import { UserStatus } from "../entities/user-status.entity";
+import { UserStatus } from "../../user-statuses/entities/user-status.entity";
 import { User } from "../entities/user.entity";
 import { UserStatuses } from "../enums/user-statuses.enum";
 import { CreateUserDto } from "./create-user.dto";

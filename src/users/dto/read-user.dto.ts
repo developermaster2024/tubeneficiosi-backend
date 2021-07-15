@@ -1,5 +1,5 @@
 import { Exclude, Expose } from "class-transformer";
-import { UserStatus } from "../entities/user-status.entity";
+import { UserStatus } from "../../user-statuses/entities/user-status.entity";
 import { Role } from "../enums/roles.enum";
 
 @Exclude()
