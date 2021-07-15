@@ -11,6 +11,7 @@ import { UserPaginationOptionsDto } from './dto/user-pagination-options.dto';
 import { Admin } from './entities/admin.entity';
 import { User } from './entities/user.entity';
 import { Role } from './enums/roles.enum';
+import { UserStatuses } from './enums/user-statuses.enum';
 import { UserNotFoundException } from './errors/user-not-found.exception';
 
 @Injectable()
@@ -46,14 +47,15 @@ export class UsersService {
     return new PaginationResult(users, total, perPage);
   }
 
-  async create({name, image, password, ...createUserDto}: CreateUserDto): Promise<User> {
-    const user = plainToClass(User, {
+  async create({name, password, ...createUserDto}: CreateUserDto): Promise<User> {
+    const user = User.create({
       ...createUserDto,
       role: Role.ADMIN,
       password: await this.hashingService.make(password),
+      userStatusCode: UserStatuses.ACTIVE,
     });
 
-    user.admin = Admin.create({name, imgPath: image.path});
+    user.admin = Admin.create({name});
 
     return await this.usersRepository.save(user);
   }
