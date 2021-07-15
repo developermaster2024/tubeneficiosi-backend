@@ -1,10 +1,13 @@
 import { OmitType } from "@nestjs/mapped-types";
 import { Exclude, Expose } from "class-transformer";
 import { IsEmail, IsPhoneNumber, MaxLength } from "class-validator";
+import { Exists } from "src/validation/exists.constrain";
 import { IsUnique } from "src/validation/is-unique.constrain";
 import { IsMimeType } from "src/validation/mime-type.constrain";
 import { Not } from "typeorm";
+import { UserStatus } from "../entities/user-status.entity";
 import { User } from "../entities/user.entity";
+import { UserStatuses } from "../enums/user-statuses.enum";
 import { CreateUserDto } from "./create-user.dto";
 
 @Exclude()
@@ -28,6 +31,10 @@ export class UpdateUserDto extends OmitType(CreateUserDto, ['email', 'password']
   @Expose()
   @MaxLength(255)
   readonly address: string;
+
+  @Expose()
+  @Exists(UserStatus, 'code')
+  readonly userStatusCode: UserStatuses;
 
   @Expose()
   @IsMimeType(['image/jpeg', 'image/png'])
