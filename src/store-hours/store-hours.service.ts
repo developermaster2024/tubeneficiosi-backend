@@ -43,7 +43,8 @@ export class StoreHoursService {
     const queryBuilder = this.storeHoursService.createQueryBuilder('storeHour')
       .innerJoin('storeHour.store', 'store')
       .innerJoin('store.user', 'user')
-      .andWhere('user.id = :userId', {userId});
+      .andWhere('user.id = :userId', {userId})
+      .andWhere('storeHour.day = :day', {day});
 
     const storeHour = await queryBuilder.getOne();
 
