@@ -18,12 +18,8 @@ export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Get()
-  @UseInterceptors(new JwtUserToBodyInterceptor())
-  async paginate(
-    @Body('userId') userId: number,
-    @Query(CategoryPaginationPipe) options: any
-  ): Promise<PaginationResult<ReadCategoryDto>> {
-    return (await this.categoriesService.paginate(options, userId)).toClass(ReadCategoryDto);
+  async paginate(@Query(CategoryPaginationPipe) options: any): Promise<PaginationResult<ReadCategoryDto>> {
+    return (await this.categoriesService.paginate(options)).toClass(ReadCategoryDto);
   }
 
   @Post()

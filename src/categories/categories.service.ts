@@ -17,23 +17,19 @@ export class CategoriesService {
     @InjectRepository(Category) private readonly categoriesRepository: Repository<Category>
   ) {}
 
-  async paginate({perPage, offset, filters}: CategoryPaginationOptionsDto, userId: number): Promise<PaginationResult<Category>> {
-    const store = await this.findStoreByUserId(userId);
+  async paginate({perPage, offset, filters}: CategoryPaginationOptionsDto): Promise<PaginationResult<Category>> {
+    const queryBuilder = this.categoriesRepository.createQueryBuilder('category')
+      .take(perPage)
+      .skip(offset)
+      .innerJoin('category.store', 'store');
 
-    const where: FindConditions<Category> = {
-      store,
-    };
+    if (filters.id) queryBuilder.andWhere('category.id = :id', {id: filters.id});
 
-    // @ts-ignore: set id filter
-    if (filters.id) where.id = +filters.id;
+    if (filters.name) queryBuilder.andWhere('category.name LIKE :name', {name: `%${filters.name}%`});
 
-    if (filters.name) where.name = Like(`%${filters.name}%`);
+    if (filters.storeId) queryBuilder.andWhere('store.userId = :storeId', {storeId: filters.storeId});
 
-    const [categories, total] = await this.categoriesRepository.findAndCount({
-      take: perPage,
-      skip: offset,
-      where,
-    });
+    const [categories, total] = await queryBuilder.getManyAndCount();
 
     return new PaginationResult(categories, total, perPage);
   }
