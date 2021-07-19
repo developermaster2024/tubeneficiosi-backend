@@ -16,15 +16,17 @@ export class Category {
   })
   name: string;
 
-  @ManyToMany(() => Category, {
-    cascade: ['insert', 'update']
+  @Column({
+    name: 'parent_id',
+    type: 'int',
+    nullable: true,
+    select: false,
   })
-  @JoinTable({
-    joinColumn: {name: 'parent_category_id'},
-    inverseJoinColumn: {name: 'child_category_id'},
-    name: 'category_category',
-  })
-  parentCategories: Category[];
+  parentId: number;
+
+  @ManyToOne(() => Category, {nullable: true, onDelete: 'CASCADE'})
+  @JoinColumn({name: 'parent_id'})
+  parentCategory: Category;
 
   @ManyToOne(() => Store, {nullable: false, onDelete: 'CASCADE'})
   @JoinColumn({name: 'store_id'})

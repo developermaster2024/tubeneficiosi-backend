@@ -34,14 +34,10 @@ export class CategoriesService {
     return new PaginationResult(categories, total, perPage);
   }
 
-  async create({parentIds, userId, name}: CreateCategoryDto): Promise<Category> {
+  async create({userId, ...createCategoryDto}: CreateCategoryDto): Promise<Category> {
     const store = await this.findStoreByUserId(userId);
 
-    const parentCategories = parentIds.length === 0 ? [] : await this.categoriesRepository.find({
-      where: {id: In(parentIds)}
-    });
-
-    const category = Category.create({name, store, parentCategories});
+    const category = Category.create({...createCategoryDto, store});
 
     return await this.categoriesRepository.save(category);
   }
@@ -68,14 +64,10 @@ export class CategoriesService {
     return category;
   }
 
-  async udpate({id, userId, parentIds, name}: UpdateCategoryDto): Promise<Category> {
+  async udpate({id, userId, ...updateCategoryDto}: UpdateCategoryDto): Promise<Category> {
     const category = await this.findOne(id, userId);
 
-    const parentCategories = parentIds.length === 0 ? [] : await this.categoriesRepository.find({
-      where: {id: In(parentIds)}
-    });
-
-    Object.assign(category, {name, parentCategories});
+    Object.assign(category, {...updateCategoryDto});
 
     return await this.categoriesRepository.save(category);
   }
