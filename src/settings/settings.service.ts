@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CreateFooterWidgetDto } from './dto/create-footer-widget.dto';
 import { UpdateBusinessInfoDto } from './dto/udpate-business-info.dto';
 import { UpdateAppSectionDto } from './dto/update-app-section.dto';
 import { UpdateFooterSectionDto } from './dto/update-footer-section.dto';
@@ -123,8 +124,8 @@ export class SettingsService {
     setting = setting ?? Setting.create({name: SettingEnum.FOOTER});
 
     const mappedWidgets = widgets.map((widget, i) => widget.type === 'image'
-      ? {position: i, ...widget, image: files?.splice(0, 1)?.[0]?.path}
-      : {position: id, ...widget}
+      ? {...widget, image: files?.splice(0, 1)?.[0]?.path, position: i, }
+      : {...widget, position: i, }
     );
 
     const sectionName = getFooterSectioName(id);
@@ -156,6 +157,31 @@ export class SettingsService {
         ...footerSection,
         isActive: !footerSection.isActive
       },
+    };
+
+    return await this.settingsRepository.save(setting);
+  }
+
+  async createFooterWidget({sectionId, ...createFooterWidgetDto}: CreateFooterWidgetDto): Promise<Setting> {
+    let setting = await this.settingsRepository.findOne({name: SettingEnum.FOOTER});
+
+    setting = setting ?? Setting.create({name: SettingEnum.FOOTER});
+
+    const sectionName = getFooterSectioName(sectionId);
+
+    const footerSection = setting.value[sectionName];
+
+    const nextPosition = footerSection.widgets.length;
+
+    const widget = createFooterWidgetDto.type === 'image'
+      ? {position: nextPosition, ...createFooterWidgetDto, image: createFooterWidgetDto.image.path}
+      : {position: nextPosition, ...createFooterWidgetDto}
+
+    footerSection.widgets.push(widget);
+
+    setting.value = {
+      ...setting.value,
+      [sectionName]: footerSection,
     };
 
     return await this.settingsRepository.save(setting);

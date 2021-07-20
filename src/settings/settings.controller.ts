@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
@@ -8,6 +8,7 @@ import { FileToBodyInterceptor } from 'src/support/interceptors/file-to-body.int
 import { FilesToBodyInterceptor } from 'src/support/interceptors/files-to-body.interceptor';
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
 import { Role } from 'src/users/enums/roles.enum';
+import { CreateFooterWidgetDto } from './dto/create-footer-widget.dto';
 import { ReadAppSectionDto } from './dto/read-app-section.dto';
 import { ReadBusinessInfoDto } from './dto/read-business-info.dto';
 import { ReadFooterDto } from './dto/read-footer.dto';
@@ -131,5 +132,13 @@ export class SettingsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   async toggeFooterSection(@Param('id') id: string): Promise<ReadFooterDto> {
     return plainToClass(ReadFooterDto, await this.settingsService.toggeFooterSection(id));
+  }
+
+  @Post('footer-sections/:id([1-4])/widgets')
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'), new ParamsToBodyInterceptor({id: 'sectionId'}))
+  async createFooterWidget(@Body() createFooterWidgetDto: CreateFooterWidgetDto): Promise<ReadFooterDto> {
+    return plainToClass(ReadFooterDto, await this.settingsService.createFooterWidget(createFooterWidgetDto));
   }
 }
