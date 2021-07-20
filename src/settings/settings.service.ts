@@ -122,9 +122,9 @@ export class SettingsService {
 
     setting = setting ?? Setting.create({name: SettingEnum.FOOTER});
 
-    const mappedWidgets = widgets.map(widget => widget.type === 'image'
-      ? {...widget, image: files?.splice(0, 1)?.[0]?.path}
-      : widget
+    const mappedWidgets = widgets.map((widget, i) => widget.type === 'image'
+      ? {position: i, ...widget, image: files?.splice(0, 1)?.[0]?.path}
+      : {position: id, ...widget}
     );
 
     const sectionName = getFooterSectioName(id);
