@@ -186,4 +186,26 @@ export class SettingsService {
 
     return await this.settingsRepository.save(setting);
   }
+
+  async deleteFooterWidget(id: string, widgetPosition: string): Promise<Setting> {
+    let setting = await this.settingsRepository.findOne({name: SettingEnum.FOOTER});
+
+    setting = setting ?? Setting.create({name: SettingEnum.FOOTER});
+
+    const sectionName = getFooterSectioName(id);
+
+    const footerSection = setting.value[sectionName];
+
+    footerSection.widgets = footerSection.widgets.filter(widget => widget.position != widgetPosition).map((widget, i) => ({
+      ...widget,
+      position: i,
+    }));
+
+    setting.value = {
+      ...setting.value,
+      [sectionName]: footerSection,
+    };
+
+    return await this.settingsRepository.save(setting);
+  }
 }

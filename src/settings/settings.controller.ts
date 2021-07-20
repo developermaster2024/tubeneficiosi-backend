@@ -141,4 +141,14 @@ export class SettingsController {
   async createFooterWidget(@Body() createFooterWidgetDto: CreateFooterWidgetDto): Promise<ReadFooterDto> {
     return plainToClass(ReadFooterDto, await this.settingsService.createFooterWidget(createFooterWidgetDto));
   }
+
+  @Delete('footer-sections/:id([1-4])/widgets/:widgetPosition')
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  async deleteFooterWidget(
+    @Param('id') id: string,
+    @Param('widgetPosition') widgetPosition: string
+  ): Promise<ReadFooterDto> {
+    return plainToClass(ReadFooterDto, await this.settingsService.deleteFooterWidget(id, widgetPosition));
+  }
 }
