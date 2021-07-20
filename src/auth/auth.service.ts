@@ -28,7 +28,7 @@ export class AuthService {
   async validateUser(email: string, password: string, role: Role): Promise<Partial<User>> {
     const user = await this.usersRepository.findOne({
       where: {email, role},
-      relations: ['client', 'store', 'userStatus'],
+      relations: ['client', 'store', 'admin', 'userStatus'],
     });
 
     if (!user) {

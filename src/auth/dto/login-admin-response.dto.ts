@@ -1,10 +1,11 @@
-import { Exclude, Expose, Transform } from "class-transformer";
+import { Exclude, Expose, Type } from "class-transformer";
+import { ReadAdminDto } from "src/users/dto/read-admin.dto";
 
 @Exclude()
 export class LoginAdminResponse {
   @Expose()
-  @Transform(({value}) => ({id: value.id, email: value.email}))
-  user: {id: number; email: string};
+  @Type(() => ReadAdminDto)
+  user: ReadAdminDto;
 
   @Expose()
   accessToken: string;
