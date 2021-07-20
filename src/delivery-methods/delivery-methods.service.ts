@@ -8,12 +8,14 @@ import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Repository } from 'typeorm';
 import { CreateDeliveryMethodDto } from './dto/create-delivery-method.dto';
 import { DeliveryMethodPaginationOptionsDto } from './dto/delivery-method-pagination-options.dto';
+import { UpdateDeliveryMethodDto } from './dto/update-delivery-method.dto';
 import { DeliveryMethod } from './entities/delivery-method.entity';
 import { DeliveryRange } from './entities/delivery-range.entity';
 import { DeliveryZoneToDeliveryRange } from './entities/delivery-zone-to-delivery-range.entity';
 import { DeliveryZoneToShippingRange } from './entities/delivery-zone-to-shipping-range.entity';
 import { DeliveryZone } from './entities/delivery-zone.entity';
 import { ShippingRange } from './entities/shipping-range.entity';
+import { DeliveryMethodNotFoundException } from './errors/delivery-method-not-found.exception';
 
 @Injectable()
 export class DeliveryMethodsService {
@@ -41,11 +43,7 @@ export class DeliveryMethodsService {
   }
 
   async create({userId, deliveryZoneToRanges, shippingZoneToRanges, ...createDeliveryMethodDto}: CreateDeliveryMethodDto): Promise<DeliveryMethod> {
-    const store = await this.storesRepository.findOne({ userId });
-
-    if (!store) {
-      throw new StoreNotFoundException();
-    }
+    const store = await this.findStoreByUserId(userId);
 
     let deliveryMethod = DeliveryMethod.create({
       ...createDeliveryMethodDto,
@@ -128,5 +126,38 @@ export class DeliveryMethodsService {
     }
 
     return deliveryMethod;
+  }
+
+  async findOne(id: number): Promise<DeliveryMethod> {
+    const deliveryMethod = await this.deliveryMethodsRepository.findOne(id);
+
+    if (!deliveryMethod) {
+      throw new DeliveryMethodNotFoundException();
+    }
+
+    return deliveryMethod;
+  }
+
+  async update({id, userId, ...updateDeliveryMethodDto}: UpdateDeliveryMethodDto): Promise<DeliveryMethod> {
+    const store = await this.findStoreByUserId(userId);
+
+    const deliveryMethod = await this.deliveryMethodsRepository.findOne({
+      id: +id,
+      store,
+    });
+
+    Object.assign(deliveryMethod, updateDeliveryMethodDto);
+
+    return await this.deliveryMethodsRepository.save(deliveryMethod);
+  }
+
+  private async findStoreByUserId(userId: number): Promise<Store> {
+    const store = await this.storesRepository.findOne({ userId });
+
+    if (!store) {
+      throw new StoreNotFoundException();
+    }
+
+    return store;
   }
 }
