@@ -61,10 +61,10 @@ export class DeliveryMethod {
   deliveryZones: DeliveryZone[];
 
   @OneToMany(() => ShippingRange, shippingRange => shippingRange.deliveryMethod, {cascade: ['insert', 'update']})
-  shippingRanges: ShippingRange[]
+  shippingRanges: ShippingRange[];
 
   @OneToMany(() => DeliveryRange, deliveryRange => deliveryRange.deliveryMethod, {cascade: ['insert', 'update']})
-  deliveryRanges: DeliveryRange[]
+  deliveryRanges: DeliveryRange[];
 
   @CreateDateColumn({
     name: 'created_at',

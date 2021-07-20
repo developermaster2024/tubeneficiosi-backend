@@ -4,8 +4,10 @@ import { DeliveryMethodTypes } from 'src/delivery-method-types/enums/delivery-me
 import { Location } from 'src/locations/entities/location.entity';
 import { Store } from 'src/stores/entities/store.entity';
 import { StoreNotFoundException } from 'src/stores/erros/store-not-found.exception';
+import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Repository } from 'typeorm';
 import { CreateDeliveryMethodDto } from './dto/create-delivery-method.dto';
+import { DeliveryMethodPaginationOptionsDto } from './dto/delivery-method-pagination-options.dto';
 import { DeliveryMethod } from './entities/delivery-method.entity';
 import { DeliveryRange } from './entities/delivery-range.entity';
 import { DeliveryZoneToDeliveryRange } from './entities/delivery-zone-to-delivery-range.entity';
@@ -22,6 +24,20 @@ export class DeliveryMethodsService {
     @InjectRepository(DeliveryZoneToDeliveryRange) private readonly deliveryZoneToDeliveryRangesRepository: Repository<DeliveryZoneToDeliveryRange>,
     @InjectRepository(Store) private readonly storesRepository: Repository<Store>
   ) {}
+
+  async paginate({perPage, offset, filters}: DeliveryMethodPaginationOptionsDto): Promise<PaginationResult<DeliveryMethod>> {
+    const queryBuilder = this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .take(perPage)
+      .skip(offset);
+
+    if (filters.name) queryBuilder.andWhere('deliveryMethod.name LIKE :name', {name: `%${filters.name}%`});
+
+    if (filters.storeId) queryBuilder.andWhere('deliveryMethod.storeId = :storeId', {storeId: filters.storeId});
+
+    const [deliveryMethods, total] = await queryBuilder.getManyAndCount();
+
+    return new PaginationResult(deliveryMethods, total, perPage);
+  }
 
   async create({userId, deliveryZoneToRanges, shippingZoneToRanges, ...createDeliveryMethodDto}: CreateDeliveryMethodDto): Promise<DeliveryMethod> {
     const store = await this.storesRepository.findOne({ userId });
