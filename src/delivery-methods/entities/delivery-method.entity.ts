@@ -1,5 +1,6 @@
 import { DeliveryMethodType } from "src/delivery-method-types/entities/delivery-method-type.entity";
 import { DeliveryMethodTypes } from "src/delivery-method-types/enums/delivery-methods-types.enum";
+import { Store } from "src/stores/entities/store.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { DeliveryRange } from "./delivery-range.entity";
 import { DeliveryZone } from "./delivery-zone.entity";
@@ -32,6 +33,17 @@ export class DeliveryMethod {
   //   type: 'varchar',
   // })
   // imgPath: string;
+
+  @Column({
+    name: 'store_id',
+    type: 'int',
+    select: false,
+  })
+  storeId: number;
+
+  @ManyToOne(() => Store, {nullable: false, onDelete: 'CASCADE'})
+  @JoinColumn({name: 'store_id'})
+  store: Store;
 
   @Column({
     name: 'delivery_method_type_code',

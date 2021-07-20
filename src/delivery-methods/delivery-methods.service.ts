@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeliveryMethodTypes } from 'src/delivery-method-types/enums/delivery-methods-types.enum';
 import { Location } from 'src/locations/entities/location.entity';
+import { Store } from 'src/stores/entities/store.entity';
+import { StoreNotFoundException } from 'src/stores/erros/store-not-found.exception';
 import { Repository } from 'typeorm';
 import { CreateDeliveryMethodDto } from './dto/create-delivery-method.dto';
 import { DeliveryMethod } from './entities/delivery-method.entity';
@@ -17,11 +19,21 @@ export class DeliveryMethodsService {
     @InjectRepository(DeliveryMethod) private readonly deliveryMethodsRepository: Repository<DeliveryMethod>,
     @InjectRepository(Location) private readonly locationsRepository: Repository<Location>,
     @InjectRepository(DeliveryZoneToShippingRange) private readonly deliveryZoneToShippingRangesRepository: Repository<DeliveryZoneToShippingRange>,
-    @InjectRepository(DeliveryZoneToDeliveryRange) private readonly deliveryZoneToDeliveryRangesRepository: Repository<DeliveryZoneToDeliveryRange>
+    @InjectRepository(DeliveryZoneToDeliveryRange) private readonly deliveryZoneToDeliveryRangesRepository: Repository<DeliveryZoneToDeliveryRange>,
+    @InjectRepository(Store) private readonly storesRepository: Repository<Store>
   ) {}
 
-  async create({deliveryZoneToRanges, shippingZoneToRanges, ...createDeliveryMethodDto}: CreateDeliveryMethodDto): Promise<DeliveryMethod> {
-    let deliveryMethod = DeliveryMethod.create(createDeliveryMethodDto);
+  async create({userId, deliveryZoneToRanges, shippingZoneToRanges, ...createDeliveryMethodDto}: CreateDeliveryMethodDto): Promise<DeliveryMethod> {
+    const store = await this.storesRepository.findOne({ userId });
+
+    if (!store) {
+      throw new StoreNotFoundException();
+    }
+
+    let deliveryMethod = DeliveryMethod.create({
+      ...createDeliveryMethodDto,
+      store,
+    });
 
     switch(createDeliveryMethodDto.deliveryMethodTypeCode) {
       case DeliveryMethodTypes.FREE: {

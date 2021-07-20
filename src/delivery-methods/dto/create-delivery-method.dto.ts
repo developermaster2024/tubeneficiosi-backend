@@ -7,6 +7,9 @@ import { CreateShippingZoneToRangeDto } from "./create-shipping-zone-to-range.dt
 @Exclude()
 export class CreateDeliveryMethodDto {
   @Expose()
+  readonly userId: number;
+
+  @Expose()
   @MaxLength(150)
   readonly name: string;
 
