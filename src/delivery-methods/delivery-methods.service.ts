@@ -28,7 +28,8 @@ export class DeliveryMethodsService {
   async paginate({perPage, offset, filters}: DeliveryMethodPaginationOptionsDto): Promise<PaginationResult<DeliveryMethod>> {
     const queryBuilder = this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
       .take(perPage)
-      .skip(offset);
+      .skip(offset)
+      .innerJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType');
 
     if (filters.name) queryBuilder.andWhere('deliveryMethod.name LIKE :name', {name: `%${filters.name}%`});
 
