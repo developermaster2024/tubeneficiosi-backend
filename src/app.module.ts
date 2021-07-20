@@ -34,6 +34,7 @@ import { StoreCategoriesModule } from './store-categories/store-categories.modul
 import { CartsModule } from './carts/carts.module';
 import { StoreHoursModule } from './store-hours/store-hours.module';
 import { UserStatusesModule } from './user-statuses/user-statuses.module';
+import { DeliveryMethodsModule } from './delivery-methods/delivery-methods.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { UserStatusesModule } from './user-statuses/user-statuses.module';
     CartsModule,
     StoreHoursModule,
     UserStatusesModule,
+    DeliveryMethodsModule,
   ],
 })
 export class AppModule {}
