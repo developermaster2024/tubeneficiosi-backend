@@ -12,7 +12,7 @@ export class MailService {
   async sendForgotPasswordEmail({email, token, fullName}: {email: string, token: string, fullName: string}): Promise<void> {
     await this.mailService.sendMail({
       to: email,
-      subject: 'Olvide mi contraseña',
+      subject: 'Recuperar contraseña',
       template: './forgot-password',
       context: {
         frontendUrl: this.configService.get('CLIENT_FRONTEND_URL'),
