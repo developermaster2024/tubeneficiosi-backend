@@ -11,6 +11,8 @@ import { LoginStoreResponseDto } from './dto/login-store-response.dto';
 import { LocalAuthStoreGuard } from './guards/local-auth-store.guard';
 import { LoginAdminResponse } from './dto/login-admin-response.dto';
 import { LocalAuthAdminGuard } from './guards/local-auth-admin.guard';
+import { ForgotClientPasswordDto } from './dto/forgot-client-password.dto';
+import { ResetClientPasswordDto } from './dto/reset-client-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -42,5 +44,15 @@ export class AuthController {
   @Post('/login-admin')
   async loginAdmin(@Request() req): Promise<LoginAdminResponse> {
     return plainToClass(LoginAdminResponse, this.authService.login(req.user));
+  }
+
+  @Post('/forgot-client-password')
+  async forgotClientPassword(@Body() forgotPasswordDto: ForgotClientPasswordDto): Promise<any> {
+    await this.authService.forgotClientPassword(forgotPasswordDto);
+  }
+
+  @Post('/reset-client-password')
+  async resetClientPassword(@Body() resetClientPasswordDto: ResetClientPasswordDto): Promise<any> {
+    await this.authService.resetClientPassword(resetClientPasswordDto);
   }
 }

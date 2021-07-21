@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { parse } from 'date-fns';
 import { Client } from 'src/clients/entities/client.entity';
+import { MailService } from 'src/mail/mail.service';
 import { StoreHour } from 'src/store-hours/entities/store-hour.entity';
 import { Store } from 'src/stores/entities/store.entity';
 import { HashingService } from 'src/support/hashing.service';
@@ -10,9 +11,14 @@ import { Days } from 'src/support/types/days.enum';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/roles.enum';
 import { UserStatuses } from 'src/users/enums/user-statuses.enum';
+import { UserNotFoundException } from 'src/users/errors/user-not-found.exception';
 import { Repository } from 'typeorm';
+import { ForgotClientPasswordDto } from './dto/forgot-client-password.dto';
 import { RegisterClientDto } from './dto/register-client.dto';
 import { RegisterStoreDto } from './dto/register-store.dto';
+import { ResetClientPasswordDto } from './dto/reset-client-password.dto';
+import { PasswordReset } from './entities/password-reset.entity';
+import { InvalidCredentialsException } from './errors/invalid-credentials.exception';
 
 type RegisterResponse = {user: User; accessToken: string};
 
@@ -21,8 +27,10 @@ export class AuthService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     @InjectRepository(StoreHour) private readonly storeHourRepository: Repository<StoreHour>,
+    @InjectRepository(PasswordReset) private readonly passwordResetsRepository: Repository<PasswordReset>,
     private readonly jwtService: JwtService,
     private readonly hashingService: HashingService,
+    private readonly mailService: MailService
   ) {}
 
   async validateUser(email: string, password: string, role: Role): Promise<Partial<User>> {
@@ -106,5 +114,53 @@ export class AuthService {
       user,
       accessToken: this.jwtService.sign({...userWithoutPassword}),
     };
+  }
+
+  async forgotClientPassword({email}: ForgotClientPasswordDto): Promise<void> {
+    const user = await this.usersRepository.findOne({
+      where: { email },
+      relations: ['client'],
+    });
+
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    const token = this.jwtService.sign({id: user.id, email: user.email}, {expiresIn: '12h'});
+
+    const passwordReset = PasswordReset.create({ email, token });
+
+    await this.passwordResetsRepository.save(passwordReset);
+
+    await this.mailService.sendForgotPasswordEmail({email, token, fullName: user.client.name});
+  }
+
+  async resetClientPassword({email, password, token}: ResetClientPasswordDto): Promise<void> {
+    // Chequear que exista un registro en password_resets con el email y token
+    const passwordReset = await this.passwordResetsRepository.findOne({email, token});
+
+    if (!passwordReset) {
+      throw new InvalidCredentialsException();
+    }
+
+    // Chequear que el token sea valido
+    const tokenIsValid = this.jwtService.verify(token);
+
+    if (!tokenIsValid) {
+      throw new InvalidCredentialsException();
+    }
+
+    // Cambiar contraseña
+    const user = await this.usersRepository.findOne({
+      email,
+      role: Role.CLIENT,
+    });
+
+    user.password = await this.hashingService.make(password);
+
+    await this.usersRepository.save(user);
+
+    // Eliminar el registro de password_resets
+    await this.passwordResetsRepository.remove(passwordReset);
   }
 }

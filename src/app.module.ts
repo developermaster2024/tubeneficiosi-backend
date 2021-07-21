@@ -35,6 +35,7 @@ import { CartsModule } from './carts/carts.module';
 import { StoreHoursModule } from './store-hours/store-hours.module';
 import { UserStatusesModule } from './user-statuses/user-statuses.module';
 import { DeliveryMethodsModule } from './delivery-methods/delivery-methods.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { DeliveryMethodsModule } from './delivery-methods/delivery-methods.modul
     StoreHoursModule,
     UserStatusesModule,
     DeliveryMethodsModule,
+    MailModule,
   ],
 })
 export class AppModule {}

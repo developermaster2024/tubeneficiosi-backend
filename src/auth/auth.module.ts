@@ -12,10 +12,12 @@ import { User } from 'src/users/entities/user.entity';
 import { LocalStoreStrategy } from './passport-strategies/local-store.strategy';
 import { LocalAdminStrategy } from './passport-strategies/local-admin.strategy';
 import { StoreHour } from 'src/store-hours/entities/store-hour.entity';
+import { MailModule } from 'src/mail/mail.module';
+import { PasswordReset } from './entities/password-reset.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, StoreHour]),
+    TypeOrmModule.forFeature([User, StoreHour, PasswordReset]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
@@ -25,6 +27,7 @@ import { StoreHour } from 'src/store-hours/entities/store-hour.entity';
     }),
     UsersModule,
     SupportModule,
+    MailModule,
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy, LocalStoreStrategy, LocalAdminStrategy],
   controllers: [AuthController]
