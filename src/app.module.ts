@@ -36,6 +36,7 @@ import { StoreHoursModule } from './store-hours/store-hours.module';
 import { UserStatusesModule } from './user-statuses/user-statuses.module';
 import { DeliveryMethodsModule } from './delivery-methods/delivery-methods.module';
 import { MailModule } from './mail/mail.module';
+import { DeliveryMethodTypesModule } from './delivery-method-types/delivery-method-types.module';
 
 @Module({
   imports: [
@@ -78,6 +79,7 @@ import { MailModule } from './mail/mail.module';
     UserStatusesModule,
     DeliveryMethodsModule,
     MailModule,
+    DeliveryMethodTypesModule,
   ],
 })
 export class AppModule {}
