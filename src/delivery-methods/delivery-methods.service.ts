@@ -59,7 +59,7 @@ export class DeliveryMethodsService {
         // Guardar las zonas
         deliveryMethod.deliveryZones = await Promise.all(shippingZoneToRanges.map(async ({ deliveryZone }) => DeliveryZone.create({
           name: deliveryZone.name,
-          extraWeightPrice: deliveryZone.extraWeightPrice,
+          extraPrice: deliveryZone.extraPrice,
           locations: await this.locationsRepository.findByIds(deliveryZone.locationIds),
         })));
 
@@ -94,7 +94,7 @@ export class DeliveryMethodsService {
         // Guardar las zonas
         deliveryMethod.deliveryZones = await Promise.all(deliveryZoneToRanges.map(async ({ deliveryZone }) => DeliveryZone.create({
           name: deliveryZone.name,
-          extraWeightPrice: deliveryZone.extraWeightPrice,
+          extraPrice: deliveryZone.extraPrice,
           locations: await this.locationsRepository.findByIds(deliveryZone.locationIds),
         })));
 

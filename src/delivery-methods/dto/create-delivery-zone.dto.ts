@@ -13,5 +13,5 @@ export class CreateDeliveryZoneDto {
   @Expose()
   @Type(() => Number)
   @Min(0)
-  readonly extraWeightPrice: number;
+  readonly extraPrice: number;
 }

@@ -24,7 +24,7 @@ export class DeliveryZone {
     scale: 4,
     default: 0,
   })
-  extraWeightPrice: number;
+  extraPrice: number;
 
   @Column({
     name: 'delivery_method_id',
