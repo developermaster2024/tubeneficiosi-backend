@@ -1,5 +1,6 @@
 import { Exclude, Expose, Type } from "class-transformer";
 import { ReadBrandDto } from "src/brands/dto/read-brand.dto";
+import { ProductDimension } from "../entities/product-dimension.entity";
 import { ProductToProductFeature } from "../entities/prouct-to-product-feature.entity";
 
 @Exclude()
@@ -34,4 +35,7 @@ export class ReadProductDto {
 
   @Expose()
   readonly productToProductFeatures: ProductToProductFeature[];
+
+  @Expose()
+  readonly productDimensions: ProductDimension;
 }

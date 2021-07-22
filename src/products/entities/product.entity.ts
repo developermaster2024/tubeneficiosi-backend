@@ -2,7 +2,8 @@ import { Brand } from "src/brands/entities/brand.entity";
 import { Category } from "src/categories/entities/category.entity";
 import { Store } from "src/stores/entities/store.entity";
 import { Tag } from "src/tags/entities/tag.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { ProductDimension } from "./product-dimension.entity";
 import { ProductFeatureGroup } from "./product-feature-group.entity";
 import { ProductImage } from "./product-image.entity";
 import { ProductToProductFeature } from "./prouct-to-product-feature.entity";
@@ -117,6 +118,9 @@ export class Product {
 
   @OneToMany(() => ProductFeatureGroup, productFeatureGroup => productFeatureGroup.product, {cascade: ['insert', 'update']})
   productFeatureGroups: ProductFeatureGroup[];
+
+  @OneToOne(() => ProductDimension, productDimension => productDimension.product, {cascade: ['insert', 'update'], eager: true})
+  productDimensions: ProductDimension;
 
   @CreateDateColumn({
     name: 'created_at',

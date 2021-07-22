@@ -64,4 +64,24 @@ export class CreateProductDto {
   @Type(() => CreateProductFeatureGroup)
   @ValidateNested({each: true})
   readonly featureGroups: CreateProductFeatureGroup[];
+
+  @Expose()
+  @Type(() => Number)
+  @Min(0)
+  readonly width: number;
+
+  @Expose()
+  @Type(() => Number)
+  @Min(0)
+  readonly height: number;
+
+  @Expose()
+  @Type(() => Number)
+  @Min(0)
+  readonly length: number;
+
+  @Expose()
+  @Type(() => Number)
+  @Min(0)
+  readonly weight: number;
 }

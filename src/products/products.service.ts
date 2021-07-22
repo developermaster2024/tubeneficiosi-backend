@@ -10,6 +10,7 @@ import { Tag } from 'src/tags/entities/tag.entity';
 import { FindConditions, In, Like, Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductPaginationOptionsDto } from './dto/product-pagination-options.dto';
+import { ProductDimension } from './entities/product-dimension.entity';
 import { ProductFeatureForGroup } from './entities/product-feature-for-group.entity';
 import { ProductFeatureGroup } from './entities/product-feature-group.entity';
 import { ProductImage } from './entities/product-image.entity';
@@ -68,7 +69,13 @@ export class ProductsService {
       productImages: images.map(imageFile => ProductImage.create({path: imageFile.path})),
       productToProductFeatures,
       store,
-      productFeatureGroups
+      productFeatureGroups,
+      productDimensions: ProductDimension.create({
+        width: createProductDto.width,
+        height: createProductDto.height,
+        length: createProductDto.length,
+        weight: createProductDto.weight,
+      }),
     });
 
     return await this.productsRepository.save(product);
