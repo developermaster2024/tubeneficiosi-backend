@@ -1,8 +1,9 @@
-import { Exclude, Expose, Transform, Type } from "class-transformer";
-import { ArrayMinSize, IsArray, IsBoolean, IsNumber, MaxLength, Min, ValidateNested } from "class-validator";
+import { Exclude, Expose, Type } from "class-transformer";
+import { ArrayMinSize, IsArray, IsNumber, MaxLength, Min, ValidateNested } from "class-validator";
 import { Brand } from "src/brands/entities/brand.entity";
-import { ProductFeature } from "src/product-features/entities/product-feature.entity";
 import { Exists } from "src/validation/exists.constrain";
+import { CreateProductFeatureGroup } from "./create-product-feature-group.dto";
+import { CreateProductToProductFeatureDto } from "./create-product-to-feature.dto";
 
 @Exclude()
 export class CreateProductDto {
@@ -63,56 +64,4 @@ export class CreateProductDto {
   @Type(() => CreateProductFeatureGroup)
   @ValidateNested({each: true})
   readonly featureGroups: CreateProductFeatureGroup[];
-}
-
-@Exclude()
-class CreateProductToProductFeatureDto {
-  @Expose()
-  @Exists(ProductFeature)
-  readonly id: number;
-
-  @Expose()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  readonly price: number;
-}
-
-@Exclude()
-class CreateProductFeatureGroup {
-  @Expose()
-  @MaxLength(255)
-  readonly name: string;
-
-  @Expose()
-  @Transform(({value}) => value === 'on')
-  @IsBoolean()
-  readonly isMultiSelectable: boolean;
-
-  @Expose()
-  @Type(() => CreateProductFeatureForGroup)
-  @ValidateNested({each: true})
-  readonly features: CreateProductFeatureForGroup[];
-}
-
-@Exclude()
-class CreateProductFeatureForGroup {
-  @Expose()
-  @MaxLength(255)
-  readonly name: string;
-
-  @Expose()
-  @MaxLength(255)
-  readonly value: string;
-
-  @Expose()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  readonly price: number;
-
-  @Expose()
-  @Transform(({value}) => value === 'on')
-  @IsBoolean()
-  readonly isSelectable: boolean;
 }
