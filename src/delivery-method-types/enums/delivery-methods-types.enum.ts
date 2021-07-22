@@ -1,7 +1,6 @@
 export enum DeliveryMethodTypes {
-  FREE = 'dmt-001',
-  SHIPPING = 'dmt-002',
-  DELIVERY = 'dmt-003',
+  SHIPPING = 'dmt-001',
+  DELIVERY = 'dmt-002',
 }
 
 export const DeliveryMethodTypesValues = Object.values(DeliveryMethodTypes);

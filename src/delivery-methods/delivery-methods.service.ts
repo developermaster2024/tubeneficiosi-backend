@@ -51,10 +51,6 @@ export class DeliveryMethodsService {
     });
 
     switch(createDeliveryMethodDto.deliveryMethodTypeCode) {
-      case DeliveryMethodTypes.FREE: {
-        deliveryMethod = await this.deliveryMethodsRepository.save(deliveryMethod);
-        break;
-      }
       case DeliveryMethodTypes.SHIPPING: {
         // Guardar las zonas
         deliveryMethod.deliveryZones = await Promise.all(shippingZoneToRanges.map(async ({ deliveryZone }) => DeliveryZone.create({
