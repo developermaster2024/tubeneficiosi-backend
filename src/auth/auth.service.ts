@@ -98,9 +98,9 @@ export class AuthService {
 
     user = await this.usersRepository.save(user);
 
-    const storeHours = Object.keys(Days).filter(key => key !== Days.SATURDAY && key !== Days.SUNDAY).map(key => StoreHour.create({
+    const storeHours = Object.keys(Days).map(key => StoreHour.create({
       day: Days[key],
-      isWorkingDay: true,
+      isWorkingDay: key !== Days.SATURDAY && key !== Days.SUNDAY,
       startTime: parse('08:00:00', 'HH:mm:ss', new Date()),
       endTime: parse('16:30:00', 'HH:mm:ss', new Date()),
       store: user.store,
