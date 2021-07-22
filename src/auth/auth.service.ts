@@ -13,10 +13,10 @@ import { Role } from 'src/users/enums/roles.enum';
 import { UserStatuses } from 'src/users/enums/user-statuses.enum';
 import { UserNotFoundException } from 'src/users/errors/user-not-found.exception';
 import { Repository } from 'typeorm';
-import { ForgotClientPasswordDto } from './dto/forgot-client-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { RegisterClientDto } from './dto/register-client.dto';
 import { RegisterStoreDto } from './dto/register-store.dto';
-import { ResetClientPasswordDto } from './dto/reset-client-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { PasswordReset } from './entities/password-reset.entity';
 import { InvalidCredentialsException } from './errors/invalid-credentials.exception';
 
@@ -116,10 +116,10 @@ export class AuthService {
     };
   }
 
-  async forgotClientPassword({email}: ForgotClientPasswordDto): Promise<void> {
+  async forgotPassword({email}: ForgotPasswordDto, role: Role): Promise<void> {
     const user = await this.usersRepository.findOne({
-      where: { email },
-      relations: ['client'],
+      where: { email, role },
+      relations: ['client', 'store'],
     });
 
     if (!user) {
@@ -132,10 +132,12 @@ export class AuthService {
 
     await this.passwordResetsRepository.save(passwordReset);
 
-    await this.mailService.sendForgotPasswordEmail({email, token, fullName: user.client.name});
+    const fullName = role === Role.CLIENT ? user.client.name : user.store.name;
+
+    await this.mailService.sendForgotPasswordEmail({email, token, fullName});
   }
 
-  async resetClientPassword({email, password, token}: ResetClientPasswordDto): Promise<void> {
+  async resetPassword({email, password, token}: ResetPasswordDto, role: Role): Promise<void> {
     // Chequear que exista un registro en password_resets con el email y token
     const passwordReset = await this.passwordResetsRepository.findOne({email, token});
 
@@ -151,10 +153,11 @@ export class AuthService {
     }
 
     // Cambiar contraseña
-    const user = await this.usersRepository.findOne({
-      email,
-      role: Role.CLIENT,
-    });
+    const user = await this.usersRepository.findOne({ email, role });
+
+    if (!user) {
+      throw new InvalidCredentialsException();
+    }
 
     user.password = await this.hashingService.make(password);
 

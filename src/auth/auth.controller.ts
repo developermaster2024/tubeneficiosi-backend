@@ -11,8 +11,9 @@ import { LoginStoreResponseDto } from './dto/login-store-response.dto';
 import { LocalAuthStoreGuard } from './guards/local-auth-store.guard';
 import { LoginAdminResponse } from './dto/login-admin-response.dto';
 import { LocalAuthAdminGuard } from './guards/local-auth-admin.guard';
-import { ForgotClientPasswordDto } from './dto/forgot-client-password.dto';
-import { ResetClientPasswordDto } from './dto/reset-client-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { Role } from 'src/users/enums/roles.enum';
 
 @Controller('auth')
 export class AuthController {
@@ -47,12 +48,22 @@ export class AuthController {
   }
 
   @Post('/forgot-client-password')
-  async forgotClientPassword(@Body() forgotPasswordDto: ForgotClientPasswordDto): Promise<any> {
-    await this.authService.forgotClientPassword(forgotPasswordDto);
+  async forgotClientPassword(@Body() forgotPasswordDto: ForgotPasswordDto): Promise<void> {
+    await this.authService.forgotPassword(forgotPasswordDto, Role.CLIENT);
   }
 
   @Post('/reset-client-password')
-  async resetClientPassword(@Body() resetClientPasswordDto: ResetClientPasswordDto): Promise<any> {
-    await this.authService.resetClientPassword(resetClientPasswordDto);
+  async resetClientPassword(@Body() resetClientPasswordDto: ResetPasswordDto): Promise<void> {
+    await this.authService.resetPassword(resetClientPasswordDto, Role.CLIENT);
+  }
+
+  @Post('/forgot-store-password')
+  async forgotStorePassword(@Body() forgotPasswordDto: ForgotPasswordDto): Promise<void> {
+    await this.authService.forgotPassword(forgotPasswordDto, Role.STORE);
+  }
+
+  @Post('/reset-store-password')
+  async resetStorePassword(@Body() resetClientPasswordDto: ResetPasswordDto): Promise<void> {
+    await this.authService.resetPassword(resetClientPasswordDto, Role.STORE);
   }
 }
