@@ -1,25 +1,19 @@
 import { OmitType } from "@nestjs/mapped-types";
 import { Expose } from "class-transformer";
-import { IsEmail, IsPhoneNumber, IsString, MaxLength } from "class-validator";
+import { IsPhoneNumber, IsString } from "class-validator";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
-import { User } from "src/users/entities/user.entity";
-import { IsUnique } from "src/validation/is-unique.constrain";
-import { Not } from "typeorm";
+import { IsMimeType } from "src/validation/mime-type.constrain";
 
-export class UpdateProfileDto extends OmitType(CreateUserDto, ['password'] as const) {
+export class UpdateProfileDto extends OmitType(CreateUserDto, ['password', 'email'] as const) {
   @Expose()
   readonly userId: number;
-
-  @Expose()
-  @IsEmail()
-  @MaxLength(150)
-  @IsUnique(User, (value, dto: UpdateProfileDto) => ({
-    where: { email: value, id: Not(dto.userId) }
-  }))
-  readonly email: string;
 
   @Expose()
   @IsString()
   @IsPhoneNumber()
   readonly phoneNumber: string;
+
+  @Expose()
+  @IsMimeType(['image/png', 'image/jpeg'])
+  readonly img: Express.Multer.File;
 }

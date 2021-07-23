@@ -29,17 +29,15 @@ export class ProfileService {
     return user;
   }
 
-  async update({userId, name, phoneNumber, ...updateProfileDto}: UpdateProfileDto, img: string): Promise<User> {
+  async update({userId, name, phoneNumber, img}: UpdateProfileDto): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: {id: userId, role: Role.CLIENT},
       relations: ['client']
     });
 
-    Object.assign(user, updateProfileDto);
-
     user.client.name = name;
     user.client.phoneNumber = phoneNumber;
-    user.client.imgPath = img;
+    user.client.imgPath = img.path;
 
     return await this.usersRepository.save(user);
   }
