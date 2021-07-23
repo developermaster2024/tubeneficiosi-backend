@@ -31,6 +31,8 @@ export class CategoriesService {
 
     if (filters.parentOnly) queryBuilder.andWhere('category.parentId IS NULL');
 
+    if (filters.parentId) queryBuilder.andWhere('category.parentId = :parentId', {parentId: filters.parentId});
+
     const [categories, total] = await queryBuilder.getManyAndCount();
 
     return new PaginationResult(categories, total, perPage);

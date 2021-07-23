@@ -5,6 +5,7 @@ type CategoryFilters = {
   name: string;
   storeId: string;
   parentOnly: boolean;
+  parentId: string;
 };
 
 export class CategoryPaginationOptionsDto extends PaginationOptions {
@@ -20,6 +21,7 @@ export class CategoryPaginationOptionsDto extends PaginationOptions {
       name,
       storeId,
       parentOnly,
+      parentId,
     } = query;
 
     return new CategoryPaginationOptionsDto(+page, +perPage, {
@@ -27,6 +29,7 @@ export class CategoryPaginationOptionsDto extends PaginationOptions {
       name,
       storeId,
       parentOnly: parentOnly === 'true',
+      parentId,
     });
   }
 }
