@@ -37,7 +37,10 @@ export class ProfileService {
 
     user.client.name = name;
     user.client.phoneNumber = phoneNumber;
-    user.client.imgPath = img.path;
+
+    if (img) {
+      user.client.imgPath = img.path;
+    }
 
     return await this.usersRepository.save(user);
   }
