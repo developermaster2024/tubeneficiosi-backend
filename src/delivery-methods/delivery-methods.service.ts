@@ -150,6 +150,10 @@ export class DeliveryMethodsService {
       store,
     });
 
+    if (!deliveryMethod) {
+      throw new DeliveryMethodNotFoundException();
+    }
+
     Object.assign(deliveryMethod, updateDeliveryMethodDto);
 
     return await this.deliveryMethodsRepository.save(deliveryMethod);
@@ -163,5 +167,20 @@ export class DeliveryMethodsService {
     }
 
     return store;
+  }
+
+  async delete(id: number, userId: number): Promise<void> {
+    const store = await this.findStoreByUserId(userId);
+
+    const deliveryMethod = await this.deliveryMethodsRepository.findOne({
+      id: id,
+      store,
+    });
+
+    if (!deliveryMethod) {
+      throw new DeliveryMethodNotFoundException();
+    }
+
+    await this.storesRepository.softRemove(deliveryMethod);
   }
 }

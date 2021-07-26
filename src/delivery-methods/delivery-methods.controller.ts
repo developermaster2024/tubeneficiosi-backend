@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -41,5 +41,13 @@ export class DeliveryMethodsController {
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({id: 'id'}))
   async update(@Body() updateDeliveryMethodDto: UpdateDeliveryMethodDto): Promise<ReadDeliveryMethodDto> {
     return plainToClass(ReadDeliveryMethodDto, await this.deliveryMethodsService.update(updateDeliveryMethodDto));
+  }
+
+  @Delete(':id')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async delete(@Param('id') id: string, @Body('userId') userId: number): Promise<void> {
+    await this.deliveryMethodsService.delete(+id, userId);
   }
 }
