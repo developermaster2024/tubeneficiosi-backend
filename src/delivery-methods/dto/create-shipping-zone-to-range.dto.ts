@@ -13,5 +13,5 @@ export class CreateShippingZoneToRangeDto {
   @Expose()
   @Type(() => CreateShippingRangeDto)
   @ValidateNested({each: true})
-  readonly shippingRanges: CreateShippingRangeDto[];
+  readonly deliveryRanges: CreateShippingRangeDto[];
 }

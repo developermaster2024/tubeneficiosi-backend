@@ -7,6 +7,8 @@ import { StoreNotFoundException } from 'src/stores/erros/store-not-found.excepti
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Repository } from 'typeorm';
 import { CreateDeliveryMethodDto } from './dto/create-delivery-method.dto';
+import { CreateDeliveryZoneToRangeDto } from './dto/create-delivery-zone-to-range.dto';
+import { CreateShippingZoneToRangeDto } from './dto/create-shipping-zone-to-range.dto';
 import { DeliveryMethodPaginationOptionsDto } from './dto/delivery-method-pagination-options.dto';
 import { UpdateDeliveryMethodDto } from './dto/update-delivery-method.dto';
 import { DeliveryMethod } from './entities/delivery-method.entity';
@@ -42,7 +44,7 @@ export class DeliveryMethodsService {
     return new PaginationResult(deliveryMethods, total, perPage);
   }
 
-  async create({userId, deliveryZoneToRanges, shippingZoneToRanges, ...createDeliveryMethodDto}: CreateDeliveryMethodDto): Promise<DeliveryMethod> {
+  async create({userId, deliveryZoneToRanges, ...createDeliveryMethodDto}: CreateDeliveryMethodDto): Promise<DeliveryMethod> {
     const store = await this.findStoreByUserId(userId);
 
     let deliveryMethod = DeliveryMethod.create({
@@ -53,13 +55,13 @@ export class DeliveryMethodsService {
     switch(createDeliveryMethodDto.deliveryMethodTypeCode) {
       case DeliveryMethodTypes.SHIPPING: {
         // Guardar las zonas
-        deliveryMethod.deliveryZones = await Promise.all(shippingZoneToRanges.map(async ({ deliveryZone }) => DeliveryZone.create({
+        deliveryMethod.deliveryZones = await Promise.all(deliveryZoneToRanges.map(async ({ deliveryZone }) => DeliveryZone.create({
           name: deliveryZone.name,
           extraPrice: deliveryZone.extraPrice,
           locations: await this.locationsRepository.findByIds(deliveryZone.locationIds),
         })));
 
-        const sortedShippingRanges = shippingZoneToRanges[0].shippingRanges.sort((a, b) => a.weightFrom - b.weightFrom);
+        const sortedShippingRanges = deliveryZoneToRanges[0].deliveryRanges.sort((a, b) => a.weightFrom - b.weightFrom);
 
         // Guardar los rangos de envío
         deliveryMethod.shippingRanges = sortedShippingRanges.map((shippingRange, i) => ShippingRange.create({
@@ -72,8 +74,8 @@ export class DeliveryMethodsService {
 
         deliveryMethod = await this.deliveryMethodsRepository.save(deliveryMethod);
 
-        const deliveryZonePrices = shippingZoneToRanges.reduce((result, shippingZoneToRange) => Object.assign(result, {
-          [shippingZoneToRange.deliveryZone.name]: shippingZoneToRange.shippingRanges.map(shippingRange => shippingRange.price),
+        const deliveryZonePrices = (deliveryZoneToRanges as CreateShippingZoneToRangeDto[]).reduce((result, shippingZoneToRange) => Object.assign(result, {
+          [shippingZoneToRange.deliveryZone.name]: shippingZoneToRange.deliveryRanges.map(shippingRange => shippingRange.price),
         }), {});
 
         // Guardar los deliveryZoneToRanges
@@ -105,7 +107,7 @@ export class DeliveryMethodsService {
 
         deliveryMethod = await this.deliveryMethodsRepository.save(deliveryMethod);
 
-        const deliveryZonePrices = deliveryZoneToRanges.reduce((result, deliveryZoneToRange) => Object.assign(result, {
+        const deliveryZonePrices = (deliveryZoneToRanges as CreateDeliveryZoneToRangeDto[]).reduce((result, deliveryZoneToRange) => Object.assign(result, {
           [deliveryZoneToRange.deliveryZone.name]: deliveryZoneToRange.deliveryRanges.map(deliveryRange => deliveryRange.price),
         }), {});
 

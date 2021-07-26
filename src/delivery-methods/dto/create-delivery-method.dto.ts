@@ -22,14 +22,7 @@ export class CreateDeliveryMethodDto {
   readonly deliveryMethodTypeCode: DeliveryMethodTypes;
 
   @Expose()
-  @Type(() => CreateDeliveryZoneToRangeDto)
-  @ValidateIf((obj) => obj.deliveryMethodTypeCode === DeliveryMethodTypes.DELIVERY)
+  @Type(({object}) => object.deliveryMethodTypeCode === DeliveryMethodTypes.DELIVERY ? CreateDeliveryZoneToRangeDto : CreateShippingZoneToRangeDto)
   @ValidateNested({each: true})
-  readonly deliveryZoneToRanges: CreateDeliveryZoneToRangeDto[];
-
-  @Expose()
-  @Type(() => CreateShippingZoneToRangeDto)
-  @ValidateIf((obj) => obj.deliveryMethodTypeCode === DeliveryMethodTypes.SHIPPING)
-  @ValidateNested({each: true})
-  readonly shippingZoneToRanges: CreateShippingZoneToRangeDto[];
+  readonly deliveryZoneToRanges: CreateShippingZoneToRangeDto[] | CreateDeliveryZoneToRangeDto[];
 }
