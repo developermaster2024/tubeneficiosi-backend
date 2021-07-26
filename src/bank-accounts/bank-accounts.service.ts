@@ -16,7 +16,7 @@ export class BankAccountsService {
     const [bankAccounts, total] = await this.bankAccountsRepository.findAndCount({
       take: perPage,
       skip: offset,
-      relations: ['cardIssuer'],
+      relations: ['cardIssuer', 'bankAccountType'],
     });
 
     return new PaginationResult(bankAccounts, total, perPage);
@@ -29,7 +29,10 @@ export class BankAccountsService {
   }
 
   async findOne(id: number): Promise<BankAccount> {
-    const bankAccount = await this.bankAccountsRepository.findOne(+id);
+    const bankAccount = await this.bankAccountsRepository.findOne({
+      where: {id},
+      relations: ['cardIssuer', 'bankAccountType'],
+    });
 
     if (!bankAccount) {
       throw new BankAccountNotFoundException();

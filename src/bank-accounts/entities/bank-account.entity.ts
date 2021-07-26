@@ -1,3 +1,4 @@
+import { BankAccountPurpose } from "src/bank-account-purposes/entities/bank-account-purposes.entity";
 import { BankAccountType } from "src/bank-account-types/entities/bank-account-type.entity";
 import { CardIssuer } from "src/card-issuers/entities/card-issuer.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
@@ -56,6 +57,17 @@ export class BankAccount {
   @ManyToOne(() => BankAccountType, {nullable: false, onDelete: 'CASCADE'})
   @JoinColumn({name: 'bank_account_type_id'})
   bankAccountType: BankAccountType;
+
+  @Column({
+    name: 'bank_account_purpose_code',
+    type: 'varchar',
+    length: 20,
+  })
+  bankAccountPurposeCode: string;
+
+  @ManyToOne(() => BankAccountPurpose, {nullable: false, onDelete: 'CASCADE'})
+  @JoinColumn({name: 'bank_account_purpose_code'})
+  bankAccountPurpose: BankAccountPurpose;
 
   @CreateDateColumn({
     name: 'created_at',
