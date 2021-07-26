@@ -27,7 +27,7 @@ export class CategoriesService {
 
     if (filters.name) queryBuilder.andWhere('category.name LIKE :name', {name: `%${filters.name}%`});
 
-    if (filters.storeId) queryBuilder.andWhere('store.userId = :storeId', {storeId: filters.storeId});
+    if (filters.storeId) queryBuilder.andWhere('store.id = :storeId', {storeId: filters.storeId});
 
     if (filters.parentOnly) queryBuilder.andWhere('category.parentId IS NULL');
 
