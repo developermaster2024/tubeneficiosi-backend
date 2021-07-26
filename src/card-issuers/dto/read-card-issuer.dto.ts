@@ -1,4 +1,5 @@
-import { Exclude, Expose } from "class-transformer";
+import { Exclude, Expose, Type } from "class-transformer";
+import { ReadCardIssuerType } from "src/card-issuer-types/entities/dto/read-card-issuer-type.dto";
 
 @Exclude()
 export class ReadCardIssuerDto {
@@ -10,4 +11,8 @@ export class ReadCardIssuerDto {
 
   @Expose()
   readonly imgPath: string;
+
+  @Expose()
+  @Type(() => ReadCardIssuerType)
+  readonly cardIssuerType: ReadCardIssuerType;
 }

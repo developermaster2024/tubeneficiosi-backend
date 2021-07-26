@@ -24,6 +24,7 @@ export class CardIssuersService {
       take: perPage,
       skip: offset,
       where,
+      relations: ['cardIssuerType'],
     });
 
     return new PaginationResult(cardIssuers, total, perPage);
@@ -39,7 +40,10 @@ export class CardIssuersService {
   }
 
   async findOne(id: number): Promise<CardIssuer> {
-    const cardIssuer = await this.cardIssuersRepository.findOne(id);
+    const cardIssuer = await this.cardIssuersRepository.findOne({
+      where: { id },
+      relations: ['cardIssuerType'],
+    });
 
     if (!cardIssuer) {
       throw new CardIssuerNotFoundException();

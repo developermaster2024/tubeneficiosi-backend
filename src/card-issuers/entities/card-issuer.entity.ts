@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { CardIssuerType } from "src/card-issuer-types/entities/card-issuer-type.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({
   name: 'card_issuers',
@@ -20,6 +21,16 @@ export class CardIssuer {
     type: 'varchar',
   })
   imgPath: string;
+
+  @Column({
+    name: 'card_issuer_type_id',
+    type: 'int',
+  })
+  cardIssuerTypeId: number;
+
+  @ManyToOne(() => CardIssuerType, {nullable: false, onDelete: 'CASCADE'})
+  @JoinColumn({name: 'card_issuer_type_id'})
+  cardIssuerType: CardIssuerType;
 
   @CreateDateColumn({
     name: 'created_at',
