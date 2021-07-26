@@ -3,21 +3,21 @@ import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { diskStorage } from 'multer';
 import { filenameGenerator } from 'src/support/file-uploads';
-import { BanksController } from './banks.controller';
-import { BanksService } from './banks.service';
-import { Bank } from './entities/bank.entity';
+import { CardIssuersController } from './card-issuers.controller';
+import { CardIssuersService } from './card-issuers.service';
+import { CardIssuer } from './entities/card-issuer.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Bank]),
+    TypeOrmModule.forFeature([CardIssuer]),
     MulterModule.register({
       storage: diskStorage({
-        destination: './uploads/banks',
+        destination: './uploads/card-issuers',
         filename: filenameGenerator,
       })
     }),
   ],
-  controllers: [BanksController],
-  providers: [BanksService]
+  controllers: [CardIssuersController],
+  providers: [CardIssuersService]
 })
-export class BanksModule {}
+export class CardIssuersModule {}

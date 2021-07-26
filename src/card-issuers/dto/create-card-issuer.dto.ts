@@ -2,13 +2,13 @@ import { Exclude, Expose } from "class-transformer";
 import { MaxLength } from "class-validator";
 import { IsUnique } from "src/validation/is-unique.constrain";
 import { IsMimeType } from "src/validation/mime-type.constrain";
-import { Bank } from "../entities/bank.entity";
+import { CardIssuer } from "../entities/card-issuer.entity";
 
 @Exclude()
-export class CreateBankDto {
+export class CreateCardIssuerDto {
   @Expose()
   @MaxLength(250)
-  @IsUnique(Bank)
+  @IsUnique(CardIssuer)
   readonly name: string;
 
   @Expose()

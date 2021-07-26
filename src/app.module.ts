@@ -25,7 +25,7 @@ import { AdsModule } from './ads/ads.module';
 import { FeaturedAdsModule } from './featured-ads/featured-ads.module';
 import { ClientsModule } from './clients/clients.module';
 import { StoresModule } from './stores/stores.module';
-import { BanksModule } from './banks/banks.module';
+import { CardIssuersModule } from './card-issuers/card-issuers.module';
 import { BankAccountTypesModule } from './bank-account-types/bank-account-types.module';
 import { BankAccountsModule } from './bank-accounts/bank-accounts.module';
 import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
@@ -68,7 +68,7 @@ import { DeliveryMethodTypesModule } from './delivery-method-types/delivery-meth
     FeaturedAdsModule,
     ClientsModule,
     StoresModule,
-    BanksModule,
+    CardIssuersModule,
     BankAccountTypesModule,
     BankAccountsModule,
     PaymentMethodsModule,

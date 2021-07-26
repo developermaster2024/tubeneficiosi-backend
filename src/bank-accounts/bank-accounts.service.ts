@@ -16,7 +16,7 @@ export class BankAccountsService {
     const [bankAccounts, total] = await this.bankAccountsRepository.findAndCount({
       take: perPage,
       skip: offset,
-      relations: ['bank'],
+      relations: ['cardIssuer'],
     });
 
     return new PaginationResult(bankAccounts, total, perPage);

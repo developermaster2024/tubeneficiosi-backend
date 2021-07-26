@@ -1,7 +1,7 @@
 import { Exclude, Expose } from "class-transformer";
 import { MaxLength } from "class-validator";
 import { BankAccountType } from "src/bank-account-types/entities/bank-account-type.entity";
-import { Bank } from "src/banks/entities/bank.entity";
+import { CardIssuer } from "src/card-issuers/entities/card-issuer.entity";
 import { Exists } from "src/validation/exists.constrain";
 
 @Exclude()
@@ -23,8 +23,8 @@ export class CreateBankAccountDto {
   readonly branchOffice: string;
 
   @Expose()
-  @Exists(Bank)
-  readonly bankId: number;
+  @Exists(CardIssuer)
+  readonly cardIssuerId: number;
 
   @Expose()
   @Exists(BankAccountType)

@@ -1,7 +1,7 @@
 import { Exclude, Expose } from "class-transformer";
 
 @Exclude()
-export class ReadBankDto {
+export class ReadCardIssuerDto {
   @Expose()
   readonly id: number;
 

@@ -1,5 +1,5 @@
 import { BankAccountType } from "src/bank-account-types/entities/bank-account-type.entity";
-import { Bank } from "src/banks/entities/bank.entity";
+import { CardIssuer } from "src/card-issuers/entities/card-issuer.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({
@@ -36,15 +36,15 @@ export class BankAccount {
   branchOffice: string;
 
   @Column({
-    name: 'bank_id',
+    name: 'card_issuer_id',
     type: 'int',
     select: false,
   })
-  bankId: number;
+  cardIssuerId: number;
 
-  @ManyToOne(() => Bank, {nullable: false, onDelete: 'CASCADE'})
-  @JoinColumn({name: 'bank_id'})
-  bank: Bank;
+  @ManyToOne(() => CardIssuer, {nullable: false, onDelete: 'CASCADE'})
+  @JoinColumn({name: 'card_issuer_id'})
+  cardIssuer: CardIssuer;
 
   @Column({
     name: 'bank_account_type_id',

@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { ReadBankDto } from "src/banks/dto/read-bank.dto";
+import { ReadCardIssuerDto } from "src/card-issuers/dto/read-card-issuer.dto";
 
 @Exclude()
 export class ReadBankAccountDto {
@@ -19,12 +19,9 @@ export class ReadBankAccountDto {
   readonly branchOffice: string;
 
   @Expose()
-  readonly bankId: number;
-
-  @Expose()
   readonly bankAccountTypeId: number;
 
   @Expose()
-  @Type(() => ReadBankDto)
-  readonly bank: ReadBankDto;
+  @Type(() => ReadCardIssuerDto)
+  readonly cardIssuer: ReadCardIssuerDto;
 }

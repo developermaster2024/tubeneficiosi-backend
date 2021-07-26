@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
 
-export class BankNotFoundException extends HttpException {
+export class CardIssuerNotFoundException extends HttpException {
   constructor() {
     super({
-      message: 'Banco no encontrado',
+      message: 'Emisor de tarjeta no encontrado',
     }, HttpStatus.NOT_FOUND);
   }
 }

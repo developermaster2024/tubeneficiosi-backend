@@ -1,9 +1,9 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({
-  name: 'banks',
+  name: 'card_issuers',
 })
-export class Bank {
+export class CardIssuer {
   @PrimaryGeneratedColumn({
     name: 'id',
   })
@@ -39,7 +39,7 @@ export class Bank {
   })
   deletedAt: Date;
 
-  static create(data: Partial<Bank>): Bank {
-    return Object.assign(new Bank(), data);
+  static create(data: Partial<CardIssuer>): CardIssuer {
+    return Object.assign(new CardIssuer(), data);
   }
 }
