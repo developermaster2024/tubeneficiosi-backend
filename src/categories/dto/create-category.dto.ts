@@ -1,5 +1,5 @@
 import { Exclude, Expose } from "class-transformer";
-import { IsString, MaxLength, ValidateIf } from "class-validator";
+import { IsNotEmpty, IsString, MaxLength, ValidateIf } from "class-validator";
 import { Exists } from "src/validation/exists.constrain";
 import { IsUnique } from "src/validation/is-unique.constrain";
 import { Category } from "../entities/category.entity";
@@ -11,6 +11,7 @@ export class CreateCategoryDto {
 
   @Expose()
   @IsString()
+  @IsNotEmpty()
   @MaxLength(255)
   @IsUnique(Category)
   readonly name: string;
