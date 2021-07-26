@@ -21,11 +21,15 @@ export class ReadStoreDto extends OmitType(ReadUserDto, ['role']) {
 
   @Expose()
   @Transform(({obj}: {obj: User}) => Number(obj.store.latitude))
-  readonly latitude: string;
+  readonly latitude: number;
 
   @Expose()
   @Transform(({obj}: {obj: User}) => Number(obj.store.longitude))
-  readonly longitude: string;
+  readonly longitude: number;
+
+  @Expose()
+  @Transform(({obj}: {obj: User}) => obj.store.id)
+  readonly storeId: string;
 
   @Expose()
   @Transform(({obj: {store: {storeCategory}}}: {obj: User}) => {
