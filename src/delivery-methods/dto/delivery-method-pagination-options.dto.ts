@@ -4,6 +4,7 @@ type DeliveryMethodFilters = {
   id: string;
   name: string;
   storeId: number;
+  deliveryMethodTypeCode: string;
 };
 
 export class DeliveryMethodPaginationOptionsDto extends PaginationOptions {
@@ -18,12 +19,14 @@ export class DeliveryMethodPaginationOptionsDto extends PaginationOptions {
       id,
       name,
       storeId,
+      deliveryMethodTypeCode,
     } = query;
 
     return new DeliveryMethodPaginationOptionsDto(+page, +perPage, {
       id,
       name,
       storeId: Number(storeId),
+      deliveryMethodTypeCode,
     });
   }
 }

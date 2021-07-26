@@ -35,6 +35,12 @@ export class DeliveryMethodsService {
       .skip(offset)
       .innerJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType');
 
+    if (filters.id) queryBuilder.andWhere('deliveryMethod.id = :id', {id: filters.id});
+
+    if (filters.deliveryMethodTypeCode) queryBuilder.andWhere('deliveryMethod.deliveryMethodTypeCode = :deliveryMethodTypeCode', {
+      deliveryMethodTypeCode: filters.deliveryMethodTypeCode
+    });
+
     if (filters.name) queryBuilder.andWhere('deliveryMethod.name LIKE :name', {name: `%${filters.name}%`});
 
     if (filters.storeId) queryBuilder.andWhere('deliveryMethod.storeId = :storeId', {storeId: filters.storeId});
