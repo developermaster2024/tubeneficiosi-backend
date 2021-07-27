@@ -37,6 +37,7 @@ import { UserStatusesModule } from './user-statuses/user-statuses.module';
 import { DeliveryMethodsModule } from './delivery-methods/delivery-methods.module';
 import { MailModule } from './mail/mail.module';
 import { DeliveryMethodTypesModule } from './delivery-method-types/delivery-method-types.module';
+import { CardTypesModule } from './card-types/card-types.module';
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { DeliveryMethodTypesModule } from './delivery-method-types/delivery-meth
     DeliveryMethodsModule,
     MailModule,
     DeliveryMethodTypesModule,
+    CardTypesModule,
   ],
 })
 export class AppModule {}
