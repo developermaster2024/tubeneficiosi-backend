@@ -181,6 +181,6 @@ export class DeliveryMethodsService {
       throw new DeliveryMethodNotFoundException();
     }
 
-    await this.storesRepository.softRemove(deliveryMethod);
+    await this.deliveryMethodsRepository.softRemove(deliveryMethod);
   }
 }
