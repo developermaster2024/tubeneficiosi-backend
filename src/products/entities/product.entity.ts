@@ -33,24 +33,28 @@ export class Product {
   @Column({
     name: 'reference',
     type: 'varchar',
+    nullable: true,
   })
   reference: string;
 
   @Column({
     name: 'short_description',
     type: 'varchar',
+    nullable: true,
   })
   shortDescription: string;
 
   @Column({
     name: 'description',
     type: 'text',
+    nullable: true,
   })
   description: string;
 
   @Column({
     name: 'quantity',
     type: 'int',
+    default: 0,
   })
   quantity: number;
 
@@ -65,10 +69,11 @@ export class Product {
   @Column({
     name: 'brand_id',
     type: 'int',
+    nullable: true,
   })
   brandId: number;
 
-  @ManyToOne(() => Brand, {nullable: false})
+  @ManyToOne(() => Brand, {nullable: true})
   @JoinColumn({name: 'brand_id'})
   brand: Brand;
 

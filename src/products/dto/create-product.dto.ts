@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { ArrayMinSize, IsArray, IsNumber, MaxLength, Min, ValidateNested } from "class-validator";
+import { ArrayMinSize, IsArray, IsNotEmpty, IsNumber, MaxLength, Min, ValidateIf, ValidateNested } from "class-validator";
 import { Brand } from "src/brands/entities/brand.entity";
 import { Exists } from "src/validation/exists.constrain";
 import { CreateProductFeatureGroup } from "./create-product-feature-group.dto";
@@ -19,21 +19,24 @@ export class CreateProductDto {
   readonly slug: string;
 
   @Expose()
+  @ValidateIf((obj) => obj.reference)
   @MaxLength(255)
   readonly reference: string;
 
   @Expose()
+  @ValidateIf((obj) => obj.shortDescription)
   @MaxLength(255)
   readonly shortDescription: string;
 
   @Expose()
+  @ValidateIf((obj) => obj.description)
   @MaxLength(2500)
   readonly description: string;
 
   @Expose()
   @Type(() => Number)
   @IsNumber()
-  @Min(1)
+  @Min(0)
   readonly quantity: number;
 
   @Expose()
@@ -42,6 +45,7 @@ export class CreateProductDto {
   readonly price: number;
 
   @Expose()
+  @ValidateIf((obj) => obj.brandId)
   @Exists(Brand)
   readonly brandId: number;
 
