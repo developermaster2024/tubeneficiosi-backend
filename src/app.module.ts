@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+  import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
@@ -38,6 +38,7 @@ import { DeliveryMethodsModule } from './delivery-methods/delivery-methods.modul
 import { MailModule } from './mail/mail.module';
 import { DeliveryMethodTypesModule } from './delivery-method-types/delivery-method-types.module';
 import { CardTypesModule } from './card-types/card-types.module';
+import { CardsModule } from './cards/cards.module';
 
 @Module({
   imports: [
@@ -82,6 +83,7 @@ import { CardTypesModule } from './card-types/card-types.module';
     MailModule,
     DeliveryMethodTypesModule,
     CardTypesModule,
+    CardsModule,
   ],
 })
 export class AppModule {}

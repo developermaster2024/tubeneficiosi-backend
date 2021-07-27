@@ -1,6 +1,9 @@
 *
 !admins/
 !banks/
+!card-issuers/
+!cards/
+!banks/
 !help-categories/
 !main-banner-ads/
 !payment-methods/
