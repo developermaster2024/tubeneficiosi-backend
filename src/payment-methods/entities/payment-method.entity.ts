@@ -1,13 +1,15 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { PaymentMethods } from "../enum/payment-methods.enum";
 
 @Entity({
   name: 'payment_methods',
 })
 export class PaymentMethod {
-  @PrimaryGeneratedColumn({
-    name: 'id',
+  @PrimaryColumn({
+    name: 'code',
+    type: 'varchar',
   })
-  readonly id: number;
+  code: PaymentMethods;
 
   @Column({
     name: 'name',
