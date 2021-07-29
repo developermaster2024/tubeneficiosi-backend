@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import slugify from 'slugify';
 import { Category } from 'src/categories/entities/category.entity';
+import { DeliveryMethodType } from 'src/delivery-method-types/entities/delivery-method-type.entity';
 import { ProductFeature } from 'src/product-features/entities/product-feature.entity';
 import { Store } from 'src/stores/entities/store.entity';
 import { StoreNotFoundException } from 'src/stores/erros/store-not-found.exception';
@@ -46,7 +47,7 @@ export class ProductsService {
     return new PaginationResult(products, total, perPage);
   }
 
-  async create({userId, tagIds, categoryIds, features, featureGroups, ...createProductDto}: CreateProductDto, images: Express.Multer.File[]): Promise<Product> {
+  async create({userId, tagIds, categoryIds, features, featureGroups, deliveryMethodTypeCodes, ...createProductDto}: CreateProductDto, images: Express.Multer.File[]): Promise<Product> {
     const store = await this.findUserStore(userId);
 
     const tags = await this.tagsRepository.find({id: In(tagIds)});
@@ -79,6 +80,7 @@ export class ProductsService {
         length: createProductDto.length,
         weight: createProductDto.weight,
       }),
+      deliveryMethodTypes: deliveryMethodTypeCodes.map(typeCode => DeliveryMethodType.create({code: typeCode})),
     });
 
     return await this.productsRepository.save(product);
