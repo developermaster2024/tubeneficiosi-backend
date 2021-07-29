@@ -66,7 +66,10 @@ export class ProductsService {
       ...createProductDto,
       tags,
       categories,
-      productImages: images.map(imageFile => ProductImage.create({path: imageFile.path})),
+      productImages: images.map((imageFile, i) => ProductImage.create({
+        path: imageFile.path,
+        isPortrait: i === 0,
+      })),
       productToProductFeatures,
       store,
       productFeatureGroups,

@@ -16,6 +16,12 @@ export class ProductImage {
   })
   path: string;
 
+  @Column({
+    name: 'is_portrait',
+    type: 'boolean',
+  })
+  isPortrait: boolean;
+
   @ManyToOne(() => Product, product => product.productImages, {nullable: false, onDelete: 'CASCADE'})
   @JoinColumn({name: 'product_id'})
   product: Product;
