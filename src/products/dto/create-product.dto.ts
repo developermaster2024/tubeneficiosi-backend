@@ -1,6 +1,7 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { ArrayMinSize, IsArray, IsNotEmpty, IsNumber, MaxLength, Min, ValidateIf, ValidateNested } from "class-validator";
+import { ArrayMinSize, IsArray, IsIn, IsNumber, MaxLength, Min, ValidateIf, ValidateNested } from "class-validator";
 import { Brand } from "src/brands/entities/brand.entity";
+import { DeliveryMethodTypes, DeliveryMethodTypesValues } from "src/delivery-method-types/enums/delivery-methods-types.enum";
 import { Exists } from "src/validation/exists.constrain";
 import { CreateProductFeatureGroup } from "./create-product-feature-group.dto";
 import { CreateProductToProductFeatureDto } from "./create-product-to-feature.dto";
@@ -88,4 +89,8 @@ export class CreateProductDto {
   @Type(() => Number)
   @Min(0)
   readonly weight: number;
+
+  @Expose()
+  @IsIn(DeliveryMethodTypesValues, {each: true})
+  readonly deliveryMethodTypeCodes: DeliveryMethodTypes[];
 }

@@ -1,5 +1,6 @@
 import { Brand } from "src/brands/entities/brand.entity";
 import { Category } from "src/categories/entities/category.entity";
+import { DeliveryMethodType } from "src/delivery-method-types/entities/delivery-method-type.entity";
 import { Store } from "src/stores/entities/store.entity";
 import { Tag } from "src/tags/entities/tag.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
@@ -87,6 +88,14 @@ export class Product {
   @ManyToOne(() => Store, {nullable: false})
   @JoinColumn({name: 'store_id'})
   store: Store;
+
+  @ManyToMany(() => DeliveryMethodType, {cascade: true, onDelete: 'CASCADE'})
+  @JoinTable({
+    name: 'product_to_delivery_method_type',
+    joinColumn: {name: 'product_id'},
+    inverseJoinColumn: {name: 'delivery_method_type_id'},
+  })
+  deliveryMethodTypes: DeliveryMethodType[];
 
   @ManyToMany(() => Tag, {
     cascade: ['insert', 'update'],
