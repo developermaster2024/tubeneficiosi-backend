@@ -52,7 +52,7 @@ export class ProductsService {
 
     const tags = await this.tagsRepository.find({id: In(tagIds ?? [])});
     const categories = await this.categoriesRepository.find({id: In(categoryIds ?? []), store});
-    const productFeatures = await this.productFeaturesRepository.find({id: In(features?.map(feature => feature.id) ?? [])});
+    const productFeatures = features ? await this.productFeaturesRepository.find({id: In(features.map(feature => feature.id))}) : [];
     const productToProductFeatures = productFeatures.map((productFeature) => ProductToProductFeature.create({
       productFeature,
       price: features.find(feature => feature.id == productFeature.id)?.price ?? 0,
