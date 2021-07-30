@@ -63,11 +63,13 @@ export class CreateProductDto {
   readonly categoryIds: number[];
 
   @Expose()
+  @ValidateIf((obj) => obj.features)
   @Type(() => CreateProductToProductFeatureDto)
   @ValidateNested({each: true})
   readonly features: CreateProductToProductFeatureDto[];
 
   @Expose()
+  @ValidateIf((obj) => obj.featureGroups)
   @Type(() => CreateProductFeatureGroup)
   @ValidateNested({each: true})
   readonly featureGroups: CreateProductFeatureGroup[];
