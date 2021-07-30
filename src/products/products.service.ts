@@ -48,6 +48,7 @@ export class ProductsService {
         'categories',
         'productImages',
       ],
+      where,
     });
 
     return new PaginationResult(products, total, perPage);
