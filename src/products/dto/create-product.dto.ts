@@ -51,6 +51,7 @@ export class CreateProductDto {
   readonly brandId: number;
 
   @Expose()
+  @ValidateIf((obj) => obj.tagIds)
   @IsArray()
   @ArrayMinSize(0)
   readonly tagIds: number[];
