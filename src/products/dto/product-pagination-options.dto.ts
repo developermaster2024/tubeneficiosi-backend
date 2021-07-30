@@ -3,6 +3,7 @@ import { PaginationOptions } from "src/support/pagination/pagination-options";
 type ProductFilters = {
   id: string;
   name: string;
+  storeId: number;
 };
 
 export class ProductPaginationOptionsDto extends PaginationOptions {
@@ -16,7 +17,12 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       perPage = 10,
       id,
       name,
+      storeId,
     } = query;
-    return new ProductPaginationOptionsDto(+page, +perPage, {id, name});
+    return new ProductPaginationOptionsDto(+page, +perPage, {
+      id,
+      name,
+      storeId: Number(storeId),
+    });
   }
 }

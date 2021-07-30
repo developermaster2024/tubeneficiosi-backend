@@ -36,6 +36,8 @@ export class ProductsService {
 
     if (filters.name) where.name = Like(`%${filters.name}%`);
 
+    if (filters.storeId) where.storeId = filters.storeId;
+
     // @TODO: agregar el resto de filtros, cuadrar con Jeyver
 
     const [products, total] = await this.productsRepository.findAndCount({
