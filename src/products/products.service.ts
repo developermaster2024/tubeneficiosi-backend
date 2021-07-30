@@ -50,8 +50,8 @@ export class ProductsService {
   async create({userId, tagIds, categoryIds, features, featureGroups, deliveryMethodTypeCodes, ...createProductDto}: CreateProductDto, images: Express.Multer.File[]): Promise<Product> {
     const store = await this.findUserStore(userId);
 
-    const tags = await this.tagsRepository.find({id: In(tagIds ?? [])});
-    const categories = await this.categoriesRepository.find({id: In(categoryIds ?? []), store});
+    const tags = tagIds ? await this.tagsRepository.find({id: In(tagIds)}) : [];
+    const categories = categoryIds ? await this.categoriesRepository.find({id: In(categoryIds), store}) : [];
     const productFeatures = features ? await this.productFeaturesRepository.find({id: In(features.map(feature => feature.id))}) : [];
     const productToProductFeatures = productFeatures.map((productFeature) => ProductToProductFeature.create({
       productFeature,
