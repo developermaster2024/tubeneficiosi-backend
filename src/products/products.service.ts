@@ -51,7 +51,7 @@ export class ProductsService {
     const store = await this.findUserStore(userId);
 
     const tags = await this.tagsRepository.find({id: In(tagIds ?? [])});
-    const categories = await this.categoriesRepository.find({id: In(categoryIds), store});
+    const categories = await this.categoriesRepository.find({id: In(categoryIds ?? []), store});
     const productFeatures = await this.productFeaturesRepository.find({id: In(features?.map(feature => feature.id) ?? [])});
     const productToProductFeatures = productFeatures.map((productFeature) => ProductToProductFeature.create({
       productFeature,
