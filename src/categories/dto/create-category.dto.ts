@@ -13,7 +13,6 @@ export class CreateCategoryDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
-  @IsUnique(Category)
   readonly name: string;
 
   @Expose()
