@@ -52,16 +52,16 @@ export class ProductsService {
 
     const tags = await this.tagsRepository.find({id: In(tagIds)});
     const categories = await this.categoriesRepository.find({id: In(categoryIds), store});
-    const productFeatures = await this.productFeaturesRepository.find({id: In(features.map(feature => feature.id))});
+    const productFeatures = await this.productFeaturesRepository.find({id: In(features?.map(feature => feature.id) ?? [])});
     const productToProductFeatures = productFeatures.map((productFeature) => ProductToProductFeature.create({
       productFeature,
       price: features.find(feature => feature.id == productFeature.id)?.price ?? 0,
     }));
-    const productFeatureGroups = featureGroups.map(({name, isMultiSelectable, features}) => ProductFeatureGroup.create({
+    const productFeatureGroups = featureGroups?.map(({name, isMultiSelectable, features}) => ProductFeatureGroup.create({
       name,
       isMultiSelectable,
       productFeatureForGroups: features.map(feature => ProductFeatureForGroup.create(feature)),
-    }));
+    })) ?? [];
 
     const product = Product.create({
       ...createProductDto,

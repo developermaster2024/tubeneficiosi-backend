@@ -52,12 +52,12 @@ export class CreateProductDto {
 
   @Expose()
   @IsArray()
-  @ArrayMinSize(1)
+  @ArrayMinSize(0)
   readonly tagIds: number[];
 
   @Expose()
   @IsArray()
-  @ArrayMinSize(1)
+  @ArrayMinSize(0)
   readonly categoryIds: number[];
 
   @Expose()
