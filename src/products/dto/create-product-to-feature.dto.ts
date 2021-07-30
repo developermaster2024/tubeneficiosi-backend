@@ -1,13 +1,19 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { IsNumber, Min } from "class-validator";
+import { IsNotEmpty, IsNumber, MaxLength, Min } from "class-validator";
 import { ProductFeature } from "src/product-features/entities/product-feature.entity";
 import { Exists } from "src/validation/exists.constrain";
 
 @Exclude()
 export class CreateProductToProductFeatureDto {
   @Expose()
-  @Exists(ProductFeature)
-  readonly id: number;
+  @IsNotEmpty()
+  @MaxLength(255)
+  readonly name: string;
+
+  @Expose()
+  @IsNotEmpty()
+  @MaxLength(255)
+  readonly value: string;
 
   @Expose()
   @Type(() => Number)

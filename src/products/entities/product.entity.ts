@@ -1,13 +1,13 @@
 import { Brand } from "src/brands/entities/brand.entity";
 import { Category } from "src/categories/entities/category.entity";
 import { DeliveryMethodType } from "src/delivery-method-types/entities/delivery-method-type.entity";
+import { ProductFeature } from "src/product-features/entities/product-feature.entity";
 import { Store } from "src/stores/entities/store.entity";
 import { Tag } from "src/tags/entities/tag.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { ProductDimension } from "./product-dimension.entity";
 import { ProductFeatureGroup } from "./product-feature-group.entity";
 import { ProductImage } from "./product-image.entity";
-import { ProductToProductFeature } from "./prouct-to-product-feature.entity";
 
 @Entity({
   name: 'products'
@@ -121,10 +121,8 @@ export class Product {
   })
   categories: Category[];
 
-  @OneToMany(() => ProductToProductFeature, producToProductFeature => producToProductFeature.product, {
-    cascade: ['insert', 'update'],
-  })
-  productToProductFeatures: ProductToProductFeature[];
+  @OneToMany(() => ProductFeature, productFeature => productFeature.product, {cascade: ['insert', 'update']})
+  productFeatures: ProductFeature[];
 
   @OneToMany(() => ProductImage, productImage => productImage.product, {cascade: ['insert', 'update']})
   productImages: ProductImage[];

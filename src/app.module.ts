@@ -18,7 +18,6 @@ import { LocationsModule } from './locations/locations.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { QuestionsModule } from './questions/questions.module';
 import { ProductsModule } from './products/products.module';
-import { ProductFeaturesModule } from './product-features/product-features.module';
 import { MainBannerAdsModule } from './main-banner-ads/main-banner-ads.module';
 import { AdsPositionsModule } from './ads-positions/ads-positions.module';
 import { AdsModule } from './ads/ads.module';
@@ -64,7 +63,6 @@ import { OrderStatusesModule } from './order-statuses/order-statuses.module';
     NotificationsModule,
     QuestionsModule,
     ProductsModule,
-    ProductFeaturesModule,
     MainBannerAdsModule,
     AdsPositionsModule,
     AdsModule,

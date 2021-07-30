@@ -1,3 +1,4 @@
+import { Product } from "src/products/entities/product.entity";
 import { Store } from "src/stores/entities/store.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
@@ -16,9 +17,23 @@ export class ProductFeature {
   })
   name: string;
 
-  @ManyToOne(() => Store, {nullable: false, onDelete: 'CASCADE'})
-  @JoinColumn({name: 'store_id'})
-  store: Store;
+  @Column({
+    name: 'value',
+    type: 'varchar',
+  })
+  value: string;
+
+  @Column({
+    name: 'price',
+    type: 'decimal',
+    precision: 14,
+    scale: 2
+  })
+  price: number;
+
+  @ManyToOne(() => Product, {nullable: false, onDelete: 'CASCADE'})
+  @JoinColumn({name: 'product_id'})
+  product: Product;
 
   @CreateDateColumn({
     name: 'created_at',

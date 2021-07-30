@@ -16,7 +16,6 @@ import { ProductFeatureForGroup } from './entities/product-feature-for-group.ent
 import { ProductFeatureGroup } from './entities/product-feature-group.entity';
 import { ProductImage } from './entities/product-image.entity';
 import { Product } from './entities/product.entity';
-import { ProductToProductFeature } from './entities/prouct-to-product-feature.entity';
 import { ProductNotFoundException } from './errors/product-not-found.exception';
 
 @Injectable()
@@ -45,7 +44,7 @@ export class ProductsService {
       relations: [
         'brand',
         'categories',
-        'productImages'
+        'productImages',
       ],
     });
 
@@ -57,11 +56,7 @@ export class ProductsService {
 
     const tags = tagIds ? await this.tagsRepository.find({id: In(tagIds)}) : [];
     const categories = categoryIds ? await this.categoriesRepository.find({id: In(categoryIds), store}) : [];
-    const productFeatures = features ? await this.productFeaturesRepository.find({id: In(features.map(feature => feature.id))}) : [];
-    const productToProductFeatures = productFeatures.map((productFeature) => ProductToProductFeature.create({
-      productFeature,
-      price: features.find(feature => feature.id == productFeature.id)?.price ?? 0,
-    }));
+    const productFeatures = features ? features.map(feature => ProductFeature.create(feature)) : [];
     const productFeatureGroups = featureGroups ? featureGroups.map(({name, isMultiSelectable, features}) => ProductFeatureGroup.create({
       name,
       isMultiSelectable,
@@ -77,7 +72,7 @@ export class ProductsService {
         path: imageFile.path,
         isPortrait: i === 0,
       })),
-      productToProductFeatures,
+      productFeatures,
       store,
       productFeatureGroups,
       productDimensions: ProductDimension.create({
@@ -99,7 +94,7 @@ export class ProductsService {
         'brand',
         'categories',
         'productImages',
-        'productToProductFeatures',
+        'productFeatures',
         'productFeatureGroups',
       ],
     });
