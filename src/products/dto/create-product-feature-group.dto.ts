@@ -1,5 +1,5 @@
 import { Exclude, Expose, Transform, Type } from "class-transformer";
-import { IsBoolean, MaxLength, ValidateNested } from "class-validator";
+import { ArrayMinSize, IsBoolean, MaxLength, ValidateNested } from "class-validator";
 import { CreateProductFeatureForGroup } from "./create-product-feature-for-group.dto";
 
 @Exclude()
@@ -16,5 +16,6 @@ export class CreateProductFeatureGroup {
   @Expose()
   @Type(() => CreateProductFeatureForGroup)
   @ValidateNested({each: true})
+  @ArrayMinSize(1)
   readonly features: CreateProductFeatureForGroup[];
 }
