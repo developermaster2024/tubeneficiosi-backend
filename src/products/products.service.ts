@@ -47,7 +47,7 @@ export class ProductsService {
     return new PaginationResult(products, total, perPage);
   }
 
-  async create({userId, tagIds, categoryIds, features, featureGroups, deliveryMethodTypeCodes, ...createProductDto}: CreateProductDto, images: Express.Multer.File[]): Promise<Product> {
+  async create({userId, tagIds, categoryIds, features, featureGroups, deliveryMethodTypeCodes, brandId, ...createProductDto}: CreateProductDto, images: Express.Multer.File[]): Promise<Product> {
     const store = await this.findUserStore(userId);
 
     const tags = tagIds ? await this.tagsRepository.find({id: In(tagIds)}) : [];
@@ -65,6 +65,7 @@ export class ProductsService {
 
     const product = Product.create({
       ...createProductDto,
+      brandId: brandId ? brandId : null,
       tags,
       categories,
       productImages: images.map((imageFile, i) => ProductImage.create({
