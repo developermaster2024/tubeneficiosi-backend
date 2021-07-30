@@ -57,11 +57,11 @@ export class ProductsService {
       productFeature,
       price: features.find(feature => feature.id == productFeature.id)?.price ?? 0,
     }));
-    const productFeatureGroups = featureGroups?.map(({name, isMultiSelectable, features}) => ProductFeatureGroup.create({
+    const productFeatureGroups = featureGroups ? featureGroups.map(({name, isMultiSelectable, features}) => ProductFeatureGroup.create({
       name,
       isMultiSelectable,
       productFeatureForGroups: features.map(feature => ProductFeatureForGroup.create(feature)),
-    })) ?? [];
+    })) : [];
 
     const product = Product.create({
       ...createProductDto,
