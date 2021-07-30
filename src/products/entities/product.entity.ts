@@ -123,7 +123,6 @@ export class Product {
 
   @OneToMany(() => ProductToProductFeature, producToProductFeature => producToProductFeature.product, {
     cascade: ['insert', 'update'],
-    eager: true,
   })
   productToProductFeatures: ProductToProductFeature[];
 
@@ -133,7 +132,7 @@ export class Product {
   @OneToMany(() => ProductFeatureGroup, productFeatureGroup => productFeatureGroup.product, {cascade: ['insert', 'update']})
   productFeatureGroups: ProductFeatureGroup[];
 
-  @OneToOne(() => ProductDimension, productDimension => productDimension.product, {cascade: ['insert', 'update'], eager: true})
+  @OneToOne(() => ProductDimension, productDimension => productDimension.product, {cascade: ['insert', 'update']})
   productDimensions: ProductDimension;
 
   @CreateDateColumn({

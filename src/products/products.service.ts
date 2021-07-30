@@ -42,6 +42,11 @@ export class ProductsService {
     const [products, total] = await this.productsRepository.findAndCount({
       take: perPage,
       skip: offset,
+      relations: [
+        'brand',
+        'categories',
+        'productImages'
+      ],
     });
 
     return new PaginationResult(products, total, perPage);
@@ -88,7 +93,16 @@ export class ProductsService {
   }
 
   async findOneBySlug(slug: string): Promise<Product> {
-    const product = await this.productsRepository.findOne({slug});
+    const product = await this.productsRepository.findOne({
+      where: { slug },
+      relations: [
+        'brand',
+        'categories',
+        'productImages',
+        'productToProductFeatures',
+        'productFeatureGroups',
+      ],
+    });
 
     if (!product) {
       throw new ProductNotFoundException();
