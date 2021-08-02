@@ -43,11 +43,16 @@ export class ProductsService {
     const [products, total] = await this.productsRepository.findAndCount({
       take: perPage,
       skip: offset,
-      relations: [
-        'brand',
-        'categories',
-        'productImages',
-      ],
+      join: {
+        alias: 'product',
+        leftJoinAndSelect: {
+          brand: 'product.brand',
+          category: 'product.categories',
+          productImage: 'product.productImages',
+          store: 'product.store',
+          storeProfile: 'store.storeProfile',
+        },
+      },
       where,
     });
 

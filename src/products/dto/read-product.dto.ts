@@ -1,7 +1,9 @@
-import { Exclude, Expose, Type } from "class-transformer";
+import { Exclude, Expose, plainToClass, Transform, Type } from "class-transformer";
 import { ReadBrandDto } from "src/brands/dto/read-brand.dto";
 import { ReadCategoryDto } from "src/categories/dto/read-category.dto";
 import { ProductFeature } from "src/product-features/entities/product-feature.entity";
+import { ReadStoreDto } from "src/stores/dto/read-store.dto";
+import { User } from "src/users/entities/user.entity";
 import { ProductDimension } from "../entities/product-dimension.entity";
 import { ProductImage } from "../entities/product-image.entity";
 
@@ -50,4 +52,8 @@ export class ReadProductDto {
   @Expose()
   @Type(() => ReadCategoryDto)
   readonly categories: ReadCategoryDto[];
+
+  @Expose()
+  @Transform(({obj}) => plainToClass(ReadStoreDto, User.create({store: obj})))
+  readonly store: ReadStoreDto;
 }
