@@ -55,10 +55,6 @@ export class ReadProductDto {
   readonly categories: ReadCategoryDto[];
 
   @Expose()
-  @Transform(({obj}) => plainToClass(ReadStoreDto, User.create({store: obj})))
+  @Transform(({obj}) => plainToClass(ReadStoreDto, User.create({store: obj.store})))
   readonly store: ReadStoreDto;
-
-  @Expose()
-  @Type(() => ReadStoreProfileDto)
-  readonly storeProfile: ReadStoreProfileDto;
 }
