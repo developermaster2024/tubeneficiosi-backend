@@ -105,6 +105,9 @@ export class ProductsService {
         'productImages',
         'productFeatures',
         'productFeatureGroups',
+        'store',
+        'store.storeProfile',
+        'deliveryMethodTypes',
       ],
     });
 
