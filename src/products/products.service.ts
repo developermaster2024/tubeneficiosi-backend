@@ -55,7 +55,7 @@ export class ProductsService {
       },
       where,
     });
-
+console.log(products[0])
     return new PaginationResult(products, total, perPage);
   }
 
