@@ -49,6 +49,7 @@ export class ProductsService {
           brand: 'product.brand',
           category: 'product.categories',
           productImage: 'product.productImages',
+          deliveryMethodType: 'product.deliveryMethodTypes',
           store: 'product.store',
           storeProfile: 'store.storeProfile',
         },

@@ -1,8 +1,8 @@
 import { Exclude, Expose, plainToClass, Transform, Type } from "class-transformer";
 import { ReadBrandDto } from "src/brands/dto/read-brand.dto";
 import { ReadCategoryDto } from "src/categories/dto/read-category.dto";
+import { DeliveryMethodType } from "src/delivery-method-types/entities/delivery-method-type.entity";
 import { ProductFeature } from "src/product-features/entities/product-feature.entity";
-import { ReadStoreProfileDto } from "src/stores-profile/dto/read-store-profile.dto";
 import { ReadStoreDto } from "src/stores/dto/read-store.dto";
 import { User } from "src/users/entities/user.entity";
 import { ProductDimension } from "../entities/product-dimension.entity";
@@ -57,4 +57,7 @@ export class ReadProductDto {
   @Expose()
   @Transform(({obj}) => plainToClass(ReadStoreDto, User.create({store: obj.store})))
   readonly store: ReadStoreDto;
+
+  @Expose()
+  readonly deliveryMethodTypes: DeliveryMethodType[];
 }
