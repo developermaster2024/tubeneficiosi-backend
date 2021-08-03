@@ -25,7 +25,7 @@ export class QuestionsService {
       take: perPage,
       skip: offset,
       where,
-      relations: ['user', 'user.client']
+      relations: ['answeredBy', 'answeredBy.client']
     })
 
     return new PaginationResult(questions, total, perPage);

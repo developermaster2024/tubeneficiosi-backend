@@ -1,3 +1,4 @@
+import { Product } from "src/products/entities/product.entity";
 import { User } from "src/users/entities/user.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
@@ -32,19 +33,25 @@ export class Question {
 
   @Column({
     name: 'product_id',
-    type: 'int'
+    type: 'int',
+    select: false,
   })
   productId: number;
 
+  @ManyToOne(() => Product)
+  @JoinColumn({name: 'product_id'})
+  product: Product;
+
   @Column({
-    name: 'user_id',
-    type: 'int'
+    name: 'answered_by_id',
+    type: 'int',
+    select: false,
   })
-  userId: number;
+  answeredById: number;
 
   @ManyToOne(() => User, {nullable: false})
-  @JoinColumn({name: 'user_id'})
-  user: User;
+  @JoinColumn({name: 'answered_by_id'})
+  answeredBy: User;
 
   @CreateDateColumn({
     name: 'created_at',

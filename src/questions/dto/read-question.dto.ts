@@ -26,5 +26,5 @@ export class ReadQuestionDto {
 
   @Expose()
   @Type(() => ReadClientDto)
-  readonly user: ReadClientDto;
+  readonly answeredBy: ReadClientDto;
 }

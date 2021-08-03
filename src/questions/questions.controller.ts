@@ -25,7 +25,7 @@ export class QuestionsController {
   @Post()
   @Roles(Role.CLIENT)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @UseInterceptors(new JwtUserToBodyInterceptor())
+  @UseInterceptors(new JwtUserToBodyInterceptor('answeredById'))
   async create(@Body() createQuestionDto: CreateQuestionDto): Promise<ReadQuestionDto> {
     return plainToClass(ReadQuestionDto, await this.questionsService.create(createQuestionDto));
   }
