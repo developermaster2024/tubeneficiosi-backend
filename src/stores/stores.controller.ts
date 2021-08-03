@@ -20,8 +20,6 @@ export class StoresController {
   constructor(private readonly storesService: StoresService) {}
 
   @Get()
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   async paginate(@Query(StorePaginationPipe) options: any): Promise<PaginationResult<ReadStoreDto>> {
     return (await this.storesService.paginate(options)).toClass(ReadStoreDto);
   }
