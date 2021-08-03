@@ -44,8 +44,6 @@ export class StoresController {
   }
 
   @Get(':id')
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   async findOne(@Param('id') id: string): Promise<ReadStoreDto> {
     return plainToClass(ReadStoreDto, await this.storesService.findOne(+id));
   }
