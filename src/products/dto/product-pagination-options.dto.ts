@@ -3,7 +3,13 @@ import { PaginationOptions } from "src/support/pagination/pagination-options";
 type ProductFilters = {
   id: string;
   name: string;
+  reference: string;
+  minPrice: number;
+  maxPrice: number;
+  minQuantity: number;
+  maxQuantity: number;
   storeId: number;
+  storeName: string;
 };
 
 export class ProductPaginationOptionsDto extends PaginationOptions {
@@ -17,12 +23,24 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       perPage = 10,
       id,
       name,
+      reference,
+      minPrice,
+      maxPrice,
+      minQuantity,
+      maxQuantity,
       storeId,
+      storeName,
     } = query;
     return new ProductPaginationOptionsDto(+page, +perPage, {
       id,
       name,
+      reference,
+      minPrice: Number(minPrice),
+      maxPrice: Number(maxPrice),
+      minQuantity: Number(minQuantity),
+      maxQuantity: Number(maxQuantity),
       storeId: Number(storeId),
+      storeName,
     });
   }
 }

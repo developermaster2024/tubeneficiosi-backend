@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import slugify from 'slugify';
 import { Category } from 'src/categories/entities/category.entity';
 import { DeliveryMethodType } from 'src/delivery-method-types/entities/delivery-method-type.entity';
 import { ProductFeature } from 'src/product-features/entities/product-feature.entity';
@@ -8,7 +7,7 @@ import { Store } from 'src/stores/entities/store.entity';
 import { StoreNotFoundException } from 'src/stores/erros/store-not-found.exception';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Tag } from 'src/tags/entities/tag.entity';
-import { FindConditions, In, Like, Repository } from 'typeorm';
+import { In, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductPaginationOptionsDto } from './dto/product-pagination-options.dto';
 import { ProductDimension } from './entities/product-dimension.entity';
@@ -28,34 +27,46 @@ export class ProductsService {
     @InjectRepository(ProductFeature) private readonly productFeaturesRepository: Repository<ProductFeature>
   ) {}
 
-  async paginate({offset, perPage, filters}: ProductPaginationOptionsDto): Promise<PaginationResult<Product>> {
-    const where: FindConditions<Product> = {};
+  async paginate({offset, perPage, filters: {
+    id,
+    name,
+    reference,
+    minPrice,
+    maxPrice,
+    minQuantity,
+    maxQuantity,
+    storeId,
+    storeName,
+  }}: ProductPaginationOptionsDto): Promise<PaginationResult<Product>> {
+    const queryBuilder = this.productsRepository.createQueryBuilder('product')
+      .take(perPage)
+      .skip(offset)
+      .leftJoinAndSelect('product.brand', 'brand')
+      .leftJoinAndSelect('product.categories', 'category')
+      .leftJoinAndSelect('product.productImages', 'productImage')
+      .leftJoinAndSelect('product.deliveryMethodTypes', 'deliveryMethodType')
+      .leftJoinAndSelect('product.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile');
 
-    // @ts-ignore
-    if (filters.id) where.id = +filters.id;
+    if (id) queryBuilder.andWhere('id = :id', { id });
 
-    if (filters.name) where.name = Like(`%${filters.name}%`);
+    if (name) queryBuilder.andWhere('name LIKE :name', { name: `%${name}%` });
 
-    if (filters.storeId) where.storeId = filters.storeId;
+    if (reference) queryBuilder.andWhere('reference LIKE :reference', { reference: `%${reference}%` });
 
-    // @TODO: agregar el resto de filtros, cuadrar con Jeyver
+    if (minPrice) queryBuilder.andWhere('price >= :minPrice', { minPrice });
 
-    const [products, total] = await this.productsRepository.findAndCount({
-      take: perPage,
-      skip: offset,
-      join: {
-        alias: 'product',
-        leftJoinAndSelect: {
-          brand: 'product.brand',
-          category: 'product.categories',
-          productImage: 'product.productImages',
-          deliveryMethodType: 'product.deliveryMethodTypes',
-          store: 'product.store',
-          storeProfile: 'store.storeProfile',
-        },
-      },
-      where,
-    });
+    if (maxPrice) queryBuilder.andWhere('price <= :maxPrice', { maxPrice });
+
+    if (minQuantity) queryBuilder.andWhere('quantity >= :minQuantity', { minQuantity });
+
+    if (maxQuantity) queryBuilder.andWhere('quantity <= :maxQuantity', { maxQuantity });
+
+    if (storeId) queryBuilder.andWhere('storeId = :storeId', { storeId });
+
+    if (storeName) queryBuilder.andWhere('store.name LIKE :storeName', { storeName: `%${storeName}%`});
+
+    const [products, total] = await queryBuilder.getManyAndCount();
 
     return new PaginationResult(products, total, perPage);
   }
