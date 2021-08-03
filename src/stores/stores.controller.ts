@@ -15,7 +15,6 @@ import { StorePaginationPipe } from './pipes/store-pagination.pipe';
 import { StoresService } from './stores.service';
 
 @Controller('stores')
-@UseGuards(JwtAuthGuard)
 export class StoresController {
   constructor(private readonly storesService: StoresService) {}
 
@@ -26,7 +25,7 @@ export class StoresController {
 
   @Post()
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(FileFieldsInterceptor([
     {name: 'banner', maxCount: 1},
     {name: 'logo', maxCount: 1},
@@ -50,7 +49,7 @@ export class StoresController {
 
   @Put(':id')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(
     FileFieldsInterceptor([
       {name: 'banner', maxCount: 1},
@@ -72,7 +71,7 @@ export class StoresController {
 
   @Put(':id/password')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new ParamsToBodyInterceptor({id: 'id'}))
   async updatePassword(@Body() updateStorePasswordDto: UpdateStorePasswordDto): Promise<ReadStoreDto> {
     return plainToClass(ReadStoreDto, await this.storesService.updatePassword(updateStorePasswordDto));
@@ -80,7 +79,7 @@ export class StoresController {
 
   @Delete(':id')
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@Param('id') id: string): Promise<void> {
     await this.storesService.delete(+id);
