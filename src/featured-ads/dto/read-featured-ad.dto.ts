@@ -22,12 +22,6 @@ export class ReadFeaturedAdDto {
   readonly until: Date;
 
   @Expose()
-  readonly storeCategoryId: number;
-
-  @Expose()
-  readonly productId: number;
-
-  @Expose()
   @Type(() => ReadProductDto)
   readonly product: ReadProductDto;
 }

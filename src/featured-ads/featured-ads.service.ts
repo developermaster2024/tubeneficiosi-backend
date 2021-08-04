@@ -16,7 +16,10 @@ export class FeaturedAdsService {
     const queryBuilder = this.featuredAdsRepository.createQueryBuilder('featuredAd')
       .take(perPage)
       .skip(offset)
-      .innerJoinAndSelect('featuredAd.product', 'product');
+      .leftJoinAndSelect('featuredAd.product', 'product')
+      .leftJoinAndSelect('product.productImages', 'productImage')
+      .leftJoinAndSelect('product.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile');
 
     if (filters.id) queryBuilder.andWhere('featuredAd.id = :id', {id: filters.id});
 
@@ -27,7 +30,7 @@ export class FeaturedAdsService {
     if (filters.date) queryBuilder.andWhere(':date BETWEEN featuredAd.from AND featuredAd.until', {date: filters.date});
 
     const [featuredAds, total] = await queryBuilder.getManyAndCount();
-    console.log(featuredAds[0])
+
     return new PaginationResult(featuredAds, total, perPage);
   }
 
