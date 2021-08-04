@@ -20,6 +20,7 @@ export class Store {
   })
   name: string;
 
+  @Index({unique: true})
   @Column({
     name: 'slug',
     type: 'varchar',

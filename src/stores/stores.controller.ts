@@ -42,9 +42,9 @@ export class StoresController {
     }));
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ReadStoreDto> {
-    return plainToClass(ReadStoreDto, await this.storesService.findOne(+id));
+  @Get(':slug')
+  async findOne(@Param('slug') slug: string): Promise<ReadStoreDto> {
+    return plainToClass(ReadStoreDto, await this.storesService.findOneBySlug(slug));
   }
 
   @Put(':id')

@@ -112,6 +112,22 @@ export class StoresService {
     return user;
   }
 
+  async findOneBySlug(slug: string): Promise<User> {
+    const user = await this.usersRepository.createQueryBuilder('user')
+      .leftJoinAndSelect('user.userStatus', 'userStatus')
+      .leftJoinAndSelect('user.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('store.storeCategory', 'storeCategory')
+      .where('store.slug = :slug', { slug })
+      .getOne();
+
+    if (!user) {
+      throw new StoreNotFoundException();
+    }
+
+    return user;
+  }
+
   async update(
     {
       id,
