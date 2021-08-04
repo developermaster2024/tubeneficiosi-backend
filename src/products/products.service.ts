@@ -48,21 +48,21 @@ export class ProductsService {
       .leftJoinAndSelect('product.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile');
 
-    if (id) queryBuilder.andWhere('id = :id', { id });
+    if (id) queryBuilder.andWhere('product.id = :id', { id });
 
-    if (name) queryBuilder.andWhere('name LIKE :name', { name: `%${name}%` });
+    if (name) queryBuilder.andWhere('product.name LIKE :name', { name: `%${name}%` });
 
-    if (reference) queryBuilder.andWhere('reference LIKE :reference', { reference: `%${reference}%` });
+    if (reference) queryBuilder.andWhere('product.reference LIKE :reference', { reference: `%${reference}%` });
 
-    if (minPrice) queryBuilder.andWhere('price >= :minPrice', { minPrice });
+    if (minPrice) queryBuilder.andWhere('product.price >= :minPrice', { minPrice });
 
-    if (maxPrice) queryBuilder.andWhere('price <= :maxPrice', { maxPrice });
+    if (maxPrice) queryBuilder.andWhere('product.price <= :maxPrice', { maxPrice });
 
-    if (minQuantity) queryBuilder.andWhere('quantity >= :minQuantity', { minQuantity });
+    if (minQuantity) queryBuilder.andWhere('product.quantity >= :minQuantity', { minQuantity });
 
-    if (maxQuantity) queryBuilder.andWhere('quantity <= :maxQuantity', { maxQuantity });
+    if (maxQuantity) queryBuilder.andWhere('product.quantity <= :maxQuantity', { maxQuantity });
 
-    if (storeId) queryBuilder.andWhere('storeId = :storeId', { storeId });
+    if (storeId) queryBuilder.andWhere('product.storeId = :storeId', { storeId });
 
     if (storeName) queryBuilder.andWhere('store.name LIKE :storeName', { storeName: `%${storeName}%`});
 
