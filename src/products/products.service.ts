@@ -37,6 +37,7 @@ export class ProductsService {
     maxQuantity,
     storeId,
     storeName,
+    storeCategoryId,
   }}: ProductPaginationOptionsDto): Promise<PaginationResult<Product>> {
     const queryBuilder = this.productsRepository.createQueryBuilder('product')
       .take(perPage)
@@ -64,7 +65,9 @@ export class ProductsService {
 
     if (storeId) queryBuilder.andWhere('product.storeId = :storeId', { storeId });
 
-    if (storeName) queryBuilder.andWhere('store.name LIKE :storeName', { storeName: `%${storeName}%`});
+    if (storeName) queryBuilder.andWhere('store.name LIKE :storeName', { storeName: `%${storeName}%` });
+
+    if (storeCategoryId) queryBuilder.andWhere('store.storeCategoryId = :storeCategoryId', { storeCategoryId });
 
     const [products, total] = await queryBuilder.getManyAndCount();
 

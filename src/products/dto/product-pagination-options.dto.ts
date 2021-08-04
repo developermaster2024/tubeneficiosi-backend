@@ -10,6 +10,7 @@ type ProductFilters = {
   maxQuantity: number;
   storeId: number;
   storeName: string;
+  storeCategoryId: number;
 };
 
 export class ProductPaginationOptionsDto extends PaginationOptions {
@@ -30,6 +31,7 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       maxQuantity,
       storeId,
       storeName,
+      storeCategoryId,
     } = query;
     return new ProductPaginationOptionsDto(+page, +perPage, {
       id,
@@ -41,6 +43,7 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       maxQuantity: Number(maxQuantity),
       storeId: Number(storeId),
       storeName,
+      storeCategoryId: Number(storeCategoryId),
     });
   }
 }
