@@ -45,6 +45,9 @@ export class ProductsService {
       .leftJoinAndSelect('product.brand', 'brand')
       .leftJoinAndSelect('product.categories', 'category')
       .leftJoinAndSelect('product.productImages', 'productImage')
+      .leftJoinAndSelect('product.productFeatures', 'productFeature')
+      .leftJoinAndSelect('product.productFeatureGroups', 'productFeatureGroup')
+      .leftJoinAndSelect('productFeatureGroup.productFeatureForGroups', 'productFeatureForGroup')
       .leftJoinAndSelect('product.deliveryMethodTypes', 'deliveryMethodType')
       .leftJoinAndSelect('product.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile');
