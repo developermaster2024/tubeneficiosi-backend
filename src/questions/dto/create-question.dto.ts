@@ -1,5 +1,5 @@
 import { Exclude, Expose } from "class-transformer";
-import { MaxLength } from "class-validator";
+import { IsNotEmpty, MaxLength } from "class-validator";
 import { Product } from "src/products/entities/product.entity";
 import { Exists } from "src/validation/exists.constrain";
 
@@ -9,6 +9,7 @@ export class CreateQuestionDto {
   answeredById: number;
 
   @Expose()
+  @IsNotEmpty()
   @MaxLength(255)
   readonly question: string;
 
