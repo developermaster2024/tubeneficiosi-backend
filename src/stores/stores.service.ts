@@ -30,7 +30,7 @@ export class StoresService {
       .take(perPage)
       .skip(offset);
 
-    if (filters.id) queryBuilder.andWhere('user.id = :id', {id: filters.id});
+    if (filters.id) queryBuilder.andWhere('store.id = :id', {id: filters.id});
 
     if (filters.userStatusCode) queryBuilder.andWhere('user.userStatusCode = :userStatusCode', {userStatusCode: filters.userStatusCode});
 
