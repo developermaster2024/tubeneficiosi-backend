@@ -17,6 +17,7 @@ export class FeaturedAdsService {
       .take(perPage)
       .skip(offset)
       .leftJoinAndSelect('featuredAd.product', 'product')
+      .leftJoinAndSelect('featuredAd.storeCategory', 'storeCategory')
       .leftJoinAndSelect('product.productImages', 'productImage')
       .leftJoinAndSelect('product.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile');
