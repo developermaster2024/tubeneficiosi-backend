@@ -6,6 +6,7 @@ import { ProductFeature } from "src/product-features/entities/product-feature.en
 import { ReadStoreDto } from "src/stores/dto/read-store.dto";
 import { User } from "src/users/entities/user.entity";
 import { ProductDimension } from "../entities/product-dimension.entity";
+import { ProductFeatureGroup } from "../entities/product-feature-group.entity";
 import { ProductImage } from "../entities/product-image.entity";
 
 @Exclude()
@@ -43,6 +44,9 @@ export class ReadProductDto {
 
   @Expose()
   readonly productFeatures: ProductFeature[];
+
+  @Expose()
+  readonly productFeatureGroups: ProductFeatureGroup[];
 
   @Expose()
   readonly productDimensions: ProductDimension;

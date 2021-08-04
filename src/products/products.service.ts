@@ -119,6 +119,7 @@ export class ProductsService {
         'productImages',
         'productFeatures',
         'productFeatureGroups',
+        'productFeatureGroups.productFeatureForGroups',
         'store',
         'store.storeProfile',
         'deliveryMethodTypes',
