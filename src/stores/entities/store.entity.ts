@@ -21,6 +21,12 @@ export class Store {
   name: string;
 
   @Column({
+    name: 'slug',
+    type: 'varchar',
+  })
+  slug: string;
+
+  @Column({
     name: 'phone_number',
     type: 'varchar',
     length: 50,

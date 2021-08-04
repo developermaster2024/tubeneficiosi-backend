@@ -12,6 +12,10 @@ export class ReadStoreDto extends OmitType(ReadUserDto, ['role']) {
   readonly name: string;
 
   @Expose()
+  @Transform(({obj}: {obj: User}) => obj.store.slug)
+  readonly slug: string;
+
+  @Expose()
   @Transform(({obj}: {obj: User}) => obj.store.phoneNumber)
   readonly phoneNumber: string;
 

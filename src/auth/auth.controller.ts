@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Request, UseGuards, UseInterceptors } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { AuthService } from './auth.service';
 import { LoginResponseDto } from './dto/login-response.dto';
@@ -14,6 +14,7 @@ import { LocalAuthAdminGuard } from './guards/local-auth-admin.guard';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Role } from 'src/users/enums/roles.enum';
+import { SlugifierInterceptor } from 'src/support/interceptors/slugifier.interceptor';
 
 @Controller('auth')
 export class AuthController {
@@ -37,6 +38,7 @@ export class AuthController {
   }
 
   @Post('/register-store')
+  @UseInterceptors(new SlugifierInterceptor({name: 'slug'}))
   async registerStore(@Body() registerStoreDto: RegisterStoreDto): Promise<RegisterStoreResponseDto> {
     return plainToClass(RegisterStoreResponseDto, await this.authService.registerStore(registerStoreDto));
   }

@@ -1,5 +1,5 @@
 import { Exclude, Expose } from "class-transformer";
-import { IsEmail, IsNumber, IsPhoneNumber, IsString, Max, MaxLength, Min, MinLength } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber, IsPhoneNumber, IsString, Max, MaxLength, Min, MinLength } from "class-validator";
 import { StoreCategory } from "src/store-categories/entities/store-category.entity";
 import { User } from "src/users/entities/user.entity";
 import { Exists } from "src/validation/exists.constrain";
@@ -8,10 +8,14 @@ import { IsUnique } from "src/validation/is-unique.constrain";
 @Exclude()
 export class RegisterStoreDto {
   @Expose()
-  @IsString()
+  @IsNotEmpty()
   @MaxLength(250)
-  @MinLength(2)
   readonly name: string;
+
+  @Expose()
+  @IsNotEmpty()
+  @MaxLength(255)
+  readonly slug: string;
 
   @Expose()
   @IsEmail()
