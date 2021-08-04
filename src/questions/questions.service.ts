@@ -11,7 +11,7 @@ import { Question } from './entities/question.entity';
 export class QuestionsService {
   constructor(@InjectRepository(Question) private readonly questionsRepository: Repository<Question>) {}
 
-  async paginate({offset, perPage, filters}: QuestionPaginationOptionsDto): Promise<PaginationResult<Question>> {
+  async paginate({offset, perPage, filters, order}: QuestionPaginationOptionsDto): Promise<PaginationResult<Question>> {
     const where: FindConditions<Question> = {};
 
     // @ts-ignore
@@ -25,7 +25,8 @@ export class QuestionsService {
       take: perPage,
       skip: offset,
       where,
-      relations: ['answeredBy', 'answeredBy.client']
+      relations: ['answeredBy', 'answeredBy.client'],
+      order,
     })
 
     return new PaginationResult(questions, total, perPage);
