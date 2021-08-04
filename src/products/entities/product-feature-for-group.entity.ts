@@ -23,6 +23,14 @@ export class ProductFeatureForGroup {
   value: string;
 
   @Column({
+    name: 'price',
+    type: 'decimal',
+    precision: 14,
+    scale: 2
+  })
+  price: number;
+
+  @Column({
     name: 'is_selectable',
     type: 'boolean',
   })
