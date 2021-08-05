@@ -35,6 +35,7 @@ export class ProductsService {
     maxPrice,
     minQuantity,
     maxQuantity,
+    categoryIds,
     storeId,
     storeName,
     storeCategoryIds,
@@ -71,6 +72,8 @@ export class ProductsService {
     if (storeName) queryBuilder.andWhere('store.name LIKE :storeName', { storeName: `%${storeName}%` });
 
     if (storeCategoryIds.length > 0) queryBuilder.andWhere('store.storeCategoryId In (:...storeCategoryIds)', { storeCategoryIds });
+
+    if (categoryIds.length > 0) queryBuilder.andWhere('category.id In (:...categoryIds)', { categoryIds });
 
     const [products, total] = await queryBuilder.getManyAndCount();
 

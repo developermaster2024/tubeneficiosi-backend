@@ -8,6 +8,7 @@ type ProductFilters = {
   maxPrice: number;
   minQuantity: number;
   maxQuantity: number;
+  categoryIds: number[];
   storeId: number;
   storeName: string;
   storeCategoryIds: number[];
@@ -29,6 +30,7 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       maxPrice,
       minQuantity,
       maxQuantity,
+      categoryIds = '',
       storeId,
       storeName,
       storeCategoryIds = '',
@@ -41,6 +43,7 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       maxPrice: Number(maxPrice),
       minQuantity: Number(minQuantity),
       maxQuantity: Number(maxQuantity),
+      categoryIds: categoryIds.split(',').filter(id => id).map(id => Number(id)),
       storeId: Number(storeId),
       storeName,
       storeCategoryIds: storeCategoryIds.split(',').filter(id => id).map(id => Number(id)),
