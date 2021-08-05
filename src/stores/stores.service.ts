@@ -99,11 +99,14 @@ export class StoresService {
     return await this.usersRepository.save(user);
   }
 
-  async findOne(id: number): Promise<User> {
-    const user = await this.usersRepository.findOne({
-      where: {id, role: Role.STORE},
-      relations: ['userStatus', 'store', 'store.storeProfile', 'store.storeCategory'],
-    });
+  async findOneById(id: number): Promise<User> {
+    const user = await this.usersRepository.createQueryBuilder('user')
+      .leftJoinAndSelect('user.userStatus', 'userStatus')
+      .leftJoinAndSelect('user.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('store.storeCategory', 'storeCategory')
+      .where('store.id = :id', { id })
+      .getOne();
 
     if (!user) {
       throw new StoreNotFoundException();
@@ -142,7 +145,7 @@ export class StoresService {
     }: UpdateStoreDto,
     images: StoreImages
   ): Promise<User> {
-    const user = await this.findOne(+id);
+    const user = await this.findOneById(+id);
 
     Object.assign(user, {email, userStatusCode});
 
@@ -177,7 +180,7 @@ export class StoresService {
   }
 
   async updatePassword({id, ...updateStorePasswordDto}: UpdateStorePasswordDto): Promise<User> {
-    const user = await this.findOne(+id);
+    const user = await this.findOneById(+id);
 
     user.password = await this.hashingService.make(updateStorePasswordDto.password);
 
@@ -185,7 +188,7 @@ export class StoresService {
   }
 
   async delete(id: number): Promise<void> {
-    const user = await this.findOne(id);
+    const user = await this.findOneById(id);
 
     await this.usersRepository.softRemove(user);
   }
