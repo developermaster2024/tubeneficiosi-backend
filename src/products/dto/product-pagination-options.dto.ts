@@ -10,7 +10,7 @@ type ProductFilters = {
   maxQuantity: number;
   storeId: number;
   storeName: string;
-  storeCategoryId: number;
+  storeCategoryIds: number[];
 };
 
 export class ProductPaginationOptionsDto extends PaginationOptions {
@@ -31,7 +31,7 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       maxQuantity,
       storeId,
       storeName,
-      storeCategoryId,
+      storeCategoryIds = '',
     } = query;
     return new ProductPaginationOptionsDto(+page, +perPage, {
       id,
@@ -43,7 +43,7 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       maxQuantity: Number(maxQuantity),
       storeId: Number(storeId),
       storeName,
-      storeCategoryId: Number(storeCategoryId),
+      storeCategoryIds: storeCategoryIds.split(',').filter(id => id).map(id => Number(id)),
     });
   }
 }
