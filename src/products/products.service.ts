@@ -120,6 +120,29 @@ export class ProductsService {
     return await this.productsRepository.save(product);
   }
 
+  async findOneById(id: number): Promise<Product> {
+    const product = await this.productsRepository.findOne({
+      where: { id },
+      relations: [
+        'brand',
+        'categories',
+        'productImages',
+        'productFeatures',
+        'productFeatureGroups',
+        'productFeatureGroups.productFeatureForGroups',
+        'store',
+        'store.storeProfile',
+        'deliveryMethodTypes',
+      ],
+    });
+
+    if (!product) {
+      throw new ProductNotFoundException();
+    }
+
+    return product;
+  }
+
   async findOneBySlug(slug: string): Promise<Product> {
     const product = await this.productsRepository.findOne({
       where: { slug },

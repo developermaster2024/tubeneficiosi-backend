@@ -33,6 +33,11 @@ export class ProductsController {
     return plainToClass(ReadProductDto, await this.productsService.create(createProductDto, images));
   }
 
+  @Get(':id(\\d+)')
+  async findOneById(@Param('id') id: string): Promise<ReadProductDto> {
+    return plainToClass(ReadProductDto, await this.productsService.findOneById(+id))
+  }
+
   @Get(':slug')
   async findOne(@Param('slug') slug: string): Promise<ReadProductDto> {
     return plainToClass(ReadProductDto, await this.productsService.findOneBySlug(slug));
