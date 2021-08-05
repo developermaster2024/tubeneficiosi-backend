@@ -36,6 +36,7 @@ export class ProductsService {
     minQuantity,
     maxQuantity,
     categoryIds,
+    tagIds,
     storeId,
     storeName,
     storeCategoryIds,
@@ -51,7 +52,8 @@ export class ProductsService {
       .leftJoinAndSelect('productFeatureGroup.productFeatureForGroups', 'productFeatureForGroup')
       .leftJoinAndSelect('product.deliveryMethodTypes', 'deliveryMethodType')
       .leftJoinAndSelect('product.store', 'store')
-      .leftJoinAndSelect('store.storeProfile', 'storeProfile');
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoin('product.tags', 'tag');
 
     if (id) queryBuilder.andWhere('product.id = :id', { id });
 
@@ -74,6 +76,8 @@ export class ProductsService {
     if (storeCategoryIds.length > 0) queryBuilder.andWhere('store.storeCategoryId In (:...storeCategoryIds)', { storeCategoryIds });
 
     if (categoryIds.length > 0) queryBuilder.andWhere('category.id In (:...categoryIds)', { categoryIds });
+
+    if (tagIds.length > 0) queryBuilder.andWhere('tag.id In (:...tagIds)', { tagIds });
 
     const [products, total] = await queryBuilder.getManyAndCount();
 
