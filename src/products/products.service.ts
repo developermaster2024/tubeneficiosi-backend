@@ -133,6 +133,7 @@ export class ProductsService {
         'store',
         'store.storeProfile',
         'deliveryMethodTypes',
+        'productDimensions',
       ],
     });
 
