@@ -23,6 +23,13 @@ export class ProductFeatureGroup {
   })
   isMultiSelectable: boolean;
 
+  @Column({
+    name: 'product_id',
+    type: 'int',
+    select: false,
+  })
+  productId: number;
+
   @ManyToOne(() => Product, {nullable: false, onDelete: 'CASCADE'})
   @JoinColumn({name: 'product_id'})
   product: Product;

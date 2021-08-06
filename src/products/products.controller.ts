@@ -1,15 +1,17 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-body.interceptor';
+import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
 import { SlugifierInterceptor } from 'src/support/interceptors/slugifier.interceptor';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ReadProductDto } from './dto/read-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductPaginationPipe } from './pipes/product-pagination.pipe';
 import { ProductsService } from './products.service';
 
@@ -41,6 +43,14 @@ export class ProductsController {
   @Get(':slug')
   async findOne(@Param('slug') slug: string): Promise<ReadProductDto> {
     return plainToClass(ReadProductDto, await this.productsService.findOneBySlug(slug));
+  }
+
+  @Put(':id')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({id: 'id'}))
+  async update(@Body() updateProductDto: UpdateProductDto): Promise<ReadProductDto> {
+    return plainToClass(ReadProductDto, await this.productsService.update(updateProductDto));
   }
 
   @Delete(':id')

@@ -22,6 +22,13 @@ export class ProductImage {
   })
   isPortrait: boolean;
 
+  @Column({
+    name: 'product_id',
+    type: 'int',
+    select: false,
+  })
+  productId: number;
+
   @ManyToOne(() => Product, product => product.productImages, {nullable: false, onDelete: 'CASCADE'})
   @JoinColumn({name: 'product_id'})
   product: Product;

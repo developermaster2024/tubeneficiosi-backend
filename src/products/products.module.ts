@@ -10,10 +10,18 @@ import { diskStorage } from 'multer';
 import { filenameGenerator } from 'src/support/file-uploads';
 import { Store } from 'src/stores/entities/store.entity';
 import { ProductFeature } from 'src/product-features/entities/product-feature.entity';
+import { ProductFeatureGroup } from './entities/product-feature-group.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Product, ProductFeature, Tag, Category, Store]),
+    TypeOrmModule.forFeature([
+      Product,
+      ProductFeature,
+      ProductFeatureGroup,
+      Tag,
+      Category,
+      Store,
+    ]),
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads/products',

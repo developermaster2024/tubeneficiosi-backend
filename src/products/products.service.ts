@@ -7,9 +7,10 @@ import { Store } from 'src/stores/entities/store.entity';
 import { StoreNotFoundException } from 'src/stores/erros/store-not-found.exception';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Tag } from 'src/tags/entities/tag.entity';
-import { In, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductPaginationOptionsDto } from './dto/product-pagination-options.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductDimension } from './entities/product-dimension.entity';
 import { ProductFeatureForGroup } from './entities/product-feature-for-group.entity';
 import { ProductFeatureGroup } from './entities/product-feature-group.entity';
@@ -24,7 +25,8 @@ export class ProductsService {
     @InjectRepository(Tag) private readonly tagsRepository: Repository<Tag>,
     @InjectRepository(Category) private readonly categoriesRepository: Repository<Category>,
     @InjectRepository(Store) private readonly storesRepository: Repository<Store>,
-    @InjectRepository(ProductFeature) private readonly productFeaturesRepository: Repository<ProductFeature>
+    @InjectRepository(ProductFeature) private readonly productFeaturesRepository: Repository<ProductFeature>,
+    @InjectRepository(ProductFeatureGroup) private readonly productFeatureForGroupsRepository: Repository<ProductFeatureGroup>
   ) {}
 
   async paginate({offset, perPage, filters: {
@@ -84,7 +86,16 @@ export class ProductsService {
     return new PaginationResult(products, total, perPage);
   }
 
-  async create({userId, tagIds, categoryIds, features, featureGroups, deliveryMethodTypeCodes, brandId, ...createProductDto}: CreateProductDto, images: Express.Multer.File[]): Promise<Product> {
+  async create({
+    userId,
+    tagIds,
+    categoryIds,
+    features,
+    featureGroups,
+    deliveryMethodTypeCodes,
+    brandId,
+    ...createProductDto
+  }: CreateProductDto, images: Express.Multer.File[]): Promise<Product> {
     const store = await this.findUserStore(userId);
 
     const tags = tagIds ? await this.tagsRepository.find({id: In(tagIds)}) : [];
@@ -165,6 +176,76 @@ export class ProductsService {
     }
 
     return product;
+  }
+
+  async update({
+    id,
+    userId,
+    tagIds,
+    categoryIds,
+    features,
+    featureGroups,
+    deliveryMethodTypeCodes,
+    brandId,
+    width,
+    height,
+    length,
+    weight,
+    ...updateProductDto
+  }: UpdateProductDto): Promise<Product> {
+    const store = await this.findUserStore(userId);
+
+    const product = await this.productsRepository.findOne({
+      id,
+      store,
+    });
+
+    if (!product) {
+      throw new ProductNotFoundException();
+    }
+
+    await this.productFeaturesRepository
+      .createQueryBuilder('productFeature')
+      .delete()
+      .from(ProductFeature)
+      .where('productId = :productId', {productId: product.id})
+      .execute();
+
+    await this.productFeatureForGroupsRepository
+      .createQueryBuilder('productFeatureGroup')
+      .delete()
+      .from(ProductFeatureGroup)
+      .where('productId = :productId', {productId: product.id})
+      .execute();
+
+    const tags = tagIds ? await this.tagsRepository.find({id: In(tagIds)}) : [];
+    const categories = categoryIds ? await this.categoriesRepository.find({id: In(categoryIds), store}) : [];
+    const productFeatures = features ? features.map(feature => ProductFeature.create(feature)) : [];
+    const productFeatureGroups = featureGroups ? featureGroups.map(({name, isMultiSelectable, features}) => ProductFeatureGroup.create({
+      name,
+      isMultiSelectable,
+      productFeatureForGroups: features.map(feature => ProductFeatureForGroup.create(feature)),
+    })) : [];
+
+    const updatedData: Record<string, any> = {
+      ...updateProductDto,
+      brandId: brandId ? brandId : null,
+      tags,
+      categories,
+      productFeatures,
+      productFeatureGroups,
+      productDimensions: ProductDimension.create({
+        width,
+        height,
+        length,
+        weight,
+      }),
+      deliveryMethodTypes: deliveryMethodTypeCodes.map(typeCode => DeliveryMethodType.create({code: typeCode})),
+    };
+
+    Object.assign(product, updatedData);
+
+    return await this.productsRepository.save(product);
   }
 
   async delete(id: number, userId: number): Promise<void> {
