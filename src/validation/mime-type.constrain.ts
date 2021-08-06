@@ -14,8 +14,8 @@ export class MimeTypeConstrain implements ValidatorConstraintInterface {
   validate(value: {mimetype?: string}, {constraints}: IsUniqueValidationArguments): boolean | Promise<boolean> {
     return constraints.includes(value?.mimetype);
   }
-  defaultMessage({ value }: ValidationArguments): string {
-    return `${value?.mimetype} is not allowed`;
+  defaultMessage({ value, targetName, property }: ValidationArguments): string {
+    return `${value?.mimetype} is not allowed for ${property}`;
   }
 }
 

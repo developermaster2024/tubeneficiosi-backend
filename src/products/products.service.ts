@@ -8,7 +8,9 @@ import { StoreNotFoundException } from 'src/stores/erros/store-not-found.excepti
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Tag } from 'src/tags/entities/tag.entity';
 import { In, Repository } from 'typeorm';
+import { CreateProductImageDto } from './dto/create-product-image.dto';
 import { CreateProductDto } from './dto/create-product.dto';
+import { DeleteProductImageDto } from './dto/delete-product-image.dto';
 import { ProductPaginationOptionsDto } from './dto/product-pagination-options.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductDimension } from './entities/product-dimension.entity';
@@ -16,6 +18,7 @@ import { ProductFeatureForGroup } from './entities/product-feature-for-group.ent
 import { ProductFeatureGroup } from './entities/product-feature-group.entity';
 import { ProductImage } from './entities/product-image.entity';
 import { Product } from './entities/product.entity';
+import { ProductImageNotFound } from './errors/product-image-not-found.exception';
 import { ProductNotFoundException } from './errors/product-not-found.exception';
 
 @Injectable()
@@ -26,7 +29,8 @@ export class ProductsService {
     @InjectRepository(Category) private readonly categoriesRepository: Repository<Category>,
     @InjectRepository(Store) private readonly storesRepository: Repository<Store>,
     @InjectRepository(ProductFeature) private readonly productFeaturesRepository: Repository<ProductFeature>,
-    @InjectRepository(ProductFeatureGroup) private readonly productFeatureForGroupsRepository: Repository<ProductFeatureGroup>
+    @InjectRepository(ProductFeatureGroup) private readonly productFeatureForGroupsRepository: Repository<ProductFeatureGroup>,
+    @InjectRepository(ProductImage) private readonly productImagesRepository: Repository<ProductImage>,
   ) {}
 
   async paginate({offset, perPage, filters: {
@@ -268,5 +272,43 @@ export class ProductsService {
     }
 
     return store;
+  }
+
+  async createProductImage({ userId, productId, image, ...createProductImageDto}: CreateProductImageDto): Promise<ProductImage> {
+    const store = await this.findUserStore(userId);
+
+    const product = await this.productsRepository.findOne({
+      id: productId,
+      store,
+    });
+
+    if (!product) {
+      throw new ProductNotFoundException();
+    }
+
+    const productImage = ProductImage.create({
+      ...createProductImageDto,
+      path: image.path,
+      product,
+    });
+
+    return await this.productImagesRepository.save(productImage);
+  }
+
+  async deleteProductImage({userId, productId, imageId}: DeleteProductImageDto): Promise<void> {
+    const productImage = await this.productImagesRepository.createQueryBuilder('productImage')
+      .leftJoin('productImage.product', 'product')
+      .leftJoin('product.store', 'store')
+      .leftJoin('store.user', 'user')
+      .where('productImage.id = :imageId', { imageId: imageId })
+      .andWhere('product.id = :productId', { productId: productId })
+      .andWhere('user.id = :userId', { userId: userId })
+      .getOne();
+
+    if (!productImage) {
+      throw new ProductImageNotFound();
+    }
+
+    await this.productImagesRepository.remove(productImage);
   }
 }

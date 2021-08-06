@@ -1,17 +1,21 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { FileToBodyInterceptor } from 'src/support/interceptors/file-to-body.interceptor';
 import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-body.interceptor';
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
 import { SlugifierInterceptor } from 'src/support/interceptors/slugifier.interceptor';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
+import { CreateProductImageDto } from './dto/create-product-image.dto';
 import { CreateProductDto } from './dto/create-product.dto';
+import { DeleteProductImageDto } from './dto/delete-product-image.dto';
 import { ReadProductDto } from './dto/read-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductImage } from './entities/product-image.entity';
 import { ProductPaginationPipe } from './pipes/product-pagination.pipe';
 import { ProductsService } from './products.service';
 
@@ -63,5 +67,21 @@ export class ProductsController {
     @Body('userId') userId: number
   ): Promise<void> {
     await this.productsService.delete(+id, userId);
+  }
+
+  @Post(':id/images')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'), new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({id: 'productId'}))
+  async createProductImage(@Body() createProductImageDto: CreateProductImageDto): Promise<ProductImage> {
+    return await this.productsService.createProductImage(createProductImageDto);
+  }
+
+  @Delete(':id/images/:imageId')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({id: 'productId', imageId: 'imageId'}))
+  async deleteProductImage(@Body() deleteProductImageDto: DeleteProductImageDto): Promise<void> {
+    await this.productsService.deleteProductImage(deleteProductImageDto);
   }
 }

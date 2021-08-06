@@ -11,6 +11,7 @@ import { filenameGenerator } from 'src/support/file-uploads';
 import { Store } from 'src/stores/entities/store.entity';
 import { ProductFeature } from 'src/product-features/entities/product-feature.entity';
 import { ProductFeatureGroup } from './entities/product-feature-group.entity';
+import { ProductImage } from './entities/product-image.entity';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ProductFeatureGroup } from './entities/product-feature-group.entity';
       Product,
       ProductFeature,
       ProductFeatureGroup,
+      ProductImage,
       Tag,
       Category,
       Store,
