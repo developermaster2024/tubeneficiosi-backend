@@ -14,6 +14,8 @@ export class MainBannerAdsService {
 
   async paginate({offset, perPage, filters}: MainBannerAdPaginationOptionsDto): Promise<PaginationResult<MainBannerAd>> {
     const queryBuilder = this.mainBannerAds.createQueryBuilder('mainBannerAds')
+      .leftJoinAndSelect('mainBannerAds.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .take(perPage)
       .skip(offset);
 
