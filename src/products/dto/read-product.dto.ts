@@ -4,6 +4,7 @@ import { ReadCategoryDto } from "src/categories/dto/read-category.dto";
 import { DeliveryMethodType } from "src/delivery-method-types/entities/delivery-method-type.entity";
 import { ProductFeature } from "src/product-features/entities/product-feature.entity";
 import { ReadStoreDto } from "src/stores/dto/read-store.dto";
+import { ReadTagDto } from "src/tags/dto/read-tag.dto";
 import { User } from "src/users/entities/user.entity";
 import { ProductDimension } from "../entities/product-dimension.entity";
 import { ProductFeatureGroup } from "../entities/product-feature-group.entity";
@@ -65,4 +66,8 @@ export class ReadProductDto {
 
   @Expose()
   readonly deliveryMethodTypes: DeliveryMethodType[];
+
+  @Expose()
+  @Type(() => ReadTagDto)
+  readonly tags: ReadTagDto[];
 }
