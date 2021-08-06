@@ -52,6 +52,7 @@ export class ReadProductDto {
   readonly productDimensions: ProductDimension;
 
   @Expose()
+  @Transform(({value}) => !value ? value : value.sort((a, b) => a.position - b.position))
   readonly productImages: ProductImage[];
 
   @Expose()

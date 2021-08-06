@@ -23,6 +23,12 @@ export class ProductImage {
   isPortrait: boolean;
 
   @Column({
+    name: 'position',
+    type: 'int',
+  })
+  position: number;
+
+  @Column({
     name: 'product_id',
     type: 'int',
     select: false,
