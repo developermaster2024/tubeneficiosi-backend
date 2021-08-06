@@ -16,7 +16,7 @@ type ProductFilters = {
 };
 
 export class ProductPaginationOptionsDto extends PaginationOptions {
-  constructor(public page: number, protected _perPage: number, public filters: ProductFilters) {
+  constructor(public page: number, protected _perPage: number, public filters: ProductFilters, public tagsToSortBy: number[]) {
     super(page, _perPage);
   }
 
@@ -36,6 +36,7 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       storeId,
       storeName,
       storeCategoryIds = '',
+      sortByTags = '',
     } = query;
     return new ProductPaginationOptionsDto(+page, +perPage, {
       id,
@@ -50,6 +51,6 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       storeId: Number(storeId),
       storeName,
       storeCategoryIds: storeCategoryIds.split(',').filter(id => id).map(id => Number(id)),
-    });
+    }, sortByTags.split(',').filter(id => id).map(id => Number()));
   }
 }

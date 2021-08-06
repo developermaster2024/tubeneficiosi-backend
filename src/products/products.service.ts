@@ -46,7 +46,7 @@ export class ProductsService {
     storeId,
     storeName,
     storeCategoryIds,
-  }}: ProductPaginationOptionsDto): Promise<PaginationResult<Product>> {
+  }, tagsToSortBy}: ProductPaginationOptionsDto): Promise<PaginationResult<Product>> {
     const queryBuilder = this.productsRepository.createQueryBuilder('product')
       .take(perPage)
       .skip(offset)
@@ -60,6 +60,18 @@ export class ProductsService {
       .leftJoinAndSelect('product.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .leftJoin('product.tags', 'tag');
+
+    if (tagsToSortBy.length > 0) {
+      queryBuilder.addSelect(`
+          (SELECT COUNT(*)
+          FROM product_to_tag
+          WHERE
+            product_to_tag.product_id = product.id AND
+            product_to_tag.tag_id IN(:...tagIds))
+        `, 'tags_count')
+        .setParameter('tagIds', [1,2,3])
+        .orderBy('tags_count', 'DESC');
+    }
 
     if (id) queryBuilder.andWhere('product.id = :id', { id });
 
