@@ -1,6 +1,8 @@
 import { Exclude, Expose, plainToClass, Transform, Type } from "class-transformer";
 import { format } from "date-fns";
 import { ReadProductDto } from "src/products/dto/read-product.dto";
+import { ReadStoreDto } from "src/stores/dto/read-store.dto";
+import { User } from "src/users/entities/user.entity";
 
 @Exclude()
 export class ReadStoreAdDto {
@@ -22,16 +24,8 @@ export class ReadStoreAdDto {
   readonly until: string;
 
   @Expose()
-  @Transform(({obj}) => obj?.store ? obj.store.name : null)
-  readonly name: string;
-
-  @Expose()
-  @Transform(({obj}) => obj?.store?.storeProfile ? obj.store.storeProfile.banner : null)
-  readonly banner: string;
-
-  @Expose()
-  @Transform(({obj}) => obj?.store?.storeProfile ? obj.store.storeProfile.logo : null)
-  readonly logo: string;
+  @Transform(({obj}) => obj.store ? plainToClass(ReadStoreDto, User.create({store: obj.store})) : null)
+  readonly store: ReadStoreDto;
 
   @Expose()
   @Transform(({obj}) => obj?.store ? obj?.store?.products : null)
