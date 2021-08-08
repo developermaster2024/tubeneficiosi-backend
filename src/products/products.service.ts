@@ -308,14 +308,14 @@ export class ProductsService {
     return await this.productImagesRepository.save(productImage);
   }
 
-  async deleteProductImage({userId, productId, imageId}: DeleteProductImageDto): Promise<void> {
+  async deleteProductImage({userId, productId, position}: DeleteProductImageDto): Promise<void> {
     const productImage = await this.productImagesRepository.createQueryBuilder('productImage')
       .leftJoin('productImage.product', 'product')
       .leftJoin('product.store', 'store')
       .leftJoin('store.user', 'user')
-      .where('productImage.id = :imageId', { imageId: imageId })
-      .andWhere('product.id = :productId', { productId: productId })
-      .andWhere('user.id = :userId', { userId: userId })
+      .where('productImage.position = :position', { position })
+      .andWhere('product.id = :productId', { productId })
+      .andWhere('user.id = :userId', { userId })
       .getOne();
 
     if (!productImage) {

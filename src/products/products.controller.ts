@@ -77,10 +77,10 @@ export class ProductsController {
     return await this.productsService.createProductImage(createProductImageDto);
   }
 
-  @Delete(':id/images/:imageId')
+  @Delete(':id/images/:position')
   @Roles(Role.STORE)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({id: 'productId', imageId: 'imageId'}))
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({id: 'productId', position: 'position'}))
   async deleteProductImage(@Body() deleteProductImageDto: DeleteProductImageDto): Promise<void> {
     await this.productsService.deleteProductImage(deleteProductImageDto);
   }

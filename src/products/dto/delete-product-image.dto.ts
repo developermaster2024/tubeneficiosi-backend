@@ -11,5 +11,5 @@ export class DeleteProductImageDto {
 
   @Expose()
   @Type(() => Number)
-  readonly imageId: number;
+  readonly position: number;
 }
