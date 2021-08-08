@@ -299,6 +299,11 @@ export class ProductsService {
       throw new ProductNotFoundException();
     }
 
+    await this.productImagesRepository.delete({
+      product,
+      position: createProductImageDto.position,
+    });
+
     const productImage = ProductImage.create({
       ...createProductImageDto,
       path: image.path,
