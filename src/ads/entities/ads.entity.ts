@@ -17,6 +17,10 @@ export class Ad {
   })
   imagePath: string;
 
+  get imgPath(): string {
+    return this.imagePath;
+  }
+
   @Column({
     name: 'title',
     type: 'varchar',

@@ -10,7 +10,7 @@ export class ReadAdDto {
   readonly id: number;
 
   @Expose()
-  readonly imagePath: string;
+  readonly imgPath: string;
 
   @Expose()
   readonly title: string;
