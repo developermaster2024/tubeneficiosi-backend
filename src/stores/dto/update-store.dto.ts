@@ -16,7 +16,16 @@ export class UpdateStoreDto extends OmitType(CreateStoreDto, ['email', 'name', '
   @IsEmail()
   @MaxLength(150)
   @IsUnique(User, (value, dto: UpdateStoreDto) => ({
-    where: {email: value, id: Not(dto.id)}
+    join: {
+      alias: 'user',
+      leftJoin: {
+        store: 'user.store',
+      },
+    },
+    where: qb => {
+      qb.where({ email: value })
+        .andWhere('store.id <> :storeId', { storeId: dto.id })
+    }
   }))
   readonly email: string;
 
@@ -25,7 +34,7 @@ export class UpdateStoreDto extends OmitType(CreateStoreDto, ['email', 'name', '
   @MaxLength(250)
   @MinLength(2)
   @IsUnique(Store, (value, dto: UpdateStoreDto) => ({
-    where: {name: value, userId: Not(dto.id)},
+    where: {name: value, id: Not(dto.id)},
   }))
   readonly name: string;
 }
