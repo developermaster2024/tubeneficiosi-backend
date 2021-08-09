@@ -42,7 +42,14 @@ export class StoresService {
 
     if (filters.phoneNumber) queryBuilder.andWhere('store.phoneNumber LIKE :phoneNumber', {phoneNumber: `%${filters.phoneNumber}%`});
 
-    // @TODO: Add status filter
+    if (filters.withCheapestProduct) {
+      queryBuilder.leftJoinAndMapOne(
+        'store.cheapestProduct',
+        'store.products',
+        'product',
+        'product.price = (SELECT MIN(product2.price) FROM products AS product2 WHERE product2.store_id = store.id)'
+      );
+    }
 
     const [stores, total] = await queryBuilder.getManyAndCount();
 

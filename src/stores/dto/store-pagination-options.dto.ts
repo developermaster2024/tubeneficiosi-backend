@@ -8,6 +8,7 @@ type StoreFilters = {
   phoneNumber: string;
   storeCategoryId: string;
   userStatusCode: string;
+  withCheapestProduct: boolean;
 };
 
 export class StorePaginationOptionsDto extends PaginationOptions {
@@ -25,8 +26,19 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       status,
       phoneNumber,
       storeCategoryId,
-      userStatusCode
+      userStatusCode,
+      withCheapestProduct,
     } = query;
-    return new StorePaginationOptionsDto(+page, +perPage, {id, name, email, status, phoneNumber, storeCategoryId, userStatusCode});
+
+    return new StorePaginationOptionsDto(+page, +perPage, {
+      id,
+      name,
+      email,
+      status,
+      phoneNumber,
+      storeCategoryId,
+      userStatusCode,
+      withCheapestProduct: withCheapestProduct === 'true',
+    });
   }
 }

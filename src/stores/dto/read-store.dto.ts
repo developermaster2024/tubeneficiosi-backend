@@ -1,5 +1,6 @@
 import { OmitType } from "@nestjs/mapped-types";
 import { Exclude, Expose, plainToClass, Transform } from "class-transformer";
+import { ReadProductDto } from "src/products/dto/read-product.dto";
 import { ReadStoreCategoryDto } from "src/store-categories/dto/read-store-categories.dto";
 import { ReadStoreProfileDto } from "src/stores-profile/dto/read-store-profile.dto";
 import { ReadUserDto } from "src/users/dto/read-user.dto";
@@ -54,4 +55,14 @@ export class ReadStoreDto extends OmitType(ReadUserDto, ['role']) {
     return plainToClass(ReadStoreProfileDto, storeProfile);
   })
   readonly storeProfile: ReadStoreProfileDto;
+
+  @Expose()
+  @Transform(({obj: {store: {cheapestProduct}}}: {obj: User}) => {
+    if (!cheapestProduct || cheapestProduct instanceof ReadProductDto) {
+      return cheapestProduct;
+    }
+
+    return plainToClass(ReadProductDto, cheapestProduct);
+  })
+  readonly cheapestProduct: ReadProductDto;
 }

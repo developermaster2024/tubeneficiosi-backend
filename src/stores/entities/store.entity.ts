@@ -99,6 +99,8 @@ export class Store {
   @OneToMany(() => StoreHour, storeHour => storeHour.store, {cascade: ['insert', 'update']})
   storeHours: StoreHour[];
 
+  cheapestProduct: Product;
+
   static create(data: Partial<Store>): Store {
     return Object.assign(new Store, data);
   }
