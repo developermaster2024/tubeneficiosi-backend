@@ -306,6 +306,7 @@ export class ProductsService {
 
     const productImage = ProductImage.create({
       ...createProductImageDto,
+      isPortrait: createProductImageDto.position == 0,
       path: image.path,
       product,
     });

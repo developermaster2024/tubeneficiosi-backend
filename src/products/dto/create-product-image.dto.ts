@@ -19,8 +19,4 @@ export class CreateProductImageDto {
   @Type(() => Number)
   @Min(0)
   readonly position: number;
-
-  @Expose()
-  @Transform(({value}) => value === 'true')
-  readonly isPortrait: boolean;
 }
