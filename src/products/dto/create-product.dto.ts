@@ -31,7 +31,6 @@ export class CreateProductDto {
 
   @Expose()
   @ValidateIf((obj) => obj.description)
-  @MaxLength(2500)
   readonly description: string;
 
   @Expose()
