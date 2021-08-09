@@ -7,7 +7,9 @@ import { Store } from 'src/stores/entities/store.entity';
 import { StoreNotFoundException } from 'src/stores/erros/store-not-found.exception';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Tag } from 'src/tags/entities/tag.entity';
-import { In, Repository } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import { Role } from 'src/users/enums/roles.enum';
+import { FindConditions, In, Repository } from 'typeorm';
 import { CreateProductImageDto } from './dto/create-product-image.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { DeleteProductImageDto } from './dto/delete-product-image.dto';
@@ -31,6 +33,7 @@ export class ProductsService {
     @InjectRepository(ProductFeature) private readonly productFeaturesRepository: Repository<ProductFeature>,
     @InjectRepository(ProductFeatureGroup) private readonly productFeatureForGroupsRepository: Repository<ProductFeatureGroup>,
     @InjectRepository(ProductImage) private readonly productImagesRepository: Repository<ProductImage>,
+    @InjectRepository(User) private readonly usersRepository: Repository<User>
   ) {}
 
   async paginate({offset, perPage, filters: {
@@ -267,8 +270,18 @@ export class ProductsService {
   }
 
   async delete(id: number, userId: number): Promise<void> {
-    const store = await this.findUserStore(userId);
-    const product = await this.productsRepository.findOne({id, store})
+    const user = await this.usersRepository.findOne(userId);
+
+    const where: FindConditions<Product> = {};
+
+    if (user.role !== Role.ADMIN) {
+      where.store = await this.findUserStore(userId);
+    }
+
+    const product = await this.productsRepository.findOne({
+      id,
+      ...where,
+    })
 
     if (!product) {
       throw new ProductNotFoundException();

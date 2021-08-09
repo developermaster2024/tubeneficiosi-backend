@@ -58,7 +58,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  @Roles(Role.STORE)
+  @Roles(Role.STORE, Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor())
   @HttpCode(HttpStatus.NO_CONTENT)
