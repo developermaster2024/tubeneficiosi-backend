@@ -14,6 +14,9 @@ export class AdsService {
 
   async paginate({offset, perPage, filters}: AdPaginationOptionsDto): Promise<PaginationResult<Ad>> {
     const queryBuilder = this.adsRepository.createQueryBuilder('ad')
+      .leftJoinAndSelect('ad.adsPosition', 'adsPosition')
+      .leftJoinAndSelect('ad.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .take(perPage)
       .skip(offset);
 

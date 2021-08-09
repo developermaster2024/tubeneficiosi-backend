@@ -1,5 +1,8 @@
-import { Exclude, Expose, Transform } from "class-transformer";
+import { Exclude, Expose, plainToClass, Transform, Type } from "class-transformer";
 import { format } from "date-fns";
+import { ReadAdsPositionDto } from "src/ads-positions/dto/read-ads-position.dto";
+import { ReadStoreDto } from "src/stores/dto/read-store.dto";
+import { User } from "src/users/entities/user.entity";
 
 @Exclude()
 export class ReadAdDto {
@@ -33,8 +36,10 @@ export class ReadAdDto {
   readonly price: number;
 
   @Expose()
-  readonly storeId: number;
+  @Transform(({obj}) => obj.store ? plainToClass(ReadStoreDto, User.create({store: obj.store})) : null)
+  readonly store: ReadStoreDto;
 
   @Expose()
-  readonly adsPositionId: number;
+  @Type(() => ReadAdsPositionDto)
+  readonly adsPosition: ReadAdsPositionDto;
 }
