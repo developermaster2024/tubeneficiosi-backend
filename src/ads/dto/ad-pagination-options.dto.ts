@@ -2,9 +2,15 @@ import { PaginationOptions } from "src/support/pagination/pagination-options";
 
 type AdFilters = {
   id: string;
-  date: string;
-  storeId: string;
-  adsPositionId: string;
+  title: string;
+  description: string;
+  storeId: number;
+  minDate: string;
+  maxDate: string;
+  minPrice: string;
+  maxPrice: string;
+  url: string;
+  adsPositionId: number;
 };
 
 export class AdPaginationOptionsDto extends PaginationOptions {
@@ -17,10 +23,28 @@ export class AdPaginationOptionsDto extends PaginationOptions {
       page = 1,
       perPage = 10,
       id,
-      date,
+      title,
+      description,
       storeId,
+      minDate,
+      maxDate,
+      minPrice,
+      maxPrice,
+      url,
       adsPositionId,
     } = query;
-    return new AdPaginationOptionsDto(+page, +perPage, {id, date, storeId, adsPositionId});
+
+    return new AdPaginationOptionsDto(+page, +perPage, {
+      id,
+      title,
+      description,
+      storeId: Number(storeId),
+      minDate,
+      maxDate,
+      minPrice,
+      maxPrice,
+      url,
+      adsPositionId: Number(adsPositionId),
+    });
   }
 }

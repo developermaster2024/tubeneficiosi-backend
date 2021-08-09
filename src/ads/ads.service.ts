@@ -12,7 +12,18 @@ import { AdNotFound } from './errors/ad-not-found.dto';
 export class AdsService {
   constructor(@InjectRepository(Ad) private readonly adsRepository: Repository<Ad>) {}
 
-  async paginate({offset, perPage, filters}: AdPaginationOptionsDto): Promise<PaginationResult<Ad>> {
+  async paginate({offset, perPage, filters: {
+    id,
+    title,
+    description,
+    storeId,
+    minDate,
+    maxDate,
+    minPrice,
+    maxPrice,
+    url,
+    adsPositionId,
+  }}: AdPaginationOptionsDto): Promise<PaginationResult<Ad>> {
     const queryBuilder = this.adsRepository.createQueryBuilder('ad')
       .leftJoinAndSelect('ad.adsPosition', 'adsPosition')
       .leftJoinAndSelect('ad.store', 'store')
@@ -20,13 +31,25 @@ export class AdsService {
       .take(perPage)
       .skip(offset);
 
-    if (filters.id) queryBuilder.andWhere('ad.id = :id', {id: filters.id});
+    if (id) queryBuilder.andWhere('ad.id = :id', { id });
 
-    if (filters.storeId) queryBuilder.andWhere('ad.storeId = :storeId', {storeId: filters.storeId});
+    if (title) queryBuilder.andWhere('ad.title LIKE :title', { title: `%${title}%` });
 
-    if (filters.adsPositionId) queryBuilder.andWhere('ad.adsPositionId = :adsPositionId', {adsPositionId: filters.adsPositionId});
+    if (description) queryBuilder.andWhere('ad.description LIKE :description', { description: `%${description}%` });
 
-    if (filters.date) queryBuilder.andWhere(':date BETWEEN ad.from AND ad.until', {date: filters.date});
+    if (minPrice) queryBuilder.andWhere('ad.price >= :minPrice', { minPrice });
+
+    if (maxPrice) queryBuilder.andWhere('ad.price <= :maxPrice', { maxPrice });
+
+    if (minDate) queryBuilder.andWhere('ad.from >= :minDate', { minDate });
+
+    if (maxDate) queryBuilder.andWhere('ad.until <= :maxDate', { maxDate });
+
+    if (storeId) queryBuilder.andWhere('ad.storeId = :storeId', { storeId });
+
+    if (url) queryBuilder.andWhere('ad.url LIKE :url', { url: `%${url}%` });
+
+    if (adsPositionId) queryBuilder.andWhere('ad.adsPositionId = :adsPositionId', { adsPositionId });
 
     const [ads, total] = await queryBuilder.getManyAndCount();
 
