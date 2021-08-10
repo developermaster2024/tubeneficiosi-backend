@@ -3,6 +3,7 @@ import { PaginationOptions } from "src/support/pagination/pagination-options";
 type CardIssuerFilters = {
   id: string;
   name: string;
+  cardIssuerTypeId: number;
 };
 
 export class CardIssuerPaginationOptionsDto extends PaginationOptions {
@@ -16,7 +17,13 @@ export class CardIssuerPaginationOptionsDto extends PaginationOptions {
       perPage = 10,
       id,
       name,
+      cardIssuerTypeId,
     } = query;
-    return new CardIssuerPaginationOptionsDto(+page, +perPage, {id, name});
+
+    return new CardIssuerPaginationOptionsDto(+page, +perPage, {
+      id,
+      name,
+      cardIssuerTypeId: Number(cardIssuerTypeId),
+    });
   }
 }

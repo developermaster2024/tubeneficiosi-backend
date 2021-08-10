@@ -20,6 +20,8 @@ export class CardIssuersService {
 
     if (filters.name) where.name = Like(`%${filters.name}%`);
 
+    if (filters.cardIssuerTypeId) where.cardIssuerTypeId = filters.cardIssuerTypeId;
+
     const [cardIssuers, total] = await this.cardIssuersRepository.findAndCount({
       take: perPage,
       skip: offset,
