@@ -39,6 +39,7 @@ import { DeliveryMethodTypesModule } from './delivery-method-types/delivery-meth
 import { CardTypesModule } from './card-types/card-types.module';
 import { CardsModule } from './cards/cards.module';
 import { OrderStatusesModule } from './order-statuses/order-statuses.module';
+import { CardIssuerTypesModule } from './card-issuer-types/card-issuer-types.module';
 
 @Module({
   imports: [
@@ -84,6 +85,7 @@ import { OrderStatusesModule } from './order-statuses/order-statuses.module';
     CardTypesModule,
     CardsModule,
     OrderStatusesModule,
+    CardIssuerTypesModule,
   ],
 })
 export class AppModule {}
