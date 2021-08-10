@@ -9,6 +9,7 @@ type ProductFilters = {
   minQuantity: number;
   maxQuantity: number;
   categoryIds: number[];
+  categoryName: string;
   tagIds: number[];
   storeId: number;
   storeName: string;
@@ -32,12 +33,14 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       minQuantity,
       maxQuantity,
       categoryIds = '',
+      categoryName,
       tagIds = '',
       storeId,
       storeName,
       storeCategoryIds = '',
       sortByTags = '',
     } = query;
+
     return new ProductPaginationOptionsDto(+page, +perPage, {
       id,
       name,
@@ -47,6 +50,7 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       minQuantity: Number(minQuantity),
       maxQuantity: Number(maxQuantity),
       categoryIds: categoryIds.split(',').filter(id => id).map(id => Number(id)),
+      categoryName,
       tagIds: tagIds.split(',').filter(id => id).map(id => Number(id)),
       storeId: Number(storeId),
       storeName,

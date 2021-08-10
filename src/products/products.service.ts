@@ -45,6 +45,7 @@ export class ProductsService {
     minQuantity,
     maxQuantity,
     categoryIds,
+    categoryName,
     tagIds,
     storeId,
     storeName,
@@ -97,6 +98,8 @@ export class ProductsService {
     if (storeCategoryIds.length > 0) queryBuilder.andWhere('store.storeCategoryId In (:...storeCategoryIds)', { storeCategoryIds });
 
     if (categoryIds.length > 0) queryBuilder.andWhere('category.id In (:...categoryIds)', { categoryIds });
+
+    if (categoryName) queryBuilder.andWhere('category.name LIKE :categoryName', { categoryName: `%${categoryName}%` });
 
     if (tagIds.length > 0) queryBuilder.andWhere('tag.id In (:...tagIds)', { tagIds });
 
