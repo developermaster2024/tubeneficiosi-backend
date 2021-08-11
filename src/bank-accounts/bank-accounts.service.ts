@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginationOptions } from 'src/support/pagination/pagination-options';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Repository } from 'typeorm';
+import { BankAccountPaginationOptionsDto } from './dto/bank-account-pagination-options.dto';
 import { CreateBankAccountDto } from './dto/create-bank-account.dto';
 import { UpdateBankAccountDto } from './dto/update-bank-account.dto';
 import { BankAccount } from './entities/bank-account.entity';
@@ -12,12 +12,36 @@ import { BankAccountNotFoundException } from './errors/bank-account-not-found.ex
 export class BankAccountsService {
   constructor(@InjectRepository(BankAccount) private readonly bankAccountsRepository: Repository<BankAccount>) {}
 
-  async paginate({offset, perPage}: PaginationOptions): Promise<PaginationResult<BankAccount>> {
-    const [bankAccounts, total] = await this.bankAccountsRepository.findAndCount({
-      take: perPage,
-      skip: offset,
-      relations: ['cardIssuer', 'bankAccountType'],
-    });
+  async paginate({offset, perPage, filters: {
+    id,
+    alias,
+    accountNumber,
+    bankAccountTypeId,
+    cbu,
+    cardIssuerName,
+    branchOffice,
+  }}: BankAccountPaginationOptionsDto): Promise<PaginationResult<BankAccount>> {
+    const queryBuilder = this.bankAccountsRepository.createQueryBuilder('bankAccount')
+      .leftJoinAndSelect('bankAccount.bankAccountType', 'bankAccountType')
+      .leftJoinAndSelect('bankAccount.cardIssuer', 'cardIssuer')
+      .take(perPage)
+      .skip(offset);
+
+    if (id) queryBuilder.andWhere('bankAccount.id = :id', { id });
+
+    if (alias) queryBuilder.andWhere('bankAccount.alias LIKE :alias', { alias: `%${alias}%` });
+
+    if (accountNumber) queryBuilder.andWhere('bankAccount.accountNumber LIKE :accountNumber', { accountNumber: `%${accountNumber}%` });
+
+    if (bankAccountTypeId) queryBuilder.andWhere('bankAccount.bankAccountTypeId = :bankAccountTypeId', { bankAccountTypeId });
+
+    if (cbu) queryBuilder.andWhere('bankAccount.cbu LIKE :cbu', { cbu: `%${cbu}%` });
+
+    if (cardIssuerName) queryBuilder.andWhere('cardIssuer.name LIKE :cardIssuerName', { cardIssuerName: `%${cardIssuerName}%` });
+
+    if (branchOffice) queryBuilder.andWhere('bankAccount.branchOffice LIKE :branchOffice', { branchOffice: `%${branchOffice}%` });
+
+    const [bankAccounts, total] = await queryBuilder.getManyAndCount();
 
     return new PaginationResult(bankAccounts, total, perPage);
   }
