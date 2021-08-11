@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { ReadCardIssuerTypeDto } from "src/card-issuer-types/entities/dto/read-card-issuer-type.dto";
+import { ReadCardIssuerTypeDto } from "src/card-issuer-types/dto/read-card-issuer-type.dto";
 
 @Exclude()
 export class ReadCardIssuerDto {
