@@ -25,6 +25,7 @@ export class BankAccountsService {
     const queryBuilder = this.bankAccountsRepository.createQueryBuilder('bankAccount')
       .leftJoinAndSelect('bankAccount.bankAccountType', 'bankAccountType')
       .leftJoinAndSelect('bankAccount.cardIssuer', 'cardIssuer')
+      .leftJoinAndSelect('bankAccount.bankAccountPurpose', 'bankAccountPurpose')
       .take(perPage)
       .skip(offset);
 
@@ -58,7 +59,7 @@ export class BankAccountsService {
   async findOne(id: number): Promise<BankAccount> {
     const bankAccount = await this.bankAccountsRepository.findOne({
       where: {id},
-      relations: ['cardIssuer', 'bankAccountType'],
+      relations: ['cardIssuer', 'bankAccountType', 'bankAccountPurpose'],
     });
 
     if (!bankAccount) {
