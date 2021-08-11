@@ -1,4 +1,4 @@
-import { Exclude, Expose } from "class-transformer";
+import { Exclude, Expose, Type } from "class-transformer";
 import { IsNotEmpty, MaxLength } from "class-validator";
 import { CardIssuer } from "src/card-issuers/entities/card-issuer.entity";
 import { CardType } from "src/card-types/entities/card-type.entity";
@@ -17,10 +17,12 @@ export class CreateCardDto {
   readonly image: Express.Multer.File;
 
   @Expose()
+  @Type(() => Number)
   @Exists(CardIssuer)
   readonly cardIssuerId: number;
 
   @Expose()
+  @Type(() => Number)
   @Exists(CardType)
   readonly cardTypeId: number;
 }

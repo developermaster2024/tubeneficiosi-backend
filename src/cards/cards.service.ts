@@ -43,10 +43,10 @@ export class CardsService {
     return await this.cardsRepository.save(card);
   }
 
-  async findOne(id: number): Promise<Card> {
+  async findOne(id: number, relations = ['cardIssuer', 'cardType']): Promise<Card> {
     const card = await this.cardsRepository.findOne({
       where: { id },
-      relations: ['cardIssuer', 'cardType'],
+      relations,
     });
 
     if (!card) {
@@ -57,10 +57,10 @@ export class CardsService {
   }
 
   async update({id, image, ...updateCardDto}: UpdateCardDto): Promise<Card> {
-    const card = await this.findOne(id);
+    const card = await this.findOne(id, []);
 
     Object.assign(card, updateCardDto);
-
+    console.log(updateCardDto)
     if (image) {
       card.imgPath = image.path;
     }
