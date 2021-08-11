@@ -5,6 +5,7 @@ type BankAccountFilters = {
   alias: string;
   accountNumber: string;
   bankAccountTypeId: number;
+  bankAccountTypeName: string;
   cbu: string;
   cardIssuerName: string;
   branchOffice: string;
@@ -23,6 +24,7 @@ export class BankAccountPaginationOptionsDto extends PaginationOptions {
       alias,
       accountNumber,
       bankAccountTypeId,
+      bankAccountTypeName,
       cbu,
       cardIssuerName,
       branchOffice,
@@ -33,6 +35,7 @@ export class BankAccountPaginationOptionsDto extends PaginationOptions {
       alias,
       accountNumber,
       bankAccountTypeId: Number(bankAccountTypeId),
+      bankAccountTypeName,
       cbu,
       cardIssuerName,
       branchOffice,

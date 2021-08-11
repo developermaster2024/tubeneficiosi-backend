@@ -17,6 +17,7 @@ export class BankAccountsService {
     alias,
     accountNumber,
     bankAccountTypeId,
+    bankAccountTypeName,
     cbu,
     cardIssuerName,
     branchOffice,
@@ -34,6 +35,8 @@ export class BankAccountsService {
     if (accountNumber) queryBuilder.andWhere('bankAccount.accountNumber LIKE :accountNumber', { accountNumber: `%${accountNumber}%` });
 
     if (bankAccountTypeId) queryBuilder.andWhere('bankAccount.bankAccountTypeId = :bankAccountTypeId', { bankAccountTypeId });
+
+    if (bankAccountTypeName) queryBuilder.andWhere('bankAccountType.name LIKE :bankAccountTypeName', { bankAccountTypeName: `%${bankAccountTypeName}%` });
 
     if (cbu) queryBuilder.andWhere('bankAccount.cbu LIKE :cbu', { cbu: `%${cbu}%` });
 
