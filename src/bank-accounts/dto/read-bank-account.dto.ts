@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { BankAccountPurpose } from "src/bank-account-purposes/entities/bank-account-purposes.entity";
+import { BankAccountPurpose } from "src/bank-account-purposes/entities/bank-account-purpose.entity";
 import { BankAccountType } from "src/bank-account-types/entities/bank-account-type.entity";
 import { ReadCardIssuerDto } from "src/card-issuers/dto/read-card-issuer.dto";
 
