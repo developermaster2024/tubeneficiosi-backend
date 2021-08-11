@@ -47,7 +47,7 @@ export class StoresService {
         'store.cheapestProduct',
         'store.products',
         'product',
-        'product.price = (SELECT MIN(product2.price) FROM products AS product2 WHERE product2.store_id = store.id)'
+        'product.price = (SELECT MIN(product2.price) FROM products AS product2 WHERE product2.store_id = store.id AND product2.deleted_at IS NULL)'
       );
     }
 
