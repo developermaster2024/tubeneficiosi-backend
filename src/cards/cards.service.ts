@@ -60,7 +60,7 @@ export class CardsService {
     const card = await this.findOne(id, []);
 
     Object.assign(card, updateCardDto);
-    console.log(updateCardDto)
+
     if (image) {
       card.imgPath = image.path;
     }
