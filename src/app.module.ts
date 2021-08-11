@@ -40,6 +40,7 @@ import { CardTypesModule } from './card-types/card-types.module';
 import { CardsModule } from './cards/cards.module';
 import { OrderStatusesModule } from './order-statuses/order-statuses.module';
 import { CardIssuerTypesModule } from './card-issuer-types/card-issuer-types.module';
+import { BankAccountPurposesModule } from './bank-account-purposes/bank-account-purposes.module';
 
 @Module({
   imports: [
@@ -86,6 +87,7 @@ import { CardIssuerTypesModule } from './card-issuer-types/card-issuer-types.mod
     CardsModule,
     OrderStatusesModule,
     CardIssuerTypesModule,
+    BankAccountPurposesModule,
   ],
 })
 export class AppModule {}
