@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
-import { FindConditions, IsNull, Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { AnswerQuestionDto } from './dto/answer-question.dto';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { QuestionPaginationOptionsDto } from './dto/question-pagination-options.dto';
@@ -17,32 +17,33 @@ export class QuestionsService {
     @InjectRepository(Product) private readonly productsRepository: Repository<Product>
   ) {}
 
-  async paginate({offset, perPage, filters, order}: QuestionPaginationOptionsDto): Promise<PaginationResult<Question>> {
-    const where: FindConditions<Question> = {};
+  async paginate({offset, perPage, filters: {
+    id,
+    productId,
+    askedById,
+    storeId,
+  }, order}: QuestionPaginationOptionsDto): Promise<PaginationResult<Question>> {
+    const queryBuilder = this.questionsRepository.createQueryBuilder('question')
+      .leftJoinAndSelect('question.product', 'product')
+      .leftJoinAndSelect('product.productImages', 'productImage')
+      .leftJoinAndSelect('product.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('question.askedBy', 'askedBy')
+      .leftJoinAndSelect('askedBy.client', 'client')
+      .take(perPage)
+      .skip(offset);
 
-    // @ts-ignore
-    if (filters.id) where.id = +filters.id;
+    Object.keys(order).forEach(key => queryBuilder.addOrderBy(`question.${key}`, order[key]));
 
-    if (filters.productId) where.productId = +filters.productId;
+    if (id) queryBuilder.andWhere('question.id = :id', { id });
 
-    if (filters.askedById) where.askedById = filters.askedById;
+    if (productId) queryBuilder.andWhere('question.productId = :productId', { productId });
 
-    if (filters.answeredById) where.answeredById = filters.answeredById;
+    if (askedById) queryBuilder.andWhere('question.askedById = :askedById', { askedById });
 
-    const [questions, total] = await this.questionsRepository.findAndCount({
-      take: perPage,
-      skip: offset,
-      where,
-      relations: [
-        'askedBy',
-        'askedBy.client',
-        'answeredBy',
-        'answeredBy.store',
-        'product',
-        'product.productImages',
-      ],
-      order,
-    })
+    if (storeId) queryBuilder.andWhere('product.storeId = :storeId', { storeId });
+
+    const [questions, total] = await queryBuilder.getManyAndCount();
 
     return new PaginationResult(questions, total, perPage);
   }

@@ -4,7 +4,7 @@ import { parseSort } from "src/database/utils/sort";
 type QuestionFilters = {
   id: string;
   productId: string;
-  answeredById: number;
+  storeId: number;
   askedById: number;
 };
 
@@ -19,7 +19,7 @@ export class QuestionPaginationOptionsDto extends PaginationOptions {
       perPage = 10,
       id,
       productId,
-      answeredById,
+      storeId,
       askedById,
       sort = '',
     } = query;
@@ -29,7 +29,7 @@ export class QuestionPaginationOptionsDto extends PaginationOptions {
     return new QuestionPaginationOptionsDto(+page, +perPage, {
       id,
       productId,
-      answeredById: Number(answeredById),
+      storeId: Number(storeId),
       askedById: Number(askedById),
     }, order);
   }
