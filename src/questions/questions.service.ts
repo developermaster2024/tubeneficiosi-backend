@@ -68,7 +68,7 @@ export class QuestionsService {
       .innerJoin('product.store', 'store')
       .innerJoin('store.user', 'user')
       .where('product.id = :productId', { productId: question.product.id })
-      .andWhere('user.id = :userId', { userId: answeredById})
+      .andWhere('user.id = :userId', { userId: answeredById })
       .getCount()
     ) > 0;
 
@@ -78,7 +78,6 @@ export class QuestionsService {
 
     Object.assign(question, {
       answer,
-      answeredById,
       answeredAt: new Date(),
     });
 

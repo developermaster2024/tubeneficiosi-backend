@@ -36,18 +36,6 @@ export class Question {
   answer: string;
 
   @Column({
-    name: 'answered_by_id',
-    type: 'int',
-    nullable: true,
-    select: false,
-  })
-  answeredById: number;
-
-  @ManyToOne(() => User, {nullable: true})
-  @JoinColumn({name: 'answered_by_id'})
-  answeredBy: User;
-
-  @Column({
     name: 'answered_at',
     type: 'datetime',
     nullable: true,
