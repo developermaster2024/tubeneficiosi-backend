@@ -18,11 +18,34 @@ export class Question {
   question: string;
 
   @Column({
+    name: 'asked_by_id',
+    type: 'int',
+    select: false,
+  })
+  askedById: number;
+
+  @ManyToOne(() => User, {nullable: false})
+  @JoinColumn({name: 'asked_by_id'})
+  askedBy: User;
+
+  @Column({
     name: 'answer',
     type: 'varchar',
     nullable: true,
   })
   answer: string;
+
+  @Column({
+    name: 'answered_by_id',
+    type: 'int',
+    nullable: true,
+    select: false,
+  })
+  answeredById: number;
+
+  @ManyToOne(() => User, {nullable: true})
+  @JoinColumn({name: 'answered_by_id'})
+  answeredBy: User;
 
   @Column({
     name: 'answered_at',
@@ -41,17 +64,6 @@ export class Question {
   @ManyToOne(() => Product)
   @JoinColumn({name: 'product_id'})
   product: Product;
-
-  @Column({
-    name: 'answered_by_id',
-    type: 'int',
-    select: false,
-  })
-  answeredById: number;
-
-  @ManyToOne(() => User, {nullable: false})
-  @JoinColumn({name: 'answered_by_id'})
-  answeredBy: User;
 
   @CreateDateColumn({
     name: 'created_at',

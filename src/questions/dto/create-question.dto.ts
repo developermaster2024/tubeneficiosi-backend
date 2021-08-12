@@ -6,7 +6,7 @@ import { Exists } from "src/validation/exists.constrain";
 @Exclude()
 export class CreateQuestionDto {
   @Expose()
-  answeredById: number;
+  askedById: number;
 
   @Expose()
   @IsNotEmpty()

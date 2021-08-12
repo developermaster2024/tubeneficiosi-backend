@@ -1,6 +1,7 @@
 import { Exclude, Expose, Transform, Type } from "class-transformer";
 import { format } from "date-fns";
 import { ReadClientDto } from "src/clients/dto/read-client.dto";
+import { ReadStoreDto } from "src/stores/dto/read-store.dto";
 
 @Exclude()
 export class ReadQuestionDto {
@@ -14,6 +15,10 @@ export class ReadQuestionDto {
   readonly question: string;
 
   @Expose()
+  @Type(() => ReadClientDto)
+  readonly askedBy: ReadClientDto;
+
+  @Expose()
   @Transform(({value}) => format(value, 'yyyy-MM-dd HH:mm:ss'))
   readonly createdAt: string;
 
@@ -24,7 +29,8 @@ export class ReadQuestionDto {
   @Transform(({value}) => value ? format(value, 'yyyy-MM-dd HH:mm:ss') : value)
   readonly answeredAt: string;
 
+
   @Expose()
-  @Type(() => ReadClientDto)
-  readonly answeredBy: ReadClientDto;
+  @Type(() => ReadStoreDto)
+  readonly answeredBy: ReadStoreDto;
 }

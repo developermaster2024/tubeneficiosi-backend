@@ -1,15 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
-import { FindConditions, Repository } from 'typeorm';
+import { FindConditions, IsNull, Repository } from 'typeorm';
 import { AnswerQuestionDto } from './dto/answer-question.dto';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { QuestionPaginationOptionsDto } from './dto/question-pagination-options.dto';
 import { Question } from './entities/question.entity';
+import { QuestionNotFoundException } from './errors/question-not-found.exception';
+import { ProductDoesntBelongToStore } from './errors/product-doesnt-belong-to-store.exception.dto';
+import { Product } from 'src/products/entities/product.entity';
 
 @Injectable()
 export class QuestionsService {
-  constructor(@InjectRepository(Question) private readonly questionsRepository: Repository<Question>) {}
+  constructor(
+    @InjectRepository(Question) private readonly questionsRepository: Repository<Question>,
+    @InjectRepository(Product) private readonly productsRepository: Repository<Product>
+  ) {}
 
   async paginate({offset, perPage, filters, order}: QuestionPaginationOptionsDto): Promise<PaginationResult<Question>> {
     const where: FindConditions<Question> = {};
@@ -38,9 +44,27 @@ export class QuestionsService {
     return await this.questionsRepository.save(question);
   }
 
-  // @TODO: Validate that only the store that owns the product can answer this question
-  async answerQuestion({id, productId, answer}: AnswerQuestionDto): Promise<Question> {
-    const question = await this.questionsRepository.findOne(id);
+  async answerQuestion({id, answeredById, answer}: AnswerQuestionDto): Promise<Question> {
+    const question = await this.questionsRepository.findOne({
+      where: { id, answer: IsNull() },
+      relations: ['product'],
+    });
+
+    if (!question) {
+      throw new QuestionNotFoundException();
+    }
+
+    const productBelongsToStore = (await this.productsRepository.createQueryBuilder('product')
+      .innerJoin('product.store', 'store')
+      .innerJoin('store.user', 'user')
+      .where('product.id = :productId', { productId: question.product.id })
+      .andWhere('user.id = :userId', { userId: answeredById})
+      .getCount()
+    ) > 0;
+
+    if (!productBelongsToStore) {
+      throw new ProductDoesntBelongToStore();
+    }
 
     Object.assign(question, {answer, answeredAt: new Date()});
 

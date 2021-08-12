@@ -25,16 +25,15 @@ export class QuestionsController {
   @Post()
   @Roles(Role.CLIENT)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @UseInterceptors(new JwtUserToBodyInterceptor('answeredById'))
+  @UseInterceptors(new JwtUserToBodyInterceptor('askedById'))
   async create(@Body() createQuestionDto: CreateQuestionDto): Promise<ReadQuestionDto> {
     return plainToClass(ReadQuestionDto, await this.questionsService.create(createQuestionDto));
   }
 
-  // @TODO: Validate that only the store that owns the product can answer this question
   @Put(':id')
   @Roles(Role.STORE)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @UseInterceptors(new ParamsToBodyInterceptor({id: 'id'}))
+  @UseInterceptors(new ParamsToBodyInterceptor({id: 'id'}), new JwtUserToBodyInterceptor('answeredById'))
   async answerQuestion(@Body() answerQuestionDto: AnswerQuestionDto): Promise<ReadQuestionDto> {
     return plainToClass(ReadQuestionDto, await this.questionsService.answerQuestion(answerQuestionDto));
   }
