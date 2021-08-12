@@ -4,6 +4,8 @@ import { parseSort } from "src/database/utils/sort";
 type QuestionFilters = {
   id: string;
   productId: string;
+  answeredById: number;
+  askedById: number;
 };
 
 export class QuestionPaginationOptionsDto extends PaginationOptions {
@@ -17,11 +19,18 @@ export class QuestionPaginationOptionsDto extends PaginationOptions {
       perPage = 10,
       id,
       productId,
+      answeredById,
+      askedById,
       sort = '',
     } = query;
 
     const order = parseSort(sort, ['createdAt']);
 
-    return new QuestionPaginationOptionsDto(+page, +perPage, {id, productId}, order);
+    return new QuestionPaginationOptionsDto(+page, +perPage, {
+      id,
+      productId,
+      answeredById: Number(answeredById),
+      askedById: Number(askedById),
+    }, order);
   }
 }

@@ -25,13 +25,22 @@ export class QuestionsService {
 
     if (filters.productId) where.productId = +filters.productId;
 
-    // @TODO: Add filter by store
+    if (filters.askedById) where.askedById = filters.askedById;
+
+    if (filters.answeredById) where.answeredById = filters.answeredById;
 
     const [questions, total] = await this.questionsRepository.findAndCount({
       take: perPage,
       skip: offset,
       where,
-      relations: ['answeredBy', 'answeredBy.client'],
+      relations: [
+        'askedBy',
+        'askedBy.client',
+        'answeredBy',
+        'answeredBy.store',
+        'product',
+        'product.productImages',
+      ],
       order,
     })
 
@@ -66,7 +75,11 @@ export class QuestionsService {
       throw new ProductDoesntBelongToStore();
     }
 
-    Object.assign(question, {answer, answeredAt: new Date()});
+    Object.assign(question, {
+      answer,
+      answeredById,
+      answeredAt: new Date(),
+    });
 
     return await this.questionsRepository.save(question);
   }
