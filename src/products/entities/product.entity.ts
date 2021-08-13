@@ -100,7 +100,6 @@ export class Product {
   @ManyToMany(() => Tag, {
     cascade: ['insert', 'update'],
     onDelete: 'CASCADE',
-    eager: true,
   })
   @JoinTable({
     name: 'product_to_tag',
@@ -112,7 +111,6 @@ export class Product {
   @ManyToMany(() => Category, {
     cascade: ['insert', 'update'],
     onDelete: 'CASCADE',
-    eager: true
   })
   @JoinTable({
     name: 'product_to_category',
