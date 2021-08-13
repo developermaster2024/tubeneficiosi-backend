@@ -1,5 +1,5 @@
-import { Exclude, Expose, Type } from "class-transformer";
-import { IsNotEmpty, IsNumber, MaxLength, Min } from "class-validator";
+import { Exclude, Expose, Transform, Type } from "class-transformer";
+import { IsBoolean, IsNotEmpty, IsNumber, MaxLength, Min } from "class-validator";
 
 @Exclude()
 export class CreateProductToProductFeatureDto {
@@ -18,4 +18,9 @@ export class CreateProductToProductFeatureDto {
   @IsNumber()
   @Min(0)
   readonly price: number;
+
+  @Expose()
+  @Transform(({value}) => value === 'on')
+  @IsBoolean()
+  readonly isSelectable: boolean;
 }

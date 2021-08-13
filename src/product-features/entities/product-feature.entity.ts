@@ -32,6 +32,12 @@ export class ProductFeature {
   price: number;
 
   @Column({
+    name: 'is_selectable',
+    type: 'boolean',
+  })
+  isSelectable: boolean;
+
+  @Column({
     name: 'product_id',
     type: 'int',
     select: false,
