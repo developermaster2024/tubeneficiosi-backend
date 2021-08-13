@@ -1,5 +1,6 @@
 import { Product } from "src/products/entities/product.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { CartItemFeature } from "./cart-item-feature.entity";
 import { Cart } from "./cart.entity";
 
 @Entity({
@@ -37,6 +38,9 @@ export class CartItem {
   @JoinColumn({name: 'product_id'})
   product: Product;
 
+  @OneToMany(() => CartItemFeature, cartItemFeature => cartItemFeature.cartItem, { cascade: ['insert', 'update'] })
+  cartItemFeatures: CartItemFeature[];
+
   @CreateDateColumn({
     name: 'created_at',
     select: false,
@@ -50,7 +54,11 @@ export class CartItem {
   updatedAt: Date;
 
   get total(): number {
-    return this.product.finalPrice * this.quantity;
+    return (Number(this.product.finalPrice) + this.featuresTotal) * this.quantity;
+  }
+
+  get featuresTotal(): number {
+    return this.cartItemFeatures?.reduce((total, {price}) => total + Number(price), 0) ?? 0;
   }
 
   static create(data: Partial<CartItem>): CartItem {
