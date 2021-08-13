@@ -27,7 +27,7 @@ export class CartsService {
       take: perPage,
       skip: offset,
       where: {userId, isProcessed: 0},
-      relations: ['cartItems', 'cartItems.product'],
+      relations: ['cartItems', 'cartItems.product', 'cartItems.cartItemFeatures'],
     });
 
     return new PaginationResult(carts, total, perPage);
