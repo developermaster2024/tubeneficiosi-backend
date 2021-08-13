@@ -9,7 +9,7 @@ export class CreateProductFeatureGroup {
   readonly name: string;
 
   @Expose()
-  @Transform(({value}) => value === 'on')
+  @Transform(({value}) => value === 'true')
   @IsBoolean()
   readonly isMultiSelectable: boolean;
 

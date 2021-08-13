@@ -18,7 +18,7 @@ export class CreateProductFeatureForGroup {
   readonly price: number;
 
   @Expose()
-  @Transform(({value}) => value === 'on')
+  @Transform(({value}) => value === 'true')
   @IsBoolean()
   readonly isSelectable: boolean;
 }
