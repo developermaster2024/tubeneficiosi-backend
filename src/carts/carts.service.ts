@@ -148,4 +148,18 @@ export class CartsService {
 
     return await this.cartItemsRepository.save(cartItem);
   }
+
+  async delete({cartId, userId}: {cartId: number, userId: number}): Promise<void> {
+    const cart = await this.cartsRepository.createQueryBuilder('cart')
+      .where('cart.id = :cartId', { cartId })
+      .andWhere('cart.userId = :userId', { userId })
+      .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
+      .getOne();
+
+    if (!cart) {
+      throw new CartNotFoundException();
+    }
+
+    await this.cartsRepository.remove(cart);
+  }
 }

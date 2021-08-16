@@ -70,4 +70,15 @@ export class CartsController {
   async udpateCartItemQuantity(@Body() updateCartItemQuantityDto: UpdateCartItemQuantityDto): Promise<CartItem> {
     return await this.cartsRepository.updateCartItemQuantity(updateCartItemQuantityDto);
   }
+
+  @Delete(':cartId')
+  @Roles(Role.CLIENT)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async delete(
+    @Param('cartId') cartId: string,
+    @Body('userId') userId: number
+  ): Promise<void> {
+    await this.cartsRepository.delete({cartId: +cartId, userId});
+  }
 }
