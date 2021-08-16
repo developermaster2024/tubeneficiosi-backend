@@ -1,15 +1,17 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-body.interceptor';
+import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
 import { PaginationOptions } from 'src/support/pagination/pagination-options';
 import { PaginationPipe } from 'src/support/pagination/pagination-pipe';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
 import { CartsService } from './carts.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
+import { DeleteCartitemDto } from './dto/delete-cart-item.dto';
 import { ReadCartDto } from './dto/read-cart.dto';
 
 @Controller('carts')
@@ -49,5 +51,13 @@ export class CartsController {
   @Get(':id')
   async findOneById(@Param('id') id: string): Promise<ReadCartDto> {
     return plainToClass(ReadCartDto, await this.cartsRepository.findOneById(+id));
+  }
+
+  @Delete(':cartId/cart-items/:cartItemId')
+  @Roles(Role.CLIENT)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({cartId: 'cartId', cartItemId: 'cartItemId'}))
+  async deleteCartItem(@Body() deleteCartItemDto: DeleteCartitemDto): Promise<void> {
+    await this.cartsRepository.deleteCartItem(deleteCartItemDto);
   }
 }

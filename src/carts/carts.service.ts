@@ -8,15 +8,18 @@ import { PaginationOptions } from 'src/support/pagination/pagination-options';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { In, Repository } from 'typeorm';
 import { AddToCartDto } from './dto/add-to-cart.dto';
+import { DeleteCartitemDto } from './dto/delete-cart-item.dto';
 import { CartItemFeature } from './entities/cart-item-feature.entity';
 import { CartItem } from './entities/cart-item.entity';
 import { Cart } from './entities/cart.entity';
+import { CartItemNotFoundException } from './errors/cart-item-not-found.exception';
 import { CartNotFoundException } from './errors/cart-not-found.exception';
 
 @Injectable()
 export class CartsService {
   constructor(
     @InjectRepository(Cart) private readonly cartsRepository: Repository<Cart>,
+    @InjectRepository(CartItem) private readonly cartItemsRepository: Repository<CartItem>,
     @InjectRepository(Product) private readonly productsRepository: Repository<Product>,
     @InjectRepository(ProductFeature) private readonly productFeaturesRepository: Repository<ProductFeature>,
     @InjectRepository(ProductFeatureForGroup) private readonly productFeatureForGroupsRepository: Repository<ProductFeatureForGroup>
@@ -109,5 +112,21 @@ export class CartsService {
     }
 
     return cart;
+  }
+
+  async deleteCartItem({userId, cartId, cartItemId}: DeleteCartitemDto): Promise<void> {
+    const cartItem = await this.cartItemsRepository.createQueryBuilder('cartItem')
+      .innerJoin('cartItem.cart', 'cart')
+      .where('cartItem.id = :cartItemId', { cartItemId })
+      .andWhere('cart.userId = :userId', { userId })
+      .andWhere('cart.id = :cartId', { cartId })
+      .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
+      .getOne();
+
+    if (!cartItem) {
+      throw new CartItemNotFoundException();
+    }
+
+    await this.cartItemsRepository.remove(cartItem);
   }
 }
