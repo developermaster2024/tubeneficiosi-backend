@@ -31,12 +31,33 @@ export class CartItem {
   @Column({
     name: 'product_id',
     type: 'int',
+    select: false,
   })
   productId: number;
 
   @ManyToOne(() => Product, {nullable: false, onDelete: 'CASCADE'})
   @JoinColumn({name: 'product_id'})
   product: Product;
+
+  @Column({
+    name: 'product_name',
+    type: 'varchar',
+  })
+  productName: string;
+
+  @Column({
+    name: 'product_image',
+    type: 'varchar',
+  })
+  productImage: string;
+
+  @Column({
+    name: 'product_price',
+    type: 'decimal',
+    precision: 14,
+    scale: 2,
+  })
+  productPrice: number;
 
   @OneToMany(() => CartItemFeature, cartItemFeature => cartItemFeature.cartItem, { cascade: ['insert', 'update'] })
   cartItemFeatures: CartItemFeature[];
@@ -54,7 +75,7 @@ export class CartItem {
   updatedAt: Date;
 
   get total(): number {
-    return (Number(this.product.finalPrice) + this.featuresTotal) * this.quantity;
+    return (Number(this.productPrice) + this.featuresTotal) * this.quantity;
   }
 
   get featuresTotal(): number {

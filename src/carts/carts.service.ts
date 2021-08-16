@@ -37,7 +37,10 @@ export class CartsService {
     const featureIds = productFeaturesData?.featureIds ?? [];
     const featureForGroupIds = productFeaturesData?.featureForGroupIds ?? [];
 
-    const product = await this.productsRepository.findOne(productId);
+    const product = await this.productsRepository.findOne({
+      where: { id: productId },
+      relations: ['productImages'],
+    });
 
     if (!product) {
       throw new ProductNotFoundException();
@@ -64,7 +67,10 @@ export class CartsService {
       cartItem.quantity += quantity;
     } else {
       cart.cartItems.push(CartItem.create({
-        product,
+        productId,
+        productName: product.name,
+        productImage: product.productImages[0].path,
+        productPrice: product.finalPrice,
         quantity,
         cartItemFeatures: [
           ...(await this.productFeaturesRepository.find({ id: In(featureIds) }))
