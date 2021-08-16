@@ -9,6 +9,7 @@ import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { In, Repository } from 'typeorm';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { DeleteCartitemDto } from './dto/delete-cart-item.dto';
+import { UpdateCartItemQuantityDto } from './dto/update-cart-item-quantity.dto';
 import { CartItemFeature } from './entities/cart-item-feature.entity';
 import { CartItem } from './entities/cart-item.entity';
 import { Cart } from './entities/cart.entity';
@@ -128,5 +129,23 @@ export class CartsService {
     }
 
     await this.cartItemsRepository.remove(cartItem);
+  }
+
+  async updateCartItemQuantity({userId, cartId, cartItemId, quantity}: UpdateCartItemQuantityDto): Promise<CartItem> {
+    const cartItem = await this.cartItemsRepository.createQueryBuilder('cartItem')
+      .innerJoin('cartItem.cart', 'cart')
+      .where('cartItem.id = :cartItemId', { cartItemId })
+      .andWhere('cart.userId = :userId', { userId })
+      .andWhere('cart.id = :cartId', { cartId })
+      .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
+      .getOne();
+
+    if (!cartItem) {
+      throw new CartItemNotFoundException();
+    }
+
+    cartItem.quantity = quantity;
+
+    return await this.cartItemsRepository.save(cartItem);
   }
 }

@@ -62,18 +62,6 @@ export class CartItem {
   @OneToMany(() => CartItemFeature, cartItemFeature => cartItemFeature.cartItem, { cascade: ['insert', 'update'] })
   cartItemFeatures: CartItemFeature[];
 
-  @CreateDateColumn({
-    name: 'created_at',
-    select: false,
-  })
-  createdAt: Date;
-
-  @UpdateDateColumn({
-    name: 'updated_at',
-    select: false,
-  })
-  updatedAt: Date;
-
   get total(): number {
     return (Number(this.productPrice) + this.featuresTotal) * this.quantity;
   }

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -13,6 +13,8 @@ import { CartsService } from './carts.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { DeleteCartitemDto } from './dto/delete-cart-item.dto';
 import { ReadCartDto } from './dto/read-cart.dto';
+import { UpdateCartItemQuantityDto } from './dto/update-cart-item-quantity.dto';
+import { CartItem } from './entities/cart-item.entity';
 
 @Controller('carts')
 export class CartsController {
@@ -59,5 +61,13 @@ export class CartsController {
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({cartId: 'cartId', cartItemId: 'cartItemId'}))
   async deleteCartItem(@Body() deleteCartItemDto: DeleteCartitemDto): Promise<void> {
     await this.cartsRepository.deleteCartItem(deleteCartItemDto);
+  }
+
+  @Put(':cartId/cart-items/:cartItemId')
+  @Roles(Role.CLIENT)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({cartId: 'cartId', cartItemId: 'cartItemId'}))
+  async udpateCartItemQuantity(@Body() updateCartItemQuantityDto: UpdateCartItemQuantityDto): Promise<CartItem> {
+    return await this.cartsRepository.updateCartItemQuantity(updateCartItemQuantityDto);
   }
 }
