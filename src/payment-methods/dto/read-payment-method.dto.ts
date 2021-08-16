@@ -1,4 +1,5 @@
-import { Exclude, Expose } from "class-transformer";
+import { Exclude, Expose, Type } from "class-transformer";
+import { ReadBankAccountDto } from "src/bank-accounts/dto/read-bank-account.dto";
 
 @Exclude()
 export class ReadPaymentMethodDto {
@@ -13,4 +14,8 @@ export class ReadPaymentMethodDto {
 
   @Expose()
   readonly usesBankAccounts: boolean;
+
+  @Expose()
+  @Type(() => ReadBankAccountDto)
+  readonly bankAccounts: ReadBankAccountDto[];
 }

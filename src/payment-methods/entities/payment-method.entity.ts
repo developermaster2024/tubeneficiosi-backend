@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { BankAccount } from "src/bank-accounts/entities/bank-account.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryColumn, UpdateDateColumn } from "typeorm";
 import { PaymentMethods } from "../enum/payment-methods.enum";
 
 @Entity({
@@ -28,6 +29,9 @@ export class PaymentMethod {
     type: 'boolean',
   })
   usesBankAccounts: boolean;
+
+  @OneToMany(() => BankAccount, bankAccount => bankAccount.paymentMethod)
+  bankAccounts: BankAccount[];
 
   @CreateDateColumn({
     name: 'created_at',

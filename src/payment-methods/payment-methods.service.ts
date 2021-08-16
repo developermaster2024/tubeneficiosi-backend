@@ -26,6 +26,7 @@ export class PaymentMethodsService {
       take: perPage,
       skip: offset,
       where,
+      relations: ['bankAccounts', 'bankAccounts.cardIssuer'],
     });
 
     return new PaginationResult(paymentMethods, total, perPage);
