@@ -14,8 +14,13 @@ export class ReadCartItemDto {
   readonly total: number;
 
   @Expose()
-  @Type(() => ReadProductDto)
-  readonly product: ReadProductDto;
+  readonly productName: string;
+
+  @Expose()
+  readonly productImage: string;
+
+  @Expose()
+  readonly productPrice: number;
 
   @Expose()
   readonly cartItemFeatures: CartItemFeature[];
