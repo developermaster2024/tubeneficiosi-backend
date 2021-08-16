@@ -21,12 +21,12 @@ export class BankAccountsService {
     cbu,
     cardIssuerName,
     branchOffice,
-    bankAccountPurposeCode,
+    paymentMethodCode,
   }}: BankAccountPaginationOptionsDto): Promise<PaginationResult<BankAccount>> {
     const queryBuilder = this.bankAccountsRepository.createQueryBuilder('bankAccount')
       .leftJoinAndSelect('bankAccount.bankAccountType', 'bankAccountType')
       .leftJoinAndSelect('bankAccount.cardIssuer', 'cardIssuer')
-      .leftJoinAndSelect('bankAccount.bankAccountPurpose', 'bankAccountPurpose')
+      .leftJoinAndSelect('bankAccount.paymentMethod', 'paymentMethod')
       .take(perPage)
       .skip(offset);
 
@@ -46,7 +46,7 @@ export class BankAccountsService {
 
     if (branchOffice) queryBuilder.andWhere('bankAccount.branchOffice LIKE :branchOffice', { branchOffice: `%${branchOffice}%` });
 
-    if (bankAccountPurposeCode) queryBuilder.andWhere('bankAccountPurpose.code = :bankAccountPurposeCode', { bankAccountPurposeCode });
+    if (paymentMethodCode) queryBuilder.andWhere('paymentMethod.code = :paymentMethodCode', { paymentMethodCode });
 
     const [bankAccounts, total] = await queryBuilder.getManyAndCount();
 
@@ -62,7 +62,7 @@ export class BankAccountsService {
   async findOne(id: number): Promise<BankAccount> {
     const bankAccount = await this.bankAccountsRepository.findOne({
       where: {id},
-      relations: ['cardIssuer', 'bankAccountType', 'bankAccountPurpose'],
+      relations: ['cardIssuer', 'bankAccountType', 'paymentMethod'],
     });
 
     if (!bankAccount) {
@@ -73,7 +73,11 @@ export class BankAccountsService {
   }
 
   async update({id, ...udpateBankAccountDto}: UpdateBankAccountDto): Promise<BankAccount> {
-    const bankAccount = await this.findOne(+id);
+    const bankAccount = await this.bankAccountsRepository.findOne(+id);
+
+    if (!bankAccount) {
+      throw new BankAccountNotFoundException();
+    }
 
     Object.assign(bankAccount, udpateBankAccountDto);
 

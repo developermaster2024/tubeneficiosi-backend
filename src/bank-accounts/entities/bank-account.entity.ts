@@ -1,6 +1,8 @@
 import { BankAccountPurpose } from "src/bank-account-purposes/entities/bank-account-purpose.entity";
 import { BankAccountType } from "src/bank-account-types/entities/bank-account-type.entity";
 import { CardIssuer } from "src/card-issuers/entities/card-issuer.entity";
+import { PaymentMethod } from "src/payment-methods/entities/payment-method.entity";
+import { PaymentMethods } from "src/payment-methods/enum/payment-methods.enum";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({
@@ -59,15 +61,15 @@ export class BankAccount {
   bankAccountType: BankAccountType;
 
   @Column({
-    name: 'bank_account_purpose_code',
+    name: 'payment_method_code',
     type: 'varchar',
     length: 20,
   })
-  bankAccountPurposeCode: string;
+  paymentMethodCode: PaymentMethods;
 
-  @ManyToOne(() => BankAccountPurpose, {nullable: false, onDelete: 'CASCADE'})
-  @JoinColumn({name: 'bank_account_purpose_code'})
-  bankAccountPurpose: BankAccountPurpose;
+  @ManyToOne(() => PaymentMethod, {nullable: false, onDelete: 'CASCADE'})
+  @JoinColumn({name: 'payment_method_code'})
+  paymentMethod: PaymentMethod;
 
   @CreateDateColumn({
     name: 'created_at',

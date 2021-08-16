@@ -3,7 +3,7 @@ import { Exclude, Expose } from "class-transformer";
 @Exclude()
 export class ReadPaymentMethodDto {
   @Expose()
-  readonly id: number;
+  readonly code: number;
 
   @Expose()
   readonly name: string;

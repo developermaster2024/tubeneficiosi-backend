@@ -1,7 +1,7 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { BankAccountPurpose } from "src/bank-account-purposes/entities/bank-account-purpose.entity";
 import { BankAccountType } from "src/bank-account-types/entities/bank-account-type.entity";
 import { ReadCardIssuerDto } from "src/card-issuers/dto/read-card-issuer.dto";
+import { ReadPaymentMethodDto } from "src/payment-methods/dto/read-payment-method.dto";
 
 @Exclude()
 export class ReadBankAccountDto {
@@ -29,6 +29,6 @@ export class ReadBankAccountDto {
   readonly cardIssuer: ReadCardIssuerDto;
 
   @Expose()
-  @Type(() => BankAccountPurpose)
-  readonly bankAccountPurpose: BankAccountPurpose;
+  @Type(() => ReadPaymentMethodDto)
+  readonly paymentMethod: ReadPaymentMethodDto;
 }

@@ -3,6 +3,8 @@ import { MaxLength } from "class-validator";
 import { BankAccountPurpose } from "src/bank-account-purposes/entities/bank-account-purpose.entity";
 import { BankAccountType } from "src/bank-account-types/entities/bank-account-type.entity";
 import { CardIssuer } from "src/card-issuers/entities/card-issuer.entity";
+import { PaymentMethod } from "src/payment-methods/entities/payment-method.entity";
+import { PaymentMethods } from "src/payment-methods/enum/payment-methods.enum";
 import { Exists } from "src/validation/exists.constrain";
 
 @Exclude()
@@ -32,6 +34,8 @@ export class CreateBankAccountDto {
   readonly bankAccountTypeId: number;
 
   @Expose()
-  @Exists(BankAccountPurpose, 'code')
-  readonly bankAccountPurposeCode: string;
+  @Exists(PaymentMethod, 'code', (value) => ({
+    where: { code: value, usesBankAccounts: true }
+  }))
+  readonly paymentMethodCode: PaymentMethods;
 }
