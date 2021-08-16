@@ -45,4 +45,9 @@ export class CartsController {
   ): Promise<ReadCartDto> {
     return plainToClass(ReadCartDto, await this.cartsRepository.findOneStoreId(userId, +storeId));
   }
+
+  @Get(':id')
+  async findOneById(@Param('id') id: string): Promise<ReadCartDto> {
+    return plainToClass(ReadCartDto, await this.cartsRepository.findOneById(+id));
+  }
 }
