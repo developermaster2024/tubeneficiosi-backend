@@ -9,6 +9,7 @@ type BankAccountFilters = {
   cbu: string;
   cardIssuerName: string;
   branchOffice: string;
+  bankAccountPurposeCode: string;
 };
 
 export class BankAccountPaginationOptionsDto extends PaginationOptions {
@@ -28,6 +29,7 @@ export class BankAccountPaginationOptionsDto extends PaginationOptions {
       cbu,
       cardIssuerName,
       branchOffice,
+      bankAccountPurposeCode,
     } = query;
 
     return new BankAccountPaginationOptionsDto(+page, +perPage, {
@@ -39,6 +41,7 @@ export class BankAccountPaginationOptionsDto extends PaginationOptions {
       cbu,
       cardIssuerName,
       branchOffice,
+      bankAccountPurposeCode,
     });
   }
 }

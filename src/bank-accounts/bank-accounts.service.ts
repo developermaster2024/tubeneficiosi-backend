@@ -21,6 +21,7 @@ export class BankAccountsService {
     cbu,
     cardIssuerName,
     branchOffice,
+    bankAccountPurposeCode,
   }}: BankAccountPaginationOptionsDto): Promise<PaginationResult<BankAccount>> {
     const queryBuilder = this.bankAccountsRepository.createQueryBuilder('bankAccount')
       .leftJoinAndSelect('bankAccount.bankAccountType', 'bankAccountType')
@@ -44,6 +45,8 @@ export class BankAccountsService {
     if (cardIssuerName) queryBuilder.andWhere('cardIssuer.name LIKE :cardIssuerName', { cardIssuerName: `%${cardIssuerName}%` });
 
     if (branchOffice) queryBuilder.andWhere('bankAccount.branchOffice LIKE :branchOffice', { branchOffice: `%${branchOffice}%` });
+
+    if (bankAccountPurposeCode) queryBuilder.andWhere('bankAccountPurpose.code = :bankAccountPurposeCode', { bankAccountPurposeCode });
 
     const [bankAccounts, total] = await queryBuilder.getManyAndCount();
 
