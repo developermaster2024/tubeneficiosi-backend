@@ -22,10 +22,10 @@ export class PaymentMethodsController {
     return (await this.paymentMethodsService.paginate(options)).toClass(ReadPaymentMethodDto);
   }
 
-  @Put(':id')
+  @Put(':code')
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'), new ParamsToBodyInterceptor({id: 'id'}))
+  @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'), new ParamsToBodyInterceptor({code: 'code'}))
   async update(@Body() updatePaymentMethodDto: UpdatePaymentMethodDto): Promise<ReadPaymentMethodDto> {
     return plainToClass(ReadPaymentMethodDto, await this.paymentMethodsService.update(updatePaymentMethodDto));
   }

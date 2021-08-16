@@ -5,6 +5,7 @@ import { FindConditions, Like, Repository } from 'typeorm';
 import { PaymentMethodPaginationOptionsDto } from './dto/payment-method-pagination-options.dto';
 import { UpdatePaymentMethodDto } from './dto/update-payment-method.dto';
 import { PaymentMethod } from './entities/payment-method.entity';
+import { PaymentMethods } from './enum/payment-methods.enum';
 import { PaymentMethodNotFoundException } from './errors/payment-method-not-found.exception';
 
 @Injectable()
@@ -19,8 +20,7 @@ export class PaymentMethodsService {
 
     if (filters.name) where.name = Like(`%${filters.name}%`);
 
-    // @ts-ignore
-    if (filters.isActive) where.isActive = filters.isActive;
+    if (filters.usesBankAccounts) where.usesBankAccounts = true;
 
     const [paymentMethods, total] = await this.paymentMethodsRepository.findAndCount({
       take: perPage,
@@ -31,8 +31,8 @@ export class PaymentMethodsService {
     return new PaginationResult(paymentMethods, total, perPage);
   }
 
-  async findOne(id: number): Promise<PaymentMethod> {
-    const paymentMethod = await this.paymentMethodsRepository.findOne(id);
+  async findOneByCode(code: PaymentMethods): Promise<PaymentMethod> {
+    const paymentMethod = await this.paymentMethodsRepository.findOne({ code });
 
     if (!paymentMethod) {
       throw new PaymentMethodNotFoundException();
@@ -41,10 +41,8 @@ export class PaymentMethodsService {
     return paymentMethod;
   }
 
-  async update({id, image, ...updatePaymentMethodDto}: UpdatePaymentMethodDto): Promise<PaymentMethod> {
-    const paymentMethod = await this.findOne(+id);
-
-    Object.assign(paymentMethod, updatePaymentMethodDto);
+  async update({ code, image }: UpdatePaymentMethodDto): Promise<PaymentMethod> {
+    const paymentMethod = await this.findOneByCode(code);
 
     if (image) {
       paymentMethod.imgPath = image.path;

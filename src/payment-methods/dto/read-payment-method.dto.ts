@@ -12,5 +12,5 @@ export class ReadPaymentMethodDto {
   readonly imgPath: string;
 
   @Expose()
-  readonly isActive: boolean;
+  readonly usesBankAccounts: boolean;
 }

@@ -24,10 +24,10 @@ export class PaymentMethod {
   imgPath: string;
 
   @Column({
-    name: 'is_active',
+    name: 'uses_bank_accounts',
     type: 'boolean',
   })
-  isActive: boolean;
+  usesBankAccounts: boolean;
 
   @CreateDateColumn({
     name: 'created_at',

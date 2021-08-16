@@ -3,7 +3,7 @@ import { PaginationOptions } from "src/support/pagination/pagination-options";
 type PaymentMethodFilters = {
   id: string;
   name: string;
-  isActive: string;
+  usesBankAccounts: boolean;
 };
 
 export class PaymentMethodPaginationOptionsDto extends PaginationOptions {
@@ -17,9 +17,13 @@ export class PaymentMethodPaginationOptionsDto extends PaginationOptions {
       perPage = 10,
       id,
       name,
-      isActive,
+      usesBankAccounts,
     } = query;
 
-    return new PaymentMethodPaginationOptionsDto(+page, +perPage, {id, name, isActive});
+    return new PaymentMethodPaginationOptionsDto(+page, +perPage, {
+      id,
+      name,
+      usesBankAccounts: usesBankAccounts === 'true',
+    });
   }
 }
