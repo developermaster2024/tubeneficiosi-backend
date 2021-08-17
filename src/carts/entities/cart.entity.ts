@@ -64,8 +64,8 @@ export class Cart {
 
   get subTotal(): number {
     return this.cartItems
-        .map(item => Number(item.total))
-        .reduce(((total, currentValue) => total + currentValue), 0);
+      .map(item => Number(item.total))
+      .reduce(((total, currentValue) => total + currentValue), 0);
   }
 
   static create(data: Partial<Cart>): Cart {

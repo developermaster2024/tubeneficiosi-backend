@@ -31,7 +31,6 @@ export class CartItem {
   @Column({
     name: 'product_id',
     type: 'int',
-    select: false,
   })
   productId: number;
 
