@@ -13,5 +13,8 @@ export class ReadDeliveryMethodDto {
   readonly description: string;
 
   @Expose()
+  readonly imgPath: string;
+
+  @Expose()
   readonly deliveryMethodType: DeliveryMethodType;
 }
