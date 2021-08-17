@@ -45,6 +45,22 @@ export class DeliveryMethodsService {
 
     if (filters.storeId) queryBuilder.andWhere('deliveryMethod.storeId = :storeId', {storeId: filters.storeId});
 
+    if (filters.addressId) queryBuilder.andWhere(`
+      EXISTS(
+        SELECT dz.id FROM delivery_zones dz WHERE EXISTS(
+          SELECT lo.id FROM locations lo WHERE ST_CONTAINS(lo.area, (
+            SELECT
+              POINT(address.latitude, address.longitude)
+            FROM
+              client_addresses address
+            WHERE
+              address.id = :addressId AND address.deleted_at IS NULL
+            LIMIT 1
+          ))
+        ) AND dz.delivery_method_id = deliveryMethod.id
+      )
+    `, { addressId: filters.addressId });
+
     const [deliveryMethods, total] = await queryBuilder.getManyAndCount();
 
     return new PaginationResult(deliveryMethods, total, perPage);
