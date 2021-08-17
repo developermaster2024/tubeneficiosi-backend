@@ -1,4 +1,4 @@
-  import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
@@ -41,6 +41,7 @@ import { CardsModule } from './cards/cards.module';
 import { OrderStatusesModule } from './order-statuses/order-statuses.module';
 import { CardIssuerTypesModule } from './card-issuer-types/card-issuer-types.module';
 import { BankAccountPurposesModule } from './bank-account-purposes/bank-account-purposes.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -88,6 +89,7 @@ import { BankAccountPurposesModule } from './bank-account-purposes/bank-account-
     OrderStatusesModule,
     CardIssuerTypesModule,
     BankAccountPurposesModule,
+    OrdersModule,
   ],
 })
 export class AppModule {}
