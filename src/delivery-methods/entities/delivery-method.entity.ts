@@ -28,11 +28,11 @@ export class DeliveryMethod {
   })
   description: string;
 
-  // @Column({
-  //   name: 'img_path',
-  //   type: 'varchar',
-  // })
-  // imgPath: string;
+  @Column({
+    name: 'img_path',
+    type: 'varchar',
+  })
+  imgPath: string;
 
   @Column({
     name: 'store_id',

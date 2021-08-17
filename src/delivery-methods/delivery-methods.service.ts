@@ -66,11 +66,12 @@ export class DeliveryMethodsService {
     return new PaginationResult(deliveryMethods, total, perPage);
   }
 
-  async create({userId, deliveryZoneToRanges, ...createDeliveryMethodDto}: CreateDeliveryMethodDto): Promise<DeliveryMethod> {
+  async create({userId, image, deliveryZoneToRanges, ...createDeliveryMethodDto}: CreateDeliveryMethodDto): Promise<DeliveryMethod> {
     const store = await this.findStoreByUserId(userId);
 
     let deliveryMethod = DeliveryMethod.create({
       ...createDeliveryMethodDto,
+      imgPath: image.path,
       store,
     });
 

@@ -1,8 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { FileToBodyInterceptor } from 'src/support/interceptors/file-to-body.interceptor';
 import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-body.interceptor';
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
@@ -25,7 +27,7 @@ export class DeliveryMethodsController {
   @Post()
   @Roles(Role.STORE)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @UseInterceptors(new JwtUserToBodyInterceptor())
+  @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'), new JwtUserToBodyInterceptor())
   async create(@Body() createDeliveryMethodDto: CreateDeliveryMethodDto): Promise<any> {
     return await this.deliveryMethodsService.create(createDeliveryMethodDto);
   }
