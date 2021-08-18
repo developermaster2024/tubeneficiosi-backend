@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BankTransfer } from 'src/bank-transfers/entities/bank-transfer.entity';
 import { Cart } from 'src/carts/entities/cart.entity';
 import { CartNotFoundException } from 'src/carts/errors/cart-not-found.exception';
-import { DeliveryZoneNotFoundException } from 'src/carts/errors/delivery-zone-not-found.exception';
+import { DeliveryZoneNotFoundException } from 'src/delivery-methods/errors/delivery-zone-not-found.exception';
 import { PaymentBelowTotalException } from 'src/carts/errors/payment-bellow-total.exception';
 import { PaymentExceedsTotalException } from 'src/carts/errors/payment-exceeds-total.exception';
 import { Delivery } from 'src/deliveries/entities/delivery.entity';
