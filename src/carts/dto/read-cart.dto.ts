@@ -10,6 +10,9 @@ export class ReadCartDto {
   readonly isProcessed: boolean;
 
   @Expose()
+  readonly isDirectPurchase: boolean;
+
+  @Expose()
   readonly storeId: number;
 
   @Expose()
