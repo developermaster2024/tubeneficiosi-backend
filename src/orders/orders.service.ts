@@ -34,10 +34,14 @@ export class OrdersService {
 
     // @TODO: Hay que validar que la cantidad de los productos sea suficiente para satisfacer la orden
 
-    const cart = await this.cartsRepository.findOne({
-      where: { id: cartId, isProcessed: false},
-      relations: ['cartItems', 'cartItems.cartItemFeatures', 'user', 'store'],
-    });
+    const cart = await this.cartsRepository.createQueryBuilder('cart')
+      .innerJoinAndSelect('cart.user', 'user')
+      .innerJoinAndSelect('cart.store', 'store')
+      .innerJoinAndSelect('cart.cartItems', 'cartItem')
+      .innerJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .where('cart.isProcessed = :isProcessed', { isProcessed: 0 })
+      .andWhere(':today < cart.expiresOn', { today: new Date() })
+      .getOne();
 
     if (!cart) {
       throw new CartNotFoundException();

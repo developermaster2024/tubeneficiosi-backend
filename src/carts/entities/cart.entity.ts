@@ -51,6 +51,12 @@ export class Cart {
   @OneToMany(() => CartItem, cartItem => cartItem.cart, {cascade: ['insert', 'update']})
   cartItems: CartItem[];
 
+  @Column({
+    name: 'expires_on',
+    type: 'datetime',
+  })
+  expiresOn: Date;
+
   @CreateDateColumn({
     name: 'created_at',
     select: false,

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { add } from 'date-fns';
 import { ProductFeature } from 'src/product-features/entities/product-feature.entity';
 import { ProductFeatureForGroup } from 'src/products/entities/product-feature-for-group.entity';
 import { Product } from 'src/products/entities/product.entity';
@@ -53,15 +54,15 @@ export class CartsService {
     let cart: Cart;
 
     if (!isDirectPurchase) {
-      cart = await this.cartsRepository.findOne({
-        where: {
-          userId,
-          storeId,
-          isProcessed: false,
-          isDirectPurchase: false,
-        },
-        relations: ['cartItems', 'cartItems.cartItemFeatures'],
-      });
+      cart = await this.cartsRepository.createQueryBuilder('cart')
+        .innerJoinAndSelect('cart.cartItems', 'cartItem')
+        .innerJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+        .where('cart.userId = :userId', { userId })
+        .andWhere('cart.storeId = :storeId', { storeId })
+        .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
+        .andWhere('cart.isDirectPurchase = :isDirectPurchase', { isDirectPurchase: 0 })
+        .andWhere(':today < cart.expiresOn', { today: new Date() })
+        .getOne();
     }
 
     if (!cart) {
@@ -71,6 +72,7 @@ export class CartsService {
         isProcessed: false,
         isDirectPurchase,
         cartItems: [],
+        expiresOn: add(new Date(), isDirectPurchase ? { hours: 1 } : { days: 2 }),
       });
     }
 
