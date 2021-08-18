@@ -39,7 +39,8 @@ export class OrdersService {
       .innerJoinAndSelect('cart.store', 'store')
       .innerJoinAndSelect('cart.cartItems', 'cartItem')
       .innerJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
-      .where('cart.isProcessed = :isProcessed', { isProcessed: 0 })
+      .where('cart.id = :cartId', { cartId })
+      .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
       .andWhere(':today < cart.expiresOn', { today: new Date() })
       .getOne();
 
