@@ -11,8 +11,6 @@ import { CreateBankTransferDto } from "./create-bank-transfer.dto";
 @Exclude()
 export class CreateOrderDto {
   @Expose()
-  // @TODO: Validar que el carrito no haya expirado ni que este procesado
-  @Exists(Cart)
   readonly cartId: number;
 
   @Expose()
