@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { IsNumber, Min, ValidateNested } from "class-validator";
+import { IsBoolean, IsNumber, Min, ValidateNested } from "class-validator";
 import { Product } from "src/products/entities/product.entity";
 import { Store } from "src/stores/entities/store.entity";
 import { Exists } from "src/validation/exists.constrain";
@@ -29,4 +29,8 @@ export class AddToCartDto {
   @Expose()
   @ValidateNested()
   readonly productFeaturesData: ProductFeaturesDto;
+
+  @Expose()
+  @IsBoolean()
+  readonly isDirectPurchase: boolean;
 }

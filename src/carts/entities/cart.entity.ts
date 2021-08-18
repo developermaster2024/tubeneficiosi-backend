@@ -20,6 +20,13 @@ export class Cart {
   isProcessed: boolean;
 
   @Column({
+    name: 'is_direct_purchase',
+    type: 'boolean',
+    default: 0,
+  })
+  isDirectPurchase: boolean;
+
+  @Column({
     name: 'user_id',
     type: 'int',
     select: false,

@@ -37,7 +37,7 @@ export class CartsService {
     return new PaginationResult(carts, total, perPage);
   }
 
-  async addToCart({userId, storeId, productId, quantity, productFeaturesData}: AddToCartDto): Promise<Cart> {
+  async addToCart({userId, storeId, productId, quantity, productFeaturesData, isDirectPurchase}: AddToCartDto): Promise<Cart> {
     const featureIds = productFeaturesData?.featureIds ?? [];
     const featureForGroupIds = productFeaturesData?.featureForGroupIds ?? [];
 
@@ -50,16 +50,26 @@ export class CartsService {
       throw new ProductNotFoundException();
     }
 
-    let cart = await this.cartsRepository.findOne({
-      where: {userId, storeId, isProcessed: 0},
-      relations: ['cartItems', 'cartItems.product'],
-    });
+    let cart: Cart;
+
+    if (!isDirectPurchase) {
+      cart = await this.cartsRepository.findOne({
+        where: {
+          userId,
+          storeId,
+          isProcessed: false,
+          isDirectPurchase: false,
+        },
+        relations: ['cartItems', 'cartItems.cartItemFeatures'],
+      });
+    }
 
     if (!cart) {
       cart = Cart.create({
         userId,
         storeId,
         isProcessed: false,
+        isDirectPurchase,
         cartItems: [],
       });
     }
