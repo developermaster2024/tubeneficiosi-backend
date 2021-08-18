@@ -10,10 +10,20 @@ import { Store } from 'src/stores/entities/store.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { filenameGenerator } from 'src/support/file-uploads';
+import { DeliveryZone } from './entities/delivery-zone.entity';
+import { Cart } from 'src/carts/entities/cart.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([DeliveryMethod, Location, DeliveryZoneToShippingRange, DeliveryZoneToDeliveryRange, Store]),
+    TypeOrmModule.forFeature([
+      DeliveryMethod,
+      Location,
+      DeliveryZoneToShippingRange,
+      DeliveryZoneToDeliveryRange,
+      Store,
+      DeliveryZone,
+      Cart,
+  ]),
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads/delivery-methods',

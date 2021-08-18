@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DeliveryZoneNotFoundException } from 'src/delivery-methods/errors/delivery-zone-not-found.exception';
 import { DeliveryMethodTypes } from 'src/delivery-method-types/enums/delivery-methods-types.enum';
 import { Location } from 'src/locations/entities/location.entity';
 import { Store } from 'src/stores/entities/store.entity';
 import { StoreNotFoundException } from 'src/stores/erros/store-not-found.exception';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Repository } from 'typeorm';
+import { CalculateCostDto } from './dto/calculate-cost.dto';
 import { CreateDeliveryMethodDto } from './dto/create-delivery-method.dto';
 import { CreateDeliveryZoneToRangeDto } from './dto/create-delivery-zone-to-range.dto';
 import { CreateShippingZoneToRangeDto } from './dto/create-shipping-zone-to-range.dto';
@@ -18,6 +20,8 @@ import { DeliveryZoneToShippingRange } from './entities/delivery-zone-to-shippin
 import { DeliveryZone } from './entities/delivery-zone.entity';
 import { ShippingRange } from './entities/shipping-range.entity';
 import { DeliveryMethodNotFoundException } from './errors/delivery-method-not-found.exception';
+import { Cart } from 'src/carts/entities/cart.entity';
+import { CartNotFoundException } from 'src/carts/errors/cart-not-found.exception';
 
 @Injectable()
 export class DeliveryMethodsService {
@@ -26,7 +30,9 @@ export class DeliveryMethodsService {
     @InjectRepository(Location) private readonly locationsRepository: Repository<Location>,
     @InjectRepository(DeliveryZoneToShippingRange) private readonly deliveryZoneToShippingRangesRepository: Repository<DeliveryZoneToShippingRange>,
     @InjectRepository(DeliveryZoneToDeliveryRange) private readonly deliveryZoneToDeliveryRangesRepository: Repository<DeliveryZoneToDeliveryRange>,
-    @InjectRepository(Store) private readonly storesRepository: Repository<Store>
+    @InjectRepository(Store) private readonly storesRepository: Repository<Store>,
+    @InjectRepository(DeliveryZone) private readonly deliveryZoneRepository: Repository<DeliveryZone>,
+    @InjectRepository(Cart) private readonly cartsRepository: Repository<Cart>
   ) {}
 
   async paginate({perPage, offset, filters}: DeliveryMethodPaginationOptionsDto): Promise<PaginationResult<DeliveryMethod>> {
@@ -199,5 +205,40 @@ export class DeliveryMethodsService {
     }
 
     await this.deliveryMethodsRepository.softRemove(deliveryMethod);
+  }
+
+  async calculateCost({deliveryMethodId, profileAddressId, cartId}: CalculateCostDto): Promise<{ cost: number }> {
+    const deliveryZone = await this.deliveryZoneRepository.createQueryBuilder('deliveryZone')
+        .innerJoin('deliveryZone.deliveryMethod', 'deliveryMethod')
+        .where(`EXISTS(
+          SELECT lo.id FROM locations lo WHERE ST_CONTAINS(lo.area, (
+            SELECT
+              POINT(address.latitude, address.longitude)
+            FROM
+              client_addresses address
+            WHERE
+              address.id = :addressId AND address.deleted_at IS NULL
+            LIMIT 1
+          ))
+        )`, { addressId: profileAddressId })
+        .andWhere('deliveryMethod.id = :deliveryMethodId', { deliveryMethodId })
+        .getOne();
+
+    if (!deliveryZone) {
+      throw new DeliveryZoneNotFoundException();
+    }
+
+    const cart = await this.cartsRepository.findOne({
+      where: { id: cartId },
+      relations: ['cartItems', 'cartItems.cartItemFeatures'],
+    });
+
+    if (!cart) {
+      throw new CartNotFoundException();
+    }
+
+    return {
+      cost: 0,
+    };
   }
 }

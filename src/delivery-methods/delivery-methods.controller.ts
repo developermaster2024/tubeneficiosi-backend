@@ -10,6 +10,7 @@ import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
 import { DeliveryMethodsService } from './delivery-methods.service';
+import { CalculateCostDto } from './dto/calculate-cost.dto';
 import { CreateDeliveryMethodDto } from './dto/create-delivery-method.dto';
 import { ReadDeliveryMethodDto } from './dto/read-delivery-method.dto';
 import { UpdateDeliveryMethodDto } from './dto/update-delivery-method.dto';
@@ -51,5 +52,10 @@ export class DeliveryMethodsController {
   @UseInterceptors(new JwtUserToBodyInterceptor())
   async delete(@Param('id') id: string, @Body('userId') userId: number): Promise<void> {
     await this.deliveryMethodsService.delete(+id, userId);
+  }
+
+  @Post('calculate-cost')
+  async calculateCost(@Body() calculateCostDto: CalculateCostDto): Promise<{cost: number}> {
+    return await this.deliveryMethodsService.calculateCost(calculateCostDto);
   }
 }
