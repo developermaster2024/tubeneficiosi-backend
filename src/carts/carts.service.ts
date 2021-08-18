@@ -143,8 +143,8 @@ export class CartsService {
     await this.cartItemsRepository.remove(cartItem);
 
     const cart = await this.cartsRepository.createQueryBuilder('cart')
-      .innerJoinAndSelect('cart.cartItems', 'cartItem')
-      .innerJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .leftJoinAndSelect('cart.cartItems', 'cartItem')
+      .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .where('cart.userId = :userId', { userId })
       .andWhere('cart.id = :cartId', { cartId })
       .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
