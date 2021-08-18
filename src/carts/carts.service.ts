@@ -43,7 +43,7 @@ export class CartsService {
     const featureForGroupIds = productFeaturesData?.featureForGroupIds ?? [];
 
     const product = await this.productsRepository.findOne({
-      where: { id: productId },
+      where: { id: productId, storeId },
       relations: ['productImages'],
     });
 
