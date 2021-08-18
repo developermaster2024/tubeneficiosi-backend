@@ -59,8 +59,8 @@ export class CartsController {
   @Roles(Role.CLIENT)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({cartId: 'cartId', cartItemId: 'cartItemId'}))
-  async deleteCartItem(@Body() deleteCartItemDto: DeleteCartitemDto): Promise<void> {
-    await this.cartsRepository.deleteCartItem(deleteCartItemDto);
+  async deleteCartItem(@Body() deleteCartItemDto: DeleteCartitemDto): Promise<ReadCartDto> {
+    return plainToClass(ReadCartDto, await this.cartsRepository.deleteCartItem(deleteCartItemDto));
   }
 
   @Put(':cartId/cart-items/:cartItemId')

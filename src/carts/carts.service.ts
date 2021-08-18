@@ -127,7 +127,7 @@ export class CartsService {
     return cart;
   }
 
-  async deleteCartItem({userId, cartId, cartItemId}: DeleteCartitemDto): Promise<void> {
+  async deleteCartItem({userId, cartId, cartItemId}: DeleteCartitemDto): Promise<Cart> {
     const cartItem = await this.cartItemsRepository.createQueryBuilder('cartItem')
       .innerJoin('cartItem.cart', 'cart')
       .where('cartItem.id = :cartItemId', { cartItemId })
@@ -141,6 +141,20 @@ export class CartsService {
     }
 
     await this.cartItemsRepository.remove(cartItem);
+
+    const cart = await this.cartsRepository.createQueryBuilder('cart')
+      .innerJoinAndSelect('cart.cartItems', 'cartItem')
+      .innerJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .where('cart.userId = :userId', { userId })
+      .andWhere('cart.id = :cartId', { cartId })
+      .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
+      .getOne();
+
+    if (!cart) {
+      throw new CartNotFoundException();
+    }
+
+    return cart;
   }
 
   async updateCartItemQuantity({userId, cartId, cartItemId, quantity}: UpdateCartItemQuantityDto): Promise<CartItem> {
