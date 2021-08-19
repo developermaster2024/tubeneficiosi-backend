@@ -100,7 +100,6 @@ export class Order {
 
   @CreateDateColumn({
     name: 'created_at',
-    select: false,
   })
   createdAt: Date;
 
