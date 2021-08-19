@@ -102,10 +102,13 @@ export class CartsService {
   }
 
   async findOneStoreId(userId: number, storeId: number): Promise<Cart> {
-    const cart = await this.cartsRepository.findOne({
-      where: {userId, storeId, isProcessed: 0},
-      relations: ['cartItems', 'cartItems.product', 'cartItems.cartItemFeatures'],
-    });
+    const cart = await this.cartsRepository.createQueryBuilder('cart')
+      .leftJoinAndSelect('cart.cartItems', 'cartItem')
+      .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .where('cart.userId = :userId', { userId })
+      .where('cart.storeId = :storeId', { storeId })
+      .andWhere(':today < cart.expiresOn', { today: new Date() })
+      .getOne();
 
     if (!cart) {
       throw new CartNotFoundException();
@@ -115,10 +118,12 @@ export class CartsService {
   }
 
   async findOneById(id: number): Promise<Cart> {
-    const cart = await this.cartsRepository.findOne({
-      where: { id },
-      relations: ['cartItems', 'cartItems.cartItemFeatures'],
-    });
+    const cart = await this.cartsRepository.createQueryBuilder('cart')
+      .leftJoinAndSelect('cart.cartItems', 'cartItem')
+      .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .where('cart.id = :cartId', { cartId: id })
+      .andWhere(':today < cart.expiresOn', { today: new Date() })
+      .getOne();
 
     if (!cart) {
       throw new CartNotFoundException();
