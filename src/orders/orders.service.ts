@@ -14,6 +14,7 @@ import { PaymentMethods } from 'src/payment-methods/enum/payment-methods.enum';
 import { Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Order } from './entities/order.entity';
+import { OrderNotFoundException } from './errors/order-not-found.exception';
 
 @Injectable()
 export class OrdersService {
@@ -114,21 +115,20 @@ export class OrdersService {
   }
 
   async findOne(id: number): Promise<Order> {
-    const order = await this.ordersRepository.findOne({
-      where: { id },
-      relations: [
-        'orderStatus',
-        'paymentMethod',
-        'deliveryMethod',
-        'cart',
-        'cart.cartItems',
-        'cart.cartItems.cartItemFeatures',
-        'bankTransfers',
-      ],
-    });
+    const order = await this.ordersRepository.createQueryBuilder('order')
+      .innerJoinAndSelect('order.orderStatus', 'orderStatus')
+      .innerJoinAndSelect('order.paymentMethod', 'paymentMethod')
+      .leftJoinAndSelect('order.deliveryMethod', 'deliveryMethod')
+      .leftJoinAndSelect('order.delivery', 'delivery')
+      .innerJoinAndSelect('order.cart', 'cart')
+      .leftJoinAndSelect('cart.cartItems', 'cartItem')
+      .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .leftJoinAndSelect('cart.bankTransfers', 'bankTransfer')
+      .where('cart.id = :cartId', { cartId: id })
+      .getOne();
 
     if (!order) {
-      // throw new OrderNotFoundException();
+      throw new OrderNotFoundException();
     }
 
     return order;
