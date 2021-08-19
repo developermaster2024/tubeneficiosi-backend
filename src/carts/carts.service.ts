@@ -16,6 +16,7 @@ import { CartItem } from './entities/cart-item.entity';
 import { Cart } from './entities/cart.entity';
 import { CartItemNotFoundException } from './errors/cart-item-not-found.exception';
 import { CartNotFoundException } from './errors/cart-not-found.exception';
+import { ProductQuantityIsLessThanRequiredQuantityException } from './errors/product-quantity-is-less-than-required-quantity.exception';
 
 @Injectable()
 export class CartsService {
@@ -78,9 +79,12 @@ export class CartsService {
 
     const cartItem = cart.cartItems.find(cartItem => cartItem.productId === Number(productId));
 
+    let itemQuantity = 0;
+
     if (cartItem) {
       // @TODO: Problema con las características cuando se actualiza con un producto cuyas características seleccionadas son las mismas
       cartItem.quantity += quantity;
+      itemQuantity = cartItem.quantity;
     } else {
       cart.cartItems.push(CartItem.create({
         productId,
@@ -96,6 +100,11 @@ export class CartsService {
             .map(({name, value, price}) => CartItemFeature.create({name, value, price})),
         ]
       }));
+      itemQuantity = quantity;
+    }
+
+    if (itemQuantity > product.quantity) {
+      throw new ProductQuantityIsLessThanRequiredQuantityException();
     }
 
     return await this.cartsRepository.save(cart);
@@ -175,7 +184,17 @@ export class CartsService {
       throw new CartItemNotFoundException();
     }
 
+    const product = await this.productsRepository.findOne(cartItem.productId);
+
+    if (!product) {
+      throw new ProductNotFoundException();
+    }
+
     cartItem.quantity = quantity;
+
+    if (cartItem.quantity > product.quantity) {
+      throw new ProductQuantityIsLessThanRequiredQuantityException();
+    }
 
     return await this.cartItemsRepository.save(cartItem);
   }
