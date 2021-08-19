@@ -11,6 +11,9 @@ import { CreateBankTransferDto } from "./create-bank-transfer.dto";
 @Exclude()
 export class CreateOrderDto {
   @Expose()
+  readonly userId: number;
+
+  @Expose()
   readonly cartId: number;
 
   @Expose()

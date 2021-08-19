@@ -25,6 +25,7 @@ export class OrdersService {
   ) {}
 
   async create({
+    userId,
     cartId,
     deliveryMethodId,
     profileAddressId,
@@ -41,6 +42,7 @@ export class OrdersService {
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .where('cart.id = :cartId', { cartId })
+      .andWhere('cart.userId = :userId', { userId })
       .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
       .andWhere(':today < cart.expiresOn', { today: new Date() })
       .getOne();
