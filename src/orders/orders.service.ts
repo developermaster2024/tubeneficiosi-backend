@@ -55,8 +55,8 @@ export class OrdersService {
 
     await this.cartsRepository.save(cart);
 
-    // @TODO: Hay que crear un correlativo
-    order.orderNumber = 'asdf';
+    const lastOrder = await this.ordersRepository.findOne({ order: { id: 'DESC' } });
+    order.orderNumber = (lastOrder ? +lastOrder.orderNumber + 1 : 1).toString().padStart(6, '0');
     order.cart = cart;
     order.storeId = cart.store.id;
     order.clientId = cart.user.id;

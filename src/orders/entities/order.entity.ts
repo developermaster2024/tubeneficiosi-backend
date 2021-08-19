@@ -91,7 +91,7 @@ export class Order {
   })
   cartId: number;
 
-  @OneToOne(() => Cart)
+  @OneToOne(() => Cart, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cart_id' })
   cart: Cart;
 
