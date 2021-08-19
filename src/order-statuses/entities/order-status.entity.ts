@@ -17,4 +17,10 @@ export class OrderStatus {
     type: 'varchar',
   })
   name: string;
+
+  @Column({
+    name: 'color',
+    type: 'varchar',
+  })
+  color: string;
 }
