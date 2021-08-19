@@ -123,7 +123,7 @@ export class OrdersService {
       .innerJoinAndSelect('order.cart', 'cart')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
-      .leftJoinAndSelect('cart.bankTransfers', 'bankTransfer')
+      .leftJoinAndSelect('order.bankTransfers', 'bankTransfer')
       .where('cart.id = :cartId', { cartId: id })
       .getOne();
 
