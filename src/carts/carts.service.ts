@@ -115,7 +115,7 @@ export class CartsService {
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .where('cart.userId = :userId', { userId })
-      .where('cart.storeId = :storeId', { storeId })
+      .andWhere('cart.storeId = :storeId', { storeId })
       .andWhere(':today < cart.expiresOn', { today: new Date() })
       .getOne();
 
