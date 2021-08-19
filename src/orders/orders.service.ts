@@ -124,7 +124,7 @@ export class OrdersService {
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .leftJoinAndSelect('order.bankTransfers', 'bankTransfer')
-      .where('cart.id = :cartId', { cartId: id })
+      .where('order.id = :orderId', { orderId: id })
       .getOne();
 
     if (!order) {
