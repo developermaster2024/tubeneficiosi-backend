@@ -93,10 +93,10 @@ export class CartsService {
         productPrice: product.finalPrice,
         quantity,
         cartItemFeatures: [
-          ...(await this.productFeaturesRepository.find({ id: In(featureIds) }))
+          ...(await this.productFeaturesRepository.find({ id: In(featureIds), productId }))
             .map(({name, value, price}) => CartItemFeature.create({name, value, price})),
 
-          ...(await this.productFeatureForGroupsRepository.find({ id: In(featureForGroupIds) }))
+          ...(await this.productFeatureForGroupsRepository.find({ id: In(featureForGroupIds), productFeatureGroup: { productId } }))
             .map(({name, value, price}) => CartItemFeature.create({name, value, price})),
         ]
       }));
