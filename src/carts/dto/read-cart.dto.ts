@@ -1,4 +1,5 @@
-import { Exclude, Expose, Type } from "class-transformer";
+import { Exclude, Expose, Transform, Type } from "class-transformer";
+import { format } from "date-fns";
 import { ReadCartItemDto } from "./read-cart-item.dto";
 
 @Exclude()
@@ -21,4 +22,8 @@ export class ReadCartDto {
   @Expose()
   @Type(() => ReadCartItemDto)
   readonly cartItems: ReadCartItemDto[];
+
+  @Expose()
+  @Transform(({value}) => format(value, 'yyyy-MM-dd HH:mm:ss'))
+  readonly createdAt: string;
 }

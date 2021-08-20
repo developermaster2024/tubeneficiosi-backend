@@ -5,8 +5,6 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-body.interceptor';
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
-import { PaginationOptions } from 'src/support/pagination/pagination-options';
-import { PaginationPipe } from 'src/support/pagination/pagination-pipe';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
 import { CartsService } from './carts.service';
@@ -15,17 +13,18 @@ import { DeleteCartitemDto } from './dto/delete-cart-item.dto';
 import { ReadCartDto } from './dto/read-cart.dto';
 import { UpdateCartItemQuantityDto } from './dto/update-cart-item-quantity.dto';
 import { CartItem } from './entities/cart-item.entity';
+import { CartPaginationPipe } from './pipes/cart-pagination.pipe';
 
 @Controller('carts')
 export class CartsController {
   constructor(private readonly cartsRepository: CartsService) {}
 
   @Get('')
-  @Roles(Role.CLIENT)
+  @Roles(Role.CLIENT, Role.STORE, Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor())
   async paginate(
-    @Query(PaginationPipe) options: PaginationOptions,
+    @Query(CartPaginationPipe) options: any,
     @Body('userId') userId: number
   ): Promise<PaginationResult<ReadCartDto>> {
     return (await this.cartsRepository.paginate(options, userId)).toClass(ReadCartDto);

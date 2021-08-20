@@ -5,10 +5,13 @@ import { ProductFeature } from 'src/product-features/entities/product-feature.en
 import { ProductFeatureForGroup } from 'src/products/entities/product-feature-for-group.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { ProductNotFoundException } from 'src/products/errors/product-not-found.exception';
-import { PaginationOptions } from 'src/support/pagination/pagination-options';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
+import { User } from 'src/users/entities/user.entity';
+import { Role } from 'src/users/enums/roles.enum';
+import { UserNotFoundException } from 'src/users/errors/user-not-found.exception';
 import { In, Repository } from 'typeorm';
 import { AddToCartDto } from './dto/add-to-cart.dto';
+import { CartPaginationOptionsDto } from './dto/cart-pagination-options.dto';
 import { DeleteCartitemDto } from './dto/delete-cart-item.dto';
 import { UpdateCartItemQuantityDto } from './dto/update-cart-item-quantity.dto';
 import { CartItemFeature } from './entities/cart-item-feature.entity';
@@ -25,16 +28,56 @@ export class CartsService {
     @InjectRepository(CartItem) private readonly cartItemsRepository: Repository<CartItem>,
     @InjectRepository(Product) private readonly productsRepository: Repository<Product>,
     @InjectRepository(ProductFeature) private readonly productFeaturesRepository: Repository<ProductFeature>,
-    @InjectRepository(ProductFeatureForGroup) private readonly productFeatureForGroupsRepository: Repository<ProductFeatureForGroup>
+    @InjectRepository(ProductFeatureForGroup) private readonly productFeatureForGroupsRepository: Repository<ProductFeatureForGroup>,
+    @InjectRepository(User) private readonly usersRepository: Repository<User>
   ) {}
 
-  async paginate({offset, perPage}: PaginationOptions, userId: number): Promise<PaginationResult<Cart>> {
-    const [carts, total] = await this.cartsRepository.findAndCount({
-      take: perPage,
-      skip: offset,
-      where: {userId, isProcessed: 0},
-      relations: ['cartItems', 'cartItems.product', 'cartItems.cartItemFeatures'],
-    });
+  async paginate({offset, perPage, filters: {
+    id,
+    storeName,
+    minTotal,
+    maxTotal,
+    minDate,
+    maxDate,
+    isProcessed,
+    isExpired,
+    isDirectPurchase,
+  }}: CartPaginationOptionsDto, userId: number): Promise<PaginationResult<Cart>> {
+    const user = await this.usersRepository.findOne(userId);
+
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    const queryBuilder = this.cartsRepository.createQueryBuilder('cart')
+      .take(perPage)
+      .skip(offset)
+      .leftJoinAndSelect('cart.cartItems', 'cartItem')
+      .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .innerJoinAndSelect('cart.store', 'store')
+      .innerJoinAndSelect('store.storeProfile', 'storeProfile');
+
+    if (user.role === Role.CLIENT) {
+      queryBuilder.andWhere('cart.userId = :userId', { userId });
+    } else if (user.role === Role.STORE) {
+      queryBuilder.andWhere('store.userId = :userId', { userId });
+    }
+
+    if (id) queryBuilder.andWhere('cart.id = :id', { id });
+
+    if (storeName) queryBuilder.andWhere('store.name LIKE :name', { name: `%${storeName}%` });
+
+    if (minDate) queryBuilder.andWhere('cart.createdAt >= :minDate', { minDate });
+
+    if (maxDate) queryBuilder.andWhere('cart.createdAt <= :maxDate', { maxDate });
+
+    if (isProcessed) queryBuilder.andWhere('cart.isProcessed = 1');
+
+    if (isExpired) queryBuilder.andWhere(':today > cart.expiresOn', { today: new Date() });
+
+    if (isDirectPurchase) queryBuilder.andWhere('cart.isDirectPurchase = 1');
+
+    const [carts, total] = await queryBuilder.getManyAndCount();
 
     return new PaginationResult(carts, total, perPage);
   }

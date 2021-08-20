@@ -59,7 +59,6 @@ export class Cart {
 
   @CreateDateColumn({
     name: 'created_at',
-    select: false,
   })
   createdAt: Date;
 
