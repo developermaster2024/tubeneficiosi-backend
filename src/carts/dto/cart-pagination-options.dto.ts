@@ -1,4 +1,5 @@
 import { PaginationOptions } from "src/support/pagination/pagination-options";
+import queryStringToBoolean from "src/support/query-string-to-boolean";
 
 type CartFilters = {
   id: string;
@@ -7,9 +8,9 @@ type CartFilters = {
   maxTotal: number;
   minDate: string;
   maxDate: string;
-  isProcessed: boolean;
-  isExpired: boolean;
-  isDirectPurchase: boolean;
+  isProcessed: boolean|null;
+  isExpired: boolean|null;
+  isDirectPurchase: boolean|null;
 };
 
 export class CartPaginationOptionsDto extends PaginationOptions {
@@ -39,9 +40,9 @@ export class CartPaginationOptionsDto extends PaginationOptions {
       maxTotal: Number(maxTotal),
       minDate: minDate,
       maxDate: maxDate,
-      isProcessed: isProcessed === 'true',
-      isExpired: isExpired === 'true',
-      isDirectPurchase: isDirectPurchase === 'true',
+      isProcessed: queryStringToBoolean(isProcessed),
+      isExpired: queryStringToBoolean(isExpired),
+      isDirectPurchase: queryStringToBoolean(isDirectPurchase),
     });
   }
 }

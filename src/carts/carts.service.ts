@@ -54,8 +54,8 @@ export class CartsService {
       .skip(offset)
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
-      .innerJoinAndSelect('cart.store', 'store')
-      .innerJoinAndSelect('store.storeProfile', 'storeProfile');
+      .leftJoinAndSelect('cart.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile');
 
     if (user.role === Role.CLIENT) {
       queryBuilder.andWhere('cart.userId = :userId', { userId });
@@ -71,11 +71,15 @@ export class CartsService {
 
     if (maxDate) queryBuilder.andWhere('cart.createdAt <= :maxDate', { maxDate });
 
-    if (isProcessed) queryBuilder.andWhere('cart.isProcessed = 1');
+    if (isProcessed !== null) queryBuilder.andWhere('cart.isProcessed = :isProcessed', { isProcessed: +isProcessed });
 
-    if (isExpired) queryBuilder.andWhere(':today > cart.expiresOn', { today: new Date() });
+    if (isExpired !== null) {
+      const comparator = isExpired ? '<' : '>';
 
-    if (isDirectPurchase) queryBuilder.andWhere('cart.isDirectPurchase = 1');
+      queryBuilder.andWhere(`cart.expiresOn ${comparator} :today`, { today: new Date() });
+    }
+
+    if (isDirectPurchase !== null) queryBuilder.andWhere('cart.isDirectPurchase = :isDirectPurchase', { isDirectPurchase: +isDirectPurchase});
 
     const [carts, total] = await queryBuilder.getManyAndCount();
 
