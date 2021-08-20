@@ -158,7 +158,6 @@ export class OrdersService {
       order.delivery = Delivery.create({
         profileAddressId,
         deliveryZone,
-        deliveryZoneId: 49,
         // @TODO: Calcular el costo de envío
         total: 0,
       });
@@ -191,6 +190,7 @@ export class OrdersService {
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .leftJoinAndSelect('order.deliveryMethod', 'deliveryMethod')
       .leftJoinAndSelect('order.delivery', 'delivery')
+      .leftJoinAndSelect('delivery.profileAddress', 'profileAddress')
       .innerJoinAndSelect('order.cart', 'cart')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
