@@ -6,6 +6,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-body.interceptor';
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
+import queryStringToBoolean from 'src/support/query-string-to-boolean';
 import { Role } from 'src/users/enums/roles.enum';
 import { CartsService } from './carts.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
@@ -44,14 +45,18 @@ export class CartsController {
   @UseInterceptors(new JwtUserToBodyInterceptor())
   async findOneByStoreId(
     @Param('storeId') storeId: string,
-    @Body('userId') userId: number
+    @Body('userId') userId: number,
+    @Query('isExpired') isExpired: string
   ): Promise<ReadCartDto> {
-    return plainToClass(ReadCartDto, await this.cartsRepository.findOneStoreId(userId, +storeId));
+    return plainToClass(ReadCartDto, await this.cartsRepository.findOneStoreId(userId, +storeId, { isExpired: queryStringToBoolean(isExpired) }));
   }
 
   @Get(':id')
-  async findOneById(@Param('id') id: string): Promise<ReadCartDto> {
-    return plainToClass(ReadCartDto, await this.cartsRepository.findOneById(+id));
+  async findOneById(
+    @Param('id') id: string,
+    @Query('isExpired') isExpired: string
+  ): Promise<ReadCartDto> {
+    return plainToClass(ReadCartDto, await this.cartsRepository.findOneById(+id, { isExpired: queryStringToBoolean(isExpired) }));
   }
 
   @Delete(':cartId/cart-items/:cartItemId')

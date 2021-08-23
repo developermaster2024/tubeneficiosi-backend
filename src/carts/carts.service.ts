@@ -160,16 +160,22 @@ export class CartsService {
     return await this.cartsRepository.save(cart);
   }
 
-  async findOneStoreId(userId: number, storeId: number): Promise<Cart> {
-    const cart = await this.cartsRepository.createQueryBuilder('cart')
+  async findOneStoreId(userId: number, storeId: number, { isExpired }: { isExpired: boolean|null }): Promise<Cart> {
+    const queryBuilder = this.cartsRepository.createQueryBuilder('cart')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .innerJoinAndSelect('cart.user', 'user')
       .leftJoinAndSelect('user.client', 'client')
       .where('cart.userId = :userId', { userId })
-      .andWhere('cart.storeId = :storeId', { storeId })
-      .andWhere(':today < cart.expiresOn', { today: new Date() })
-      .getOne();
+      .andWhere('cart.storeId = :storeId', { storeId });
+
+    if (isExpired !== null) {
+      const comparator = isExpired ? '<' : '>';
+
+      queryBuilder.andWhere(`cart.expiresOn ${comparator} :today`, { today: new Date() });
+    }
+
+    const cart = await queryBuilder.getOne();
 
     if (!cart) {
       throw new CartNotFoundException();
@@ -178,15 +184,21 @@ export class CartsService {
     return cart;
   }
 
-  async findOneById(id: number): Promise<Cart> {
-    const cart = await this.cartsRepository.createQueryBuilder('cart')
+  async findOneById(id: number, { isExpired }: { isExpired: boolean|null }): Promise<Cart> {
+    const queryBuilder = this.cartsRepository.createQueryBuilder('cart')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .innerJoinAndSelect('cart.user', 'user')
       .leftJoinAndSelect('user.client', 'client')
-      .where('cart.id = :cartId', { cartId: id })
-      .andWhere(':today < cart.expiresOn', { today: new Date() })
-      .getOne();
+      .where('cart.id = :cartId', { cartId: id });
+
+    if (isExpired !== null) {
+      const comparator = isExpired ? '<' : '>';
+
+      queryBuilder.andWhere(`cart.expiresOn ${comparator} :today`, { today: new Date() });
+    }
+
+    const cart = await queryBuilder.getOne();
 
     if (!cart) {
       throw new CartNotFoundException();
