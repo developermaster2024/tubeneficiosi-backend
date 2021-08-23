@@ -138,6 +138,7 @@ export class CartsService {
         productName: product.name,
         productImage: product.productImages[0].path,
         productPrice: product.finalPrice,
+        productSlug: product.slug,
         quantity,
         cartItemFeatures: [
           ...(await this.productFeaturesRepository.find({ id: In(featureIds), productId }))

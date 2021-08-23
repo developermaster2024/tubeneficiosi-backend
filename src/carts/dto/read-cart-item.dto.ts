@@ -20,6 +20,9 @@ export class ReadCartItemDto {
   readonly productImage: string;
 
   @Expose()
+  readonly productSlug: string;
+
+  @Expose()
   readonly productPrice: number;
 
   @Expose()

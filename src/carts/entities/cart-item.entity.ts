@@ -58,6 +58,12 @@ export class CartItem {
   })
   productPrice: number;
 
+  @Column({
+    name: 'product_slug',
+    type: 'varchar',
+  })
+  productSlug: string;
+
   @OneToMany(() => CartItemFeature, cartItemFeature => cartItemFeature.cartItem, { cascade: ['insert', 'update'] })
   cartItemFeatures: CartItemFeature[];
 
