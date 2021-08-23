@@ -2,6 +2,7 @@ import { Exclude, Expose, plainToClass, Transform, Type } from "class-transforme
 import { format } from "date-fns";
 import { BankTransfer } from "src/bank-transfers/entities/bank-transfer.entity";
 import { ReadCartDto } from "src/carts/dto/read-cart.dto";
+import { ReadClientDto } from "src/clients/dto/read-client.dto";
 import { Delivery } from "src/deliveries/entities/delivery.entity";
 import { ReadDeliveryMethodDto } from "src/delivery-methods/dto/read-delivery-method.dto";
 import { OrderStatus } from "src/order-statuses/entities/order-status.entity";
@@ -48,4 +49,8 @@ export class ReadOrderDto {
   @Expose()
   @Transform(({obj}) => obj.store ? plainToClass(ReadStoreDto, User.create({store: obj.store})) : null)
   readonly store: ReadStoreDto;
+
+  @Expose()
+  @Type(() => ReadClientDto)
+  readonly user: ReadClientDto;
 }

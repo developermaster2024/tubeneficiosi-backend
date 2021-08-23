@@ -60,10 +60,12 @@ export class OrdersService {
       .innerJoinAndSelect('order.cart', 'cart')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
-      .leftJoinAndSelect('order.bankTransfers', 'bankTransfer');
+      .leftJoinAndSelect('order.bankTransfers', 'bankTransfer')
+      .innerJoinAndSelect('order.user', 'user')
+      .leftJoinAndSelect('user.client', 'client');
 
     if (user.role === Role.CLIENT) {
-      queryBuilder.andWhere('order.clientId = :userId', { userId });
+      queryBuilder.andWhere('order.userId = :userId', { userId });
     } else if (user.role === Role.STORE) {
       queryBuilder.andWhere('store.userId = :userId', { userId });
     }
@@ -118,15 +120,11 @@ export class OrdersService {
       throw new CartNotFoundException();
     }
 
-    cart.isProcessed = true;
-
-    await this.cartsRepository.save(cart);
-
     const lastOrder = await this.ordersRepository.findOne({ order: { id: 'DESC' } });
     order.orderNumber = (lastOrder ? +lastOrder.orderNumber + 1 : 1).toString().padStart(6, '0');
     order.cart = cart;
     order.storeId = cart.store.id;
-    order.clientId = cart.user.id;
+    order.userId = cart.user.id;
     order.orderStatusCode = OrderStatuses.PENDING;
     order.paymentMethodCode = paymentMethodCode;
 
@@ -179,6 +177,9 @@ export class OrdersService {
       // @TODO: Crear url de mercado pago
     }
 
+    cart.isProcessed = true;
+    await this.cartsRepository.save(cart);
+
     return await this.ordersRepository.save(order);
   }
 
@@ -195,6 +196,8 @@ export class OrdersService {
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .leftJoinAndSelect('order.bankTransfers', 'bankTransfer')
+      .innerJoinAndSelect('order.user', 'user')
+      .leftJoinAndSelect('user.client', 'client')
       .where('order.id = :orderId', { orderId: id })
       .getOne();
 

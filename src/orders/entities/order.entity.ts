@@ -48,15 +48,15 @@ export class Order {
   store: Store;
 
   @Column({
-    name: 'client_id',
+    name: 'user_id',
     type: 'int',
     select: false,
   })
-  clientId: number;
+  userId: number;
 
   @ManyToOne(() => User, {nullable: false, onDelete: 'CASCADE'})
-  @JoinColumn({name: 'client_id'})
-  client: User;
+  @JoinColumn({name: 'user_id'})
+  user: User;
 
   @Column({
     name: 'payment_method_code',
