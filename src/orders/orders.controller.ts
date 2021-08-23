@@ -35,7 +35,13 @@ export class OrdersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ReadOrderDto> {
-    return plainToClass(ReadOrderDto, await this.ordersService.findOne(+id));
+  @Roles(Role.CLIENT, Role.STORE, Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async findOne(
+    @Param('id') id: string,
+    @Body('userId') userId: number
+  ): Promise<ReadOrderDto> {
+    return plainToClass(ReadOrderDto, await this.ordersService.findOne(+id, userId));
   }
 }

@@ -219,8 +219,14 @@ export class OrdersService {
     return await this.ordersRepository.save(order);
   }
 
-  async findOne(id: number): Promise<Order> {
-    const order = await this.ordersRepository.createQueryBuilder('order')
+  async findOne(id: number, userId: number): Promise<Order> {
+    const user = await this.usersRepository.findOne(userId);
+
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    const queryBuilder = await this.ordersRepository.createQueryBuilder('order')
       .innerJoinAndSelect('order.orderStatus', 'orderStatus')
       .innerJoinAndSelect('order.paymentMethod', 'paymentMethod')
       .innerJoinAndSelect('order.store', 'store')
@@ -236,8 +242,15 @@ export class OrdersService {
       .leftJoinAndSelect('bankAccount.cardIssuer', 'cardIssuer')
       .innerJoinAndSelect('order.user', 'user')
       .leftJoinAndSelect('user.client', 'client')
-      .where('order.id = :orderId', { orderId: id })
-      .getOne();
+      .where('order.id = :orderId', { orderId: id });
+
+    if (user.role === Role.CLIENT) {
+      queryBuilder.andWhere('order.userId = :userId', { userId });
+    } else if (user.role === Role.STORE) {
+      queryBuilder.andWhere('store.userId = :userId', { userId });
+    }
+
+    const order = await queryBuilder.getOne();
 
     if (!order) {
       throw new OrderNotFoundException();
