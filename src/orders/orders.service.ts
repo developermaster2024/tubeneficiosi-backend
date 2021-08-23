@@ -64,6 +64,8 @@ export class OrdersService {
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .leftJoinAndSelect('order.bankTransfers', 'bankTransfer')
+      .leftJoinAndSelect('bankTransfer.bankAccount', 'bankAccount')
+      .leftJoinAndSelect('bankAccount.cardIssuer', 'cardIssuer')
       .innerJoinAndSelect('order.user', 'user')
       .leftJoinAndSelect('user.client', 'client');
 
@@ -230,6 +232,8 @@ export class OrdersService {
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .leftJoinAndSelect('order.bankTransfers', 'bankTransfer')
+      .leftJoinAndSelect('bankTransfer.bankAccount', 'bankAccount')
+      .leftJoinAndSelect('bankAccount.cardIssuer', 'cardIssuer')
       .innerJoinAndSelect('order.user', 'user')
       .leftJoinAndSelect('user.client', 'client')
       .where('order.id = :orderId', { orderId: id })
