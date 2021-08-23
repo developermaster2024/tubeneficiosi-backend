@@ -10,7 +10,7 @@ import { Delivery } from 'src/deliveries/entities/delivery.entity';
 import { DeliveryZone } from 'src/delivery-methods/entities/delivery-zone.entity';
 import { OrderStatuses } from 'src/order-statuses/enums/order-statuses.enum';
 import { PaymentMethods } from 'src/payment-methods/enum/payment-methods.enum';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Order } from './entities/order.entity';
 import { OrderNotFoundException } from './errors/order-not-found.exception';
@@ -19,6 +19,8 @@ import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { User } from 'src/users/entities/user.entity';
 import { UserNotFoundException } from 'src/users/errors/user-not-found.exception';
 import { Role } from 'src/users/enums/roles.enum';
+import { Product } from 'src/products/entities/product.entity';
+import { ProductQuantityIsLessThanRequiredQuantityException } from 'src/carts/errors/product-quantity-is-less-than-required-quantity.exception';
 
 @Injectable()
 export class OrdersService {
@@ -26,7 +28,8 @@ export class OrdersService {
     @InjectRepository(Order) private readonly ordersRepository: Repository<Order>,
     @InjectRepository(Cart) private readonly cartsRepository: Repository<Cart>,
     @InjectRepository(DeliveryZone) private readonly deliveryZoneRepository: Repository<DeliveryZone>,
-    @InjectRepository(User) private readonly usersRepository: Repository<User>
+    @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    @InjectRepository(Product) private readonly productsRepository: Repository<Product>,
   ) {}
 
   async paginate({perPage, offset, filters: {
@@ -107,6 +110,7 @@ export class OrdersService {
 
     const cart = await this.cartsRepository.createQueryBuilder('cart')
       .innerJoinAndSelect('cart.user', 'user')
+      .leftJoinAndSelect('user.client', 'client')
       .innerJoinAndSelect('cart.store', 'store')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
@@ -118,6 +122,17 @@ export class OrdersService {
 
     if (!cart) {
       throw new CartNotFoundException();
+    }
+
+    for (let cartItem of cart.cartItems) {
+      const product = await this.productsRepository.findOne({
+        id: cartItem.productId,
+        quantity: LessThan(cartItem.quantity),
+      });
+
+      if (product) {
+        throw new ProductQuantityIsLessThanRequiredQuantityException(cartItem);
+      }
     }
 
     const lastOrder = await this.ordersRepository.findOne({ order: { id: 'DESC' } });
