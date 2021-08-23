@@ -195,6 +195,25 @@ export class OrdersService {
     cart.isProcessed = true;
     await this.cartsRepository.save(cart);
 
+    await this.productsRepository.createQueryBuilder('product')
+      .update(Product)
+      .set({
+        quantity: () => `
+          products.quantity - (SELECT
+            cart_items.quantity
+          FROM
+            cart_items
+          WHERE
+            cart_items.product_id = products.id AND
+            cart_items.cart_id = ${cart.id}
+          LIMIT
+            1
+          )
+        `
+      })
+      .where('id IN (:...ids)', { ids: cart.cartItems.map(item => item.productId) })
+      .execute();
+
     return await this.ordersRepository.save(order);
   }
 
