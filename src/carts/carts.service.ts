@@ -55,7 +55,9 @@ export class CartsService {
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .leftJoinAndSelect('cart.store', 'store')
-      .leftJoinAndSelect('store.storeProfile', 'storeProfile');
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .innerJoinAndSelect('cart.user', 'user')
+      .leftJoinAndSelect('user.client', 'client');
 
     if (user.role === Role.CLIENT) {
       queryBuilder.andWhere('cart.userId = :userId', { userId });
@@ -162,6 +164,8 @@ export class CartsService {
     const cart = await this.cartsRepository.createQueryBuilder('cart')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .innerJoinAndSelect('cart.user', 'user')
+      .leftJoinAndSelect('user.client', 'client')
       .where('cart.userId = :userId', { userId })
       .andWhere('cart.storeId = :storeId', { storeId })
       .andWhere(':today < cart.expiresOn', { today: new Date() })
@@ -178,6 +182,8 @@ export class CartsService {
     const cart = await this.cartsRepository.createQueryBuilder('cart')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .innerJoinAndSelect('cart.user', 'user')
+      .leftJoinAndSelect('user.client', 'client')
       .where('cart.id = :cartId', { cartId: id })
       .andWhere(':today < cart.expiresOn', { today: new Date() })
       .getOne();
@@ -207,6 +213,8 @@ export class CartsService {
     const cart = await this.cartsRepository.createQueryBuilder('cart')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .innerJoinAndSelect('cart.user', 'user')
+      .leftJoinAndSelect('user.client', 'client')
       .where('cart.userId = :userId', { userId })
       .andWhere('cart.id = :cartId', { cartId })
       .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
