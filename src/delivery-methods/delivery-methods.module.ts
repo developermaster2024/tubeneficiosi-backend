@@ -39,6 +39,7 @@ import { DeliveryCostCalculatorResolver } from './support/delivery-cost-calculat
     }),
   ],
   providers: [DeliveryMethodsService, ShippingCostCalculator, DeliveryCostCalculator, DeliveryCostCalculatorResolver],
-  controllers: [DeliveryMethodsController]
+  controllers: [DeliveryMethodsController],
+  exports: [DeliveryCostCalculatorResolver]
 })
 export class DeliveryMethodsModule {}

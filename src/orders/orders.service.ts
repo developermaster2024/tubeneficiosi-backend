@@ -21,6 +21,9 @@ import { UserNotFoundException } from 'src/users/errors/user-not-found.exception
 import { Role } from 'src/users/enums/roles.enum';
 import { Product } from 'src/products/entities/product.entity';
 import { ProductQuantityIsLessThanRequiredQuantityException } from 'src/carts/errors/product-quantity-is-less-than-required-quantity.exception';
+import { DeliveryMethod } from 'src/delivery-methods/entities/delivery-method.entity';
+import { DeliveryMethodNotFoundException } from 'src/delivery-methods/errors/delivery-method-not-found.exception';
+import { DeliveryCostCalculatorResolver } from 'src/delivery-methods/support/delivery-cost-calculator-resolver';
 
 @Injectable()
 export class OrdersService {
@@ -30,6 +33,8 @@ export class OrdersService {
     @InjectRepository(DeliveryZone) private readonly deliveryZoneRepository: Repository<DeliveryZone>,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     @InjectRepository(Product) private readonly productsRepository: Repository<Product>,
+    @InjectRepository(DeliveryMethod) private readonly deliveryMethodsRepository: Repository<DeliveryMethod>,
+    private readonly deliveryCostCalculatorResolver: DeliveryCostCalculatorResolver
   ) {}
 
   async paginate({perPage, offset, filters: {
@@ -108,14 +113,14 @@ export class OrdersService {
   }: CreateOrderDto): Promise<Order> {
     const order = Order.create({});
 
-    // @TODO: Hay que validar que la cantidad de los productos sea suficiente para satisfacer la orden
-
     const cart = await this.cartsRepository.createQueryBuilder('cart')
       .innerJoinAndSelect('cart.user', 'user')
       .leftJoinAndSelect('user.client', 'client')
       .innerJoinAndSelect('cart.store', 'store')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .leftJoinAndSelect('cartItem.product', 'product')
+      .leftJoinAndSelect('product.productDimensions', 'productDimensions')
       .where('cart.id = :cartId', { cartId })
       .andWhere('cart.userId = :userId', { userId })
       .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
@@ -145,15 +150,19 @@ export class OrdersService {
     order.orderStatusCode = OrderStatuses.PENDING;
     order.paymentMethodCode = paymentMethodCode;
 
-    // @TODO: Hay que disminuir la cantidad del producto después de crear la orden
-
     if (deliveryMethodId) {
       order.deliveryMethodId = deliveryMethodId;
 
       const deliveryZone = await this.deliveryZoneRepository.createQueryBuilder('deliveryZone')
         .innerJoin('deliveryZone.deliveryMethod', 'deliveryMethod')
         .where(`EXISTS(
-          SELECT lo.id FROM locations lo WHERE ST_CONTAINS(lo.area, (
+          SELECT
+            lo.id
+          FROM
+            delivery_zone_to_location dztl
+          INNER JOIN
+            locations lo ON lo.id = dztl.location_id
+          WHERE ST_CONTAINS(lo.area, (
             SELECT
               POINT(address.latitude, address.longitude)
             FROM
@@ -161,7 +170,7 @@ export class OrdersService {
             WHERE
               address.id = :addressId AND address.deleted_at IS NULL
             LIMIT 1
-          ))
+          )) AND dztl.delivery_zone_id = deliveryZone.id
         )`, { addressId: profileAddressId })
         .andWhere('deliveryMethod.id = :deliveryMethodId', { deliveryMethodId })
         .getOne();
@@ -170,11 +179,23 @@ export class OrdersService {
         throw new DeliveryZoneNotFoundException();
       }
 
+      const deliveryMethod = await this.deliveryMethodsRepository.findOne({
+        select: ['id', 'deliveryMethodTypeCode'],
+        where: { id: deliveryMethodId },
+      });
+
+      if (!deliveryMethod) {
+        throw new DeliveryMethodNotFoundException();
+      }
+
       order.delivery = Delivery.create({
         profileAddressId,
         deliveryZone,
-        // @TODO: Calcular el costo de envío
-        total: 0,
+        total: await this.deliveryCostCalculatorResolver.calculateCost({
+          addressId: profileAddressId,
+          deliveryMethodId,
+          products: cart.cartItems,
+        }, deliveryMethod.deliveryMethodTypeCode),
       });
     }
 
