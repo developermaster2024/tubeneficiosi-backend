@@ -40,7 +40,6 @@ export class Cart {
   @Column({
     name: 'store_id',
     type: 'int',
-    // select: false,
   })
   storeId: number;
 

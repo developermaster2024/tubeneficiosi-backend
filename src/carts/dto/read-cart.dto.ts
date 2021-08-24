@@ -32,6 +32,10 @@ export class ReadCartDto {
 
   @Expose()
   @Transform(({value}) => format(value, 'yyyy-MM-dd HH:mm:ss'))
+  readonly expiresOn: string;
+
+  @Expose()
+  @Transform(({value}) => format(value, 'yyyy-MM-dd HH:mm:ss'))
   readonly createdAt: string;
 
   @Expose()
