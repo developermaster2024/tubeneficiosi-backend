@@ -16,6 +16,7 @@ import { ShippingCostCalculator } from './support/shipping-cost-calculator';
 import { ShippingRange } from './entities/shipping-range.entity';
 import { DeliveryCostCalculator } from './support/delivery-cost-calculator';
 import { DeliveryRange } from './entities/delivery-range.entity';
+import { DeliveryCostCalculatorResolver } from './support/delivery-cost-calculator-resolver';
 
 @Module({
   imports: [
@@ -37,7 +38,7 @@ import { DeliveryRange } from './entities/delivery-range.entity';
       })
     }),
   ],
-  providers: [DeliveryMethodsService, ShippingCostCalculator, DeliveryCostCalculator],
+  providers: [DeliveryMethodsService, ShippingCostCalculator, DeliveryCostCalculator, DeliveryCostCalculatorResolver],
   controllers: [DeliveryMethodsController]
 })
 export class DeliveryMethodsModule {}

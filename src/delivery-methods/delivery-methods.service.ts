@@ -21,8 +21,7 @@ import { ShippingRange } from './entities/shipping-range.entity';
 import { DeliveryMethodNotFoundException } from './errors/delivery-method-not-found.exception';
 import { Cart } from 'src/carts/entities/cart.entity';
 import { CartNotFoundException } from 'src/carts/errors/cart-not-found.exception';
-import { ShippingCostCalculator } from './support/shipping-cost-calculator';
-import { DeliveryCostCalculator } from './support/delivery-cost-calculator';
+import { DeliveryCostCalculatorResolver } from './support/delivery-cost-calculator-resolver';
 
 @Injectable()
 export class DeliveryMethodsService {
@@ -33,8 +32,7 @@ export class DeliveryMethodsService {
     @InjectRepository(DeliveryZoneToDeliveryRange) private readonly deliveryZoneToDeliveryRangesRepository: Repository<DeliveryZoneToDeliveryRange>,
     @InjectRepository(Store) private readonly storesRepository: Repository<Store>,
     @InjectRepository(Cart) private readonly cartsRepository: Repository<Cart>,
-    private readonly shippingCostCalculator: ShippingCostCalculator,
-    private readonly deliveryCostCalculator: DeliveryCostCalculator
+    private readonly deliveryCostCalculatorResolver: DeliveryCostCalculatorResolver
   ) {}
 
   async paginate({perPage, offset, filters}: DeliveryMethodPaginationOptionsDto): Promise<PaginationResult<DeliveryMethod>> {
@@ -221,17 +219,20 @@ export class DeliveryMethodsService {
       throw new CartNotFoundException();
     }
 
-    const deliveryMethod = await this.deliveryMethodsRepository.findOne(deliveryMethodId);
+    const deliveryMethod = await this.deliveryMethodsRepository.findOne({
+      select: ['id', 'deliveryMethodTypeCode'],
+      where: { id: deliveryMethodId },
+    });
 
-    const calculator = deliveryMethod.deliveryMethodTypeCode === DeliveryMethodTypes.SHIPPING
-      ? this.shippingCostCalculator
-      : this.deliveryCostCalculator;
+    if (!deliveryMethod) {
+      throw new DeliveryMethodNotFoundException();
+    }
 
-    const cost = await calculator.calculateCost({
+    const cost = await this.deliveryCostCalculatorResolver.calculateCost({
       deliveryMethodId,
       addressId,
       products: cart.cartItems,
-    });
+    }, deliveryMethod.deliveryMethodTypeCode);
 
     return { cost };
   }
