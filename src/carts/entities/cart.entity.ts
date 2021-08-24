@@ -1,3 +1,4 @@
+import { isAfter } from "date-fns";
 import { Store } from "src/stores/entities/store.entity";
 import { User } from "src/users/entities/user.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
@@ -77,6 +78,10 @@ export class Cart {
     return this.cartItems
       .map(item => Number(item.total))
       .reduce(((total, currentValue) => total + currentValue), 0);
+  }
+
+  get isExpired(): boolean {
+    return isAfter(new Date, this.expiresOn);
   }
 
   static create(data: Partial<Cart>): Cart {
