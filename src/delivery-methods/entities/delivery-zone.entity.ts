@@ -1,6 +1,8 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { DeliveryMethod } from "./delivery-method.entity";
 import { Location } from "src/locations/entities/location.entity";
+import { DeliveryZoneToShippingRange } from "./delivery-zone-to-shipping-range.entity";
+import { DeliveryZoneToDeliveryRange } from "./delivery-zone-to-delivery-range.entity";
 
 @Entity({
   name: 'delivery_zones',
@@ -44,6 +46,12 @@ export class DeliveryZone {
     inverseJoinColumn: {name: 'location_id'},
   })
   locations: Location[];
+
+  @OneToMany(() => DeliveryZoneToDeliveryRange, (dztsr) => dztsr.deliveryZone)
+  deliveryZoneToDeliveryRanges: DeliveryZoneToDeliveryRange[];
+
+  @OneToMany(() => DeliveryZoneToShippingRange, (dztsr) => dztsr.deliveryZone)
+  deliveryZoneToShippingRanges: DeliveryZoneToShippingRange[];
 
   @CreateDateColumn({
     name: 'created_at',

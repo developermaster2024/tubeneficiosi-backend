@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeliveryZoneNotFoundException } from 'src/delivery-methods/errors/delivery-zone-not-found.exception';
 import { DeliveryMethodTypes } from 'src/delivery-method-types/enums/delivery-methods-types.enum';
 import { Location } from 'src/locations/entities/location.entity';
 import { Store } from 'src/stores/entities/store.entity';
@@ -22,6 +21,8 @@ import { ShippingRange } from './entities/shipping-range.entity';
 import { DeliveryMethodNotFoundException } from './errors/delivery-method-not-found.exception';
 import { Cart } from 'src/carts/entities/cart.entity';
 import { CartNotFoundException } from 'src/carts/errors/cart-not-found.exception';
+import { ShippingCostCalculator } from './support/shipping-cost-calculator';
+import { DeliveryCostCalculator } from './support/delivery-cost-calculator';
 
 @Injectable()
 export class DeliveryMethodsService {
@@ -31,8 +32,9 @@ export class DeliveryMethodsService {
     @InjectRepository(DeliveryZoneToShippingRange) private readonly deliveryZoneToShippingRangesRepository: Repository<DeliveryZoneToShippingRange>,
     @InjectRepository(DeliveryZoneToDeliveryRange) private readonly deliveryZoneToDeliveryRangesRepository: Repository<DeliveryZoneToDeliveryRange>,
     @InjectRepository(Store) private readonly storesRepository: Repository<Store>,
-    @InjectRepository(DeliveryZone) private readonly deliveryZoneRepository: Repository<DeliveryZone>,
-    @InjectRepository(Cart) private readonly cartsRepository: Repository<Cart>
+    @InjectRepository(Cart) private readonly cartsRepository: Repository<Cart>,
+    private readonly shippingCostCalculator: ShippingCostCalculator,
+    private readonly deliveryCostCalculator: DeliveryCostCalculator
   ) {}
 
   async paginate({perPage, offset, filters}: DeliveryMethodPaginationOptionsDto): Promise<PaginationResult<DeliveryMethod>> {
@@ -207,38 +209,30 @@ export class DeliveryMethodsService {
     await this.deliveryMethodsRepository.softRemove(deliveryMethod);
   }
 
-  async calculateCost({deliveryMethodId, profileAddressId, cartId}: CalculateCostDto): Promise<{ cost: number }> {
-    const deliveryZone = await this.deliveryZoneRepository.createQueryBuilder('deliveryZone')
-        .innerJoin('deliveryZone.deliveryMethod', 'deliveryMethod')
-        .where(`EXISTS(
-          SELECT lo.id FROM locations lo WHERE ST_CONTAINS(lo.area, (
-            SELECT
-              POINT(address.latitude, address.longitude)
-            FROM
-              client_addresses address
-            WHERE
-              address.id = :addressId AND address.deleted_at IS NULL
-            LIMIT 1
-          ))
-        )`, { addressId: profileAddressId })
-        .andWhere('deliveryMethod.id = :deliveryMethodId', { deliveryMethodId })
-        .getOne();
-
-    if (!deliveryZone) {
-      throw new DeliveryZoneNotFoundException();
-    }
-
-    const cart = await this.cartsRepository.findOne({
-      where: { id: cartId },
-      relations: ['cartItems', 'cartItems.cartItemFeatures'],
-    });
+  async calculateCost({deliveryMethodId, profileAddressId: addressId, cartId}: CalculateCostDto): Promise<{ cost: number }> {
+    const cart = await this.cartsRepository.createQueryBuilder('cart')
+      .leftJoinAndSelect('cart.cartItems', 'cartItem')
+      .leftJoinAndSelect('cartItem.product', 'product')
+      .leftJoinAndSelect('product.productDimensions', 'productDimensions')
+      .where('cart.id = :cartId', { cartId })
+      .getOne();
 
     if (!cart) {
       throw new CartNotFoundException();
     }
 
-    return {
-      cost: 0,
-    };
+    const deliveryMethod = await this.deliveryMethodsRepository.findOne(deliveryMethodId);
+
+    const calculator = deliveryMethod.deliveryMethodTypeCode === DeliveryMethodTypes.SHIPPING
+      ? this.shippingCostCalculator
+      : this.deliveryCostCalculator;
+
+    const cost = await calculator.calculateCost({
+      deliveryMethodId,
+      addressId,
+      products: cart.cartItems,
+    });
+
+    return { cost };
   }
 }

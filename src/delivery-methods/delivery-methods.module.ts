@@ -12,18 +12,24 @@ import { diskStorage } from 'multer';
 import { filenameGenerator } from 'src/support/file-uploads';
 import { DeliveryZone } from './entities/delivery-zone.entity';
 import { Cart } from 'src/carts/entities/cart.entity';
+import { ShippingCostCalculator } from './support/shipping-cost-calculator';
+import { ShippingRange } from './entities/shipping-range.entity';
+import { DeliveryCostCalculator } from './support/delivery-cost-calculator';
+import { DeliveryRange } from './entities/delivery-range.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       DeliveryMethod,
-      Location,
+      DeliveryZone,
+      ShippingRange,
+      DeliveryRange,
       DeliveryZoneToShippingRange,
       DeliveryZoneToDeliveryRange,
+      Location,
       Store,
-      DeliveryZone,
       Cart,
-  ]),
+    ]),
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads/delivery-methods',
@@ -31,7 +37,7 @@ import { Cart } from 'src/carts/entities/cart.entity';
       })
     }),
   ],
-  providers: [DeliveryMethodsService],
+  providers: [DeliveryMethodsService, ShippingCostCalculator, DeliveryCostCalculator],
   controllers: [DeliveryMethodsController]
 })
 export class DeliveryMethodsModule {}

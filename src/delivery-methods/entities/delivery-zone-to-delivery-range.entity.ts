@@ -23,6 +23,12 @@ export class DeliveryZoneToDeliveryRange {
   @JoinColumn({name: 'delivery_zone_id'})
   deliveryZone: DeliveryZone;
 
+  @Column({
+    name: 'delivery_range_id',
+    type: 'int',
+  })
+  deliveryRangeId: number;
+
   @ManyToOne(() => DeliveryRange, {nullable: false, onDelete: 'CASCADE'})
   @JoinColumn({name: 'delivery_range_id'})
   deliveryRange: DeliveryRange;
