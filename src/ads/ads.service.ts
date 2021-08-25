@@ -23,6 +23,7 @@ export class AdsService {
     maxPrice,
     url,
     adsPositionId,
+    isActive,
   }}: AdPaginationOptionsDto): Promise<PaginationResult<Ad>> {
     const queryBuilder = this.adsRepository.createQueryBuilder('ad')
       .leftJoinAndSelect('ad.adsPosition', 'adsPosition')
@@ -50,6 +51,14 @@ export class AdsService {
     if (url) queryBuilder.andWhere('ad.url LIKE :url', { url: `%${url}%` });
 
     if (adsPositionId) queryBuilder.andWhere('ad.adsPositionId = :adsPositionId', { adsPositionId });
+
+    if (isActive !== null) {
+      const condition = isActive
+        ? 'ad.from <= :today AND ad.until >= :today'
+        : 'ad.from >= :today OR ad.until <= :today';
+
+      queryBuilder.andWhere(condition, { today: new Date() });
+    }
 
     const [ads, total] = await queryBuilder.getManyAndCount();
 

@@ -1,4 +1,5 @@
 import { PaginationOptions } from "src/support/pagination/pagination-options";
+import queryStringToBoolean from "src/support/query-string-to-boolean";
 
 type AdFilters = {
   id: string;
@@ -11,6 +12,7 @@ type AdFilters = {
   maxPrice: string;
   url: string;
   adsPositionId: number;
+  isActive: boolean|null;
 };
 
 export class AdPaginationOptionsDto extends PaginationOptions {
@@ -32,6 +34,7 @@ export class AdPaginationOptionsDto extends PaginationOptions {
       maxPrice,
       url,
       adsPositionId,
+      isActive,
     } = query;
 
     return new AdPaginationOptionsDto(+page, +perPage, {
@@ -45,6 +48,7 @@ export class AdPaginationOptionsDto extends PaginationOptions {
       maxPrice,
       url,
       adsPositionId: Number(adsPositionId),
+      isActive: queryStringToBoolean(isActive),
     });
   }
 }
