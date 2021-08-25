@@ -25,6 +25,9 @@ export class UpdateBusinessInfoDto {
   readonly leftSectionBtnText: string;
 
   @Expose()
+  readonly leftSectionBtnUrl: string;
+
+  @Expose()
   @ValidateIf(obj => obj.rightSectionImage)
   @IsMimeType(['image/png','image/jpeg'])
   readonly rightSectionImage: Express.Multer.File;
@@ -40,4 +43,7 @@ export class UpdateBusinessInfoDto {
 
   @Expose()
   readonly rightSectionBtnText: string;
+
+  @Expose()
+  readonly rightSectionBtnUrl: string;
 }

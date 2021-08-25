@@ -27,6 +27,10 @@ export class ReadBusinessInfoDto {
   readonly leftSectionBtnText: string;
 
   @Expose()
+  @Transform(({obj}) => obj.value.leftSectionBtnUrl)
+  readonly leftSectionBtnUrl: string;
+
+  @Expose()
   @Transform(({obj}) => obj.value.rightSectionImage)
   readonly rightSectionImage: string;
 
@@ -45,4 +49,8 @@ export class ReadBusinessInfoDto {
   @Expose()
   @Transform(({obj}) => obj.value.rightSectionBtnText)
   readonly rightSectionBtnText: string;
+
+  @Expose()
+  @Transform(({obj}) => obj.value.rightSectionBtnUrl)
+  readonly rightSectionBtnUrl: string;
 }
