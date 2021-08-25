@@ -9,6 +9,7 @@ import { PaymentMethods } from "src/payment-methods/enum/payment-methods.enum";
 import { Store } from "src/stores/entities/store.entity";
 import { User } from "src/users/entities/user.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { OrderStatusHistory } from "./order-status-history.entity";
 
 @Entity({
   name: 'orders',
@@ -97,6 +98,9 @@ export class Order {
 
   @OneToMany(() => BankTransfer, bankTransfer => bankTransfer.order, {cascade: true, onDelete: 'CASCADE'})
   bankTransfers: BankTransfer[];
+
+  @OneToMany(() => OrderStatusHistory, (history) => history.order, { cascade: ['insert', 'update'] })
+  orderStatusHistory: OrderStatusHistory[];
 
   @CreateDateColumn({
     name: 'created_at',

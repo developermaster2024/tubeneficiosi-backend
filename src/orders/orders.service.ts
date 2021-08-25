@@ -24,6 +24,7 @@ import { ProductQuantityIsLessThanRequiredQuantityException } from 'src/carts/er
 import { DeliveryMethod } from 'src/delivery-methods/entities/delivery-method.entity';
 import { DeliveryMethodNotFoundException } from 'src/delivery-methods/errors/delivery-method-not-found.exception';
 import { DeliveryCostCalculatorResolver } from 'src/delivery-methods/support/delivery-cost-calculator-resolver';
+import { OrderStatusHistory } from './entities/order-status-history.entity';
 
 @Injectable()
 export class OrdersService {
@@ -72,7 +73,10 @@ export class OrdersService {
       .leftJoinAndSelect('bankTransfer.bankAccount', 'bankAccount')
       .leftJoinAndSelect('bankAccount.cardIssuer', 'cardIssuer')
       .innerJoinAndSelect('order.user', 'user')
-      .leftJoinAndSelect('user.client', 'client');
+      .leftJoinAndSelect('user.client', 'client')
+      .innerJoinAndSelect('order.orderStatusHistory', 'orderStatusHistory')
+      .leftJoinAndSelect('orderStatusHistory.prevOrderStatus', 'prevOrderStatus')
+      .innerJoinAndSelect('orderStatusHistory.newOrderStatus', 'newOrderStatus');
 
     if (user.role === Role.CLIENT) {
       queryBuilder.andWhere('order.userId = :userId', { userId });
@@ -149,6 +153,7 @@ export class OrdersService {
     order.userId = cart.user.id;
     order.orderStatusCode = OrderStatuses.CONFIRMING_PAYMENT;
     order.paymentMethodCode = paymentMethodCode;
+    order.orderStatusHistory = [OrderStatusHistory.create({newOrderStatusCode: OrderStatuses.CONFIRMING_PAYMENT})];
 
     if (deliveryMethodId) {
       order.deliveryMethodId = deliveryMethodId;
@@ -263,6 +268,9 @@ export class OrdersService {
       .leftJoinAndSelect('bankAccount.cardIssuer', 'cardIssuer')
       .innerJoinAndSelect('order.user', 'user')
       .leftJoinAndSelect('user.client', 'client')
+      .innerJoinAndSelect('order.orderStatusHistory', 'orderStatusHistory')
+      .leftJoinAndSelect('orderStatusHistory.prevOrderStatus', 'prevOrderStatus')
+      .innerJoinAndSelect('orderStatusHistory.newOrderStatus', 'newOrderStatus')
       .where('order.id = :orderId', { orderId: id });
 
     if (user.role === Role.CLIENT) {
