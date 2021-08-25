@@ -11,7 +11,7 @@ import { UpdatePageInfoDto } from './dto/update-page-info.dto';
 import { Setting } from './entities/setting.entity';
 import { Setting as SettingEnum } from './enums/setting.enum';
 
-export const getFooterSectioName = (id: string) => {
+export const getFooterSectionName = (id: string) => {
   switch(id) {
     case '1':
       return 'firstSection';
@@ -128,7 +128,7 @@ export class SettingsService {
       : {...widget, position: i, }
     );
 
-    const sectionName = getFooterSectioName(id);
+    const sectionName = getFooterSectionName(id);
 
     setting.value = {
       ...setting.value,
@@ -147,7 +147,7 @@ export class SettingsService {
 
     setting = setting ?? Setting.create({name: SettingEnum.FOOTER});
 
-    const sectionName = getFooterSectioName(id);
+    const sectionName = getFooterSectionName(id);
 
     const footerSection = setting.value[sectionName];
 
@@ -167,7 +167,7 @@ export class SettingsService {
 
     setting = setting ?? Setting.create({name: SettingEnum.FOOTER});
 
-    const sectionName = getFooterSectioName(sectionId);
+    const sectionName = getFooterSectionName(sectionId);
 
     const footerSection = setting.value[sectionName];
 
@@ -192,7 +192,7 @@ export class SettingsService {
 
     setting = setting ?? Setting.create({name: SettingEnum.FOOTER});
 
-    const sectionName = getFooterSectioName(id);
+    const sectionName = getFooterSectionName(id);
 
     const footerSection = setting.value[sectionName];
 
