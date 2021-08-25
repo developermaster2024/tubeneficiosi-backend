@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { AdPaginationOptionsDto } from './dto/ad-pagination-options.dto';
 import { CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
-import { Ad } from './entities/ads.entity';
+import { Ad } from './entities/ad.entity';
 import { AdNotFound } from './errors/ad-not-found.dto';
 
 @Injectable()

@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { filenameGenerator } from 'src/support/file-uploads';
-import { Ad } from './entities/ads.entity';
+import { Ad } from './entities/ad.entity';
 
 @Module({
   imports: [
