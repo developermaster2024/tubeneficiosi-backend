@@ -35,37 +35,45 @@ export class DeliveryMethodsService {
     private readonly deliveryCostCalculatorResolver: DeliveryCostCalculatorResolver
   ) {}
 
-  async paginate({perPage, offset, filters}: DeliveryMethodPaginationOptionsDto): Promise<PaginationResult<DeliveryMethod>> {
+  async paginate({perPage, offset, filters: {
+    id,
+    deliveryMethodTypeCode,
+    name,
+    storeId,
+    addressId,
+  }}: DeliveryMethodPaginationOptionsDto): Promise<PaginationResult<DeliveryMethod>> {
     const queryBuilder = this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
       .take(perPage)
       .skip(offset)
       .innerJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType');
 
-    if (filters.id) queryBuilder.andWhere('deliveryMethod.id = :id', {id: filters.id});
+    if (id) queryBuilder.andWhere('deliveryMethod.id = :id', { id });
 
-    if (filters.deliveryMethodTypeCode) queryBuilder.andWhere('deliveryMethod.deliveryMethodTypeCode = :deliveryMethodTypeCode', {
-      deliveryMethodTypeCode: filters.deliveryMethodTypeCode
-    });
+    if (deliveryMethodTypeCode) queryBuilder.andWhere('deliveryMethod.deliveryMethodTypeCode = :deliveryMethodTypeCode', { deliveryMethodTypeCode });
 
-    if (filters.name) queryBuilder.andWhere('deliveryMethod.name LIKE :name', {name: `%${filters.name}%`});
+    if (name) queryBuilder.andWhere('deliveryMethod.name LIKE :name', { name: `%${name}%` });
 
-    if (filters.storeId) queryBuilder.andWhere('deliveryMethod.storeId = :storeId', {storeId: filters.storeId});
+    if (storeId) queryBuilder.andWhere('deliveryMethod.storeId = :storeId', { storeId });
 
-    if (filters.addressId) queryBuilder.andWhere(`
-      EXISTS(
-        SELECT dz.id FROM delivery_zones dz WHERE EXISTS(
-          SELECT lo.id FROM locations lo WHERE ST_CONTAINS(lo.area, (
-            SELECT
-              POINT(address.latitude, address.longitude)
-            FROM
-              client_addresses address
-            WHERE
-              address.id = :addressId AND address.deleted_at IS NULL
-            LIMIT 1
-          ))
-        ) AND dz.delivery_method_id = deliveryMethod.id
-      )
-    `, { addressId: filters.addressId });
+    if (addressId) {
+      queryBuilder.innerJoin('deliveryMethod.deliveryZones', 'deliveryZone', `EXISTS(
+        SELECT
+          lo.id
+        FROM
+          delivery_zone_to_location dztl
+        INNER JOIN
+          locations lo ON lo.id = dztl.location_id
+        WHERE ST_CONTAINS(lo.area, (
+          SELECT
+            POINT(address.latitude, address.longitude)
+          FROM
+            client_addresses address
+          WHERE
+            address.id = :addressId AND address.deleted_at IS NULL
+          LIMIT 1
+        )) AND dztl.delivery_zone_id = deliveryZone.id
+      )`, { addressId });
+    }
 
     const [deliveryMethods, total] = await queryBuilder.getManyAndCount();
 
