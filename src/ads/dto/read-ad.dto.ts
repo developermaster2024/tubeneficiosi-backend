@@ -42,4 +42,7 @@ export class ReadAdDto {
   @Expose()
   @Type(() => ReadAdsPositionDto)
   readonly adsPosition: ReadAdsPositionDto;
+
+  @Expose()
+  readonly isActive: boolean;
 }
