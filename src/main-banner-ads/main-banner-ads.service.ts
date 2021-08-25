@@ -12,18 +12,31 @@ import { MainBannerAdNotFoundException } from './errors/main-banner-ad-not-found
 export class MainBannerAdsService {
   constructor(@InjectRepository(MainBannerAd) private readonly mainBannerAds: Repository<MainBannerAd>) {}
 
-  async paginate({offset, perPage, filters}: MainBannerAdPaginationOptionsDto): Promise<PaginationResult<MainBannerAd>> {
+  async paginate({offset, perPage, filters: {
+    id,
+    storeId,
+    date,
+    isActive,
+  }}: MainBannerAdPaginationOptionsDto): Promise<PaginationResult<MainBannerAd>> {
     const queryBuilder = this.mainBannerAds.createQueryBuilder('mainBannerAds')
       .leftJoinAndSelect('mainBannerAds.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .take(perPage)
       .skip(offset);
 
-    if (filters.id) queryBuilder.andWhere('mainBannerAds.id = :id', {id: filters.id});
+    if (id) queryBuilder.andWhere('mainBannerAds.id = :id', { id });
 
-    if (filters.storeId) queryBuilder.andWhere('mainBannerAds.storeId = :storeId', {storeId: filters.storeId});
+    if (storeId) queryBuilder.andWhere('mainBannerAds.storeId = :storeId', { storeId });
 
-    if (filters.date) queryBuilder.andWhere(':date BETWEEN mainBannerAds.from AND mainBannerAds.until', {date: filters.date});
+    if (date) queryBuilder.andWhere(':date BETWEEN mainBannerAds.from AND mainBannerAds.until', { date });
+
+    if (isActive !== null) {
+      const condition = isActive
+        ? 'ad.from <= :today AND ad.until >= :today'
+        : 'ad.from >= :today OR ad.until <= :today';
+
+      queryBuilder.andWhere(condition, { today: new Date() });
+    }
 
     const [mainBannerAds, total] = await queryBuilder.getManyAndCount();
 

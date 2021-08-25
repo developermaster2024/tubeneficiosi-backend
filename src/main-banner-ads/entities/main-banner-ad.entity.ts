@@ -1,3 +1,4 @@
+import { isAfter, isBefore, isEqual } from "date-fns";
 import { Store } from "src/stores/entities/store.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
@@ -76,6 +77,11 @@ export class MainBannerAd {
     select: false
   })
   deletedAt: Date;
+
+  get isActive(): boolean {
+    const today = new Date();
+    return (isAfter(today, this.from) || isEqual(today, this.from)) && (isBefore(today, this.until) || isEqual(today, this.until));
+  }
 
   static create(data: Partial<MainBannerAd>): MainBannerAd {
     return Object.assign(new MainBannerAd(), data);
