@@ -1,3 +1,3 @@
 export enum OrderStatuses {
-  PENDING = 'ors-001',
+  CONFIRMING_PAYMENT = 'ors-001',
 }

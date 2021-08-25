@@ -147,7 +147,7 @@ export class OrdersService {
     order.cart = cart;
     order.storeId = cart.store.id;
     order.userId = cart.user.id;
-    order.orderStatusCode = OrderStatuses.PENDING;
+    order.orderStatusCode = OrderStatuses.CONFIRMING_PAYMENT;
     order.paymentMethodCode = paymentMethodCode;
 
     if (deliveryMethodId) {
