@@ -29,4 +29,7 @@ export class ReadFeaturedAdDto {
   @Expose()
   @Type(() => ReadStoreCategoryDto)
   readonly storeCategory: ReadStoreCategoryDto;
+
+  @Expose()
+  readonly isActive: boolean;
 }
