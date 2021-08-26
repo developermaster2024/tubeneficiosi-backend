@@ -9,7 +9,7 @@ import { OrderStatus } from "src/order-statuses/entities/order-status.entity";
 import { ReadPaymentMethodDto } from "src/payment-methods/dto/read-payment-method.dto";
 import { ReadStoreDto } from "src/stores/dto/read-store.dto";
 import { User } from "src/users/entities/user.entity";
-import { OrderStatusHistoryDto } from "./read-order-status-history.dto";
+import { ReadOrderStatusHistoryDto } from "./read-order-status-history.dto";
 
 @Exclude()
 export class ReadOrderDto {
@@ -56,6 +56,6 @@ export class ReadOrderDto {
   readonly user: ReadClientDto;
 
   @Expose()
-  @Type(() => OrderStatusHistoryDto)
-  readonly orderStatusHistory: OrderStatusHistoryDto[];
+  @Type(() => ReadOrderStatusHistoryDto)
+  readonly orderStatusHistory: ReadOrderStatusHistoryDto[];
 }

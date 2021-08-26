@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BankTransfer } from 'src/bank-transfers/entities/bank-transfer.entity';
 import { Cart } from 'src/carts/entities/cart.entity';
@@ -25,6 +25,14 @@ import { DeliveryMethod } from 'src/delivery-methods/entities/delivery-method.en
 import { DeliveryMethodNotFoundException } from 'src/delivery-methods/errors/delivery-method-not-found.exception';
 import { DeliveryCostCalculatorResolver } from 'src/delivery-methods/support/delivery-cost-calculator-resolver';
 import { OrderStatusHistory } from './entities/order-status-history.entity';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import { IncorrectOrderStatusException } from './errors/incorrect-order-status.exception';
+import { OrderStatus } from 'src/order-statuses/entities/order-status.entity';
+import { OrderStatusNotFoundException } from './errors/order-status-not-found.exception';
+import { OrderStatusIsAlreadyInHistoryException } from './errors/order-status-is-already-in-history.exception';
+import { UserMustBeAdminException } from './errors/user-must-be-admin.exception';
+import { UserMustBeTheStoreThatOwnsTheProduct } from './errors/user-must-be-the-store-that-owns-the-product.exception';
+import { UserMustBeTheBuyer } from './errors/user-must-be-the-buyer.exception';
 
 @Injectable()
 export class OrdersService {
@@ -35,6 +43,7 @@ export class OrdersService {
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     @InjectRepository(Product) private readonly productsRepository: Repository<Product>,
     @InjectRepository(DeliveryMethod) private readonly deliveryMethodsRepository: Repository<DeliveryMethod>,
+    @InjectRepository(OrderStatus) private readonly orderStatusesRepository: Repository<OrderStatus>,
     private readonly deliveryCostCalculatorResolver: DeliveryCostCalculatorResolver
   ) {}
 
@@ -286,5 +295,88 @@ export class OrdersService {
     }
 
     return order;
+  }
+
+  async updateOrderStatus({id, userId, orderStatusCode}: UpdateOrderStatusDto): Promise<Order> {
+    const user = await this.usersRepository.findOne(userId);
+
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    const orderStatus = await this.orderStatusesRepository.findOne({
+      code: orderStatusCode,
+    });
+
+    if (!orderStatus) {
+      throw new OrderStatusNotFoundException();
+    }
+
+    const queryBuilder = this.ordersRepository.createQueryBuilder('order')
+      .innerJoinAndSelect('order.orderStatus', 'orderStatus')
+      .innerJoinAndSelect('order.paymentMethod', 'paymentMethod')
+      .innerJoinAndSelect('order.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('store.user', 'userStore')
+      .leftJoinAndSelect('order.deliveryMethod', 'deliveryMethod')
+      .leftJoinAndSelect('order.delivery', 'delivery')
+      .leftJoinAndSelect('delivery.profileAddress', 'profileAddress')
+      .innerJoinAndSelect('order.cart', 'cart')
+      .leftJoinAndSelect('cart.cartItems', 'cartItem')
+      .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .leftJoinAndSelect('order.bankTransfers', 'bankTransfer')
+      .leftJoinAndSelect('bankTransfer.bankAccount', 'bankAccount')
+      .leftJoinAndSelect('bankAccount.cardIssuer', 'cardIssuer')
+      .innerJoinAndSelect('order.user', 'user')
+      .leftJoinAndSelect('user.client', 'client')
+      .innerJoinAndSelect('order.orderStatusHistory', 'orderStatusHistory')
+      .leftJoinAndSelect('orderStatusHistory.prevOrderStatus', 'prevOrderStatus')
+      .innerJoinAndSelect('orderStatusHistory.newOrderStatus', 'newOrderStatus')
+      .where('order.id = :id', { id })
+
+    const order = await queryBuilder.getOne();
+
+    if (!order) {
+      throw new OrderNotFoundException();
+    }
+
+    const alreadyHasStatusCode = order.orderStatusHistory
+      .some(history => history?.prevOrderStatus?.code === orderStatusCode || history.newOrderStatus.code === orderStatusCode);
+
+    if (alreadyHasStatusCode) {
+      throw new OrderStatusIsAlreadyInHistoryException();
+    }
+
+    switch(orderStatusCode) {
+      case OrderStatuses.PAYMENT_ACCEPTED:
+      case OrderStatuses.PAYMENT_REJECTED:
+        if (order.orderStatus.code !== OrderStatuses.CONFIRMING_PAYMENT) throw new IncorrectOrderStatusException();
+        if (user.role !== Role.ADMIN) throw new UserMustBeAdminException();
+        break;
+      case OrderStatuses.SENDING_PRODUCTS:
+        if (order.orderStatus.code !== OrderStatuses.PAYMENT_ACCEPTED) throw new IncorrectOrderStatusException();
+        if (order.store.user.id !== userId) throw new UserMustBeTheStoreThatOwnsTheProduct();
+        break;
+      case OrderStatuses.PRODUCTS_SENT:
+      case OrderStatuses.SHIPPING_ERROR:
+        if (order.orderStatus.code !== OrderStatuses.SENDING_PRODUCTS) throw new IncorrectOrderStatusException();
+        if (order.store.user.id !== userId) throw new UserMustBeTheStoreThatOwnsTheProduct();
+        break;
+      case OrderStatuses.PRODUCTS_RECEIVED:
+        if (order.orderStatus.code !== OrderStatuses.PRODUCTS_SENT) throw new IncorrectOrderStatusException();
+        if (order.user.id !== userId) throw new UserMustBeTheBuyer();
+        break;
+      default:
+        throw new UnauthorizedException();
+    }
+
+    order.orderStatusHistory.push(OrderStatusHistory.create({
+      prevOrderStatus: order.orderStatus,
+      newOrderStatus: orderStatus,
+    }));
+
+    order.orderStatus = orderStatus;
+
+    return await this.ordersRepository.save(order);
   }
 }

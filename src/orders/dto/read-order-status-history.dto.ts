@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { OrderStatus } from "src/order-statuses/entities/order-status.entity";
 
 @Exclude()
-export class OrderStatusHistoryDto {
+export class ReadOrderStatusHistoryDto {
   @Expose()
   readonly id: number;
 
