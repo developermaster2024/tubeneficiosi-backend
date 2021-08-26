@@ -32,8 +32,8 @@ export class MainBannerAdsService {
 
     if (isActive !== null) {
       const condition = isActive
-        ? 'ad.from <= :today AND ad.until >= :today'
-        : 'ad.from >= :today OR ad.until <= :today';
+        ? 'mainBannerAds.from <= :today AND mainBannerAds.until >= :today'
+        : 'mainBannerAds.from >= :today OR mainBannerAds.until <= :today';
 
       queryBuilder.andWhere(condition, { today: new Date() });
     }
