@@ -12,7 +12,16 @@ import { StoreAdNotFoundException } from './errors/store-ad-not-found.exception'
 export class StoreAdsService {
   constructor(@InjectRepository(StoreAd) private readonly storeAdsRepository: Repository<StoreAd>) {}
 
-  async paginate({perPage, offset, filters}: StoreAdPaginationOptionsDto): Promise<PaginationResult<StoreAd>> {
+  async paginate({perPage, offset, filters: {
+    id,
+    priority,
+    storeName,
+    minDate,
+    maxDate,
+    minPrice,
+    maxPrice,
+    isActive,
+  }}: StoreAdPaginationOptionsDto): Promise<PaginationResult<StoreAd>> {
     const queryBuilder = this.storeAdsRepository.createQueryBuilder('storeAd')
       .leftJoinAndSelect('storeAd.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
@@ -21,9 +30,27 @@ export class StoreAdsService {
       .take(perPage)
       .skip(offset);
 
-    if (filters.id) queryBuilder.andWhere('storeAd.id = :id', {id: filters.id});
+    if (id) queryBuilder.andWhere('storeAd.id = :id', { id });
 
-    if (filters.date) queryBuilder.andWhere(':date BETWEEN storeAd.from AND storeAd.until', {date: filters.date});
+    if (priority) queryBuilder.andWhere('storeAd.priority LIKE :priority', { priority });
+
+    if (storeName) queryBuilder.andWhere('store.name LIKE :storeName', { storeName: `%${storeName}%` });
+
+    if (minDate) queryBuilder.andWhere('storeAd.from >= :minDate', { minDate });
+
+    if (maxDate) queryBuilder.andWhere('storeAd.until <= :maxDate', { maxDate });
+
+    if (minPrice) queryBuilder.andWhere('storeAd.price >= :minPrice', { minPrice });
+
+    if (maxPrice) queryBuilder.andWhere('storeAd.price <= :maxPrice', { maxPrice });
+
+    if (isActive !== null) {
+      const condition = isActive
+        ? 'storeAd.from <= :today AND storeAd.until >= :today'
+        : 'storeAd.from >= :today OR storeAd.until <= :today';
+
+      queryBuilder.andWhere(condition, { today: new Date() });
+    }
 
     const [storeAds, total] = await queryBuilder.getManyAndCount();
 
