@@ -14,8 +14,13 @@ export class MainBannerAdsService {
 
   async paginate({offset, perPage, filters: {
     id,
-    storeId,
-    date,
+    priority,
+    storeName,
+    minDate,
+    maxDate,
+    minPrice,
+    maxPrice,
+    url,
     isActive,
   }}: MainBannerAdPaginationOptionsDto): Promise<PaginationResult<MainBannerAd>> {
     const queryBuilder = this.mainBannerAds.createQueryBuilder('mainBannerAds')
@@ -26,9 +31,19 @@ export class MainBannerAdsService {
 
     if (id) queryBuilder.andWhere('mainBannerAds.id = :id', { id });
 
-    if (storeId) queryBuilder.andWhere('mainBannerAds.storeId = :storeId', { storeId });
+    if (priority) queryBuilder.andWhere('mainBannerAds.priority LIKE :priority', { priority });
 
-    if (date) queryBuilder.andWhere(':date BETWEEN mainBannerAds.from AND mainBannerAds.until', { date });
+    if (storeName) queryBuilder.andWhere('store.name LIKE :storeName', { storeName: `%${storeName}%` });
+
+    if (minDate) queryBuilder.andWhere('mainBannerAds.from >= :minDate', { minDate });
+
+    if (maxDate) queryBuilder.andWhere('mainBannerAds.until <= :maxDate', { maxDate });
+
+    if (minPrice) queryBuilder.andWhere('mainBannerAds.price >= :minPrice', { minPrice });
+
+    if (maxPrice) queryBuilder.andWhere('mainBannerAds.price <= :maxPrice', { maxPrice });
+
+    if (url) queryBuilder.andWhere('mainBannerAds.url LIKE :url', { url: `%${url}%` });
 
     if (isActive !== null) {
       const condition = isActive

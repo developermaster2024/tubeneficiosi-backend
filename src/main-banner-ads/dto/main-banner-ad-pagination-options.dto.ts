@@ -2,9 +2,14 @@ import { PaginationOptions } from "src/support/pagination/pagination-options";
 import queryStringToBoolean from "src/support/query-string-to-boolean";
 
 type MainBannerAdFilters = {
-  id: string;
-  storeId: string;
-  date: string;
+  id: number;
+  priority: number;
+  storeName: string;
+  minDate: string;
+  maxDate: string;
+  minPrice: string;
+  maxPrice: string;
+  url: string;
   isActive: boolean|null;
 };
 
@@ -18,14 +23,24 @@ export class MainBannerAdPaginationOptionsDto extends PaginationOptions {
       page = 1,
       perPage = 10,
       id,
-      storeId,
-      date,
+      priority,
+      storeName,
+      minDate,
+      maxDate,
+      minPrice,
+      maxPrice,
+      url,
       isActive,
     } = query;
     return new MainBannerAdPaginationOptionsDto(+page, +perPage, {
-      id,
-      storeId,
-      date,
+      id: +id,
+      priority: +priority,
+      storeName,
+      minDate,
+      maxDate,
+      minPrice,
+      maxPrice,
+      url,
       isActive: queryStringToBoolean(isActive),
     });
   }
