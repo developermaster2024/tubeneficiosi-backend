@@ -12,7 +12,18 @@ import { FeaturedAdNotFoundException } from './errors/featured-ad-not-found.exce
 export class FeaturedAdsService {
   constructor(@InjectRepository(FeaturedAd) private readonly featuredAdsRepository: Repository<FeaturedAd>) {}
 
-  async paginate({offset, perPage, filters}: FeaturedAdPaginationOptionsDto): Promise<PaginationResult<FeaturedAd>> {
+  async paginate({offset, perPage, filters: {
+    id,
+    priority,
+    productName,
+    storeName,
+    storeCategoryId,
+    minDate,
+    maxDate,
+    minPrice,
+    maxPrice,
+    isActive,
+  }}: FeaturedAdPaginationOptionsDto): Promise<PaginationResult<FeaturedAd>> {
     const queryBuilder = this.featuredAdsRepository.createQueryBuilder('featuredAd')
       .take(perPage)
       .skip(offset)
@@ -22,13 +33,32 @@ export class FeaturedAdsService {
       .leftJoinAndSelect('product.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile');
 
-    if (filters.id) queryBuilder.andWhere('featuredAd.id = :id', {id: filters.id});
+    if (id) queryBuilder.andWhere('featuredAd.id = :id', { id });
 
-    if (filters.productId) queryBuilder.andWhere('featuredAd.productId = :productId', {productId: filters.productId});
+    if (priority) queryBuilder.andWhere('featuredAd.priority LIKE :priority', { priority });
 
-    if (filters.storeCategoryId) queryBuilder.andWhere('featuredAd.storeCategoryId = :storeCategoryId', {storeCategoryId: filters.storeCategoryId});
+    if (productName) queryBuilder.andWhere('product.name LIKE :productName', { productName: `%${productName}%` });
 
-    if (filters.date) queryBuilder.andWhere(':date BETWEEN featuredAd.from AND featuredAd.until', {date: filters.date});
+    if (storeName) queryBuilder.andWhere('store.name LIKE :storeName', { storeName: `%${storeName}%` });
+
+    if (storeCategoryId) queryBuilder.andWhere('store.storeCategoryId = :storeCategoryId', { storeCategoryId });
+
+    if (minDate) queryBuilder.andWhere('featuredAd.from >= :minDate', { minDate });
+
+    if (maxDate) queryBuilder.andWhere('featuredAd.until <= :maxDate', { maxDate });
+
+    if (minPrice) queryBuilder.andWhere('featuredAd.price >= :minPrice', { minPrice });
+
+    if (maxPrice) queryBuilder.andWhere('featuredAd.price <= :maxPrice', { maxPrice });
+
+    if (isActive !== null) {
+      const condition = isActive
+        ? 'featuredAd.from <= :today AND featuredAd.until >= :today'
+        : 'featuredAd.from >= :today OR featuredAd.until <= :today';
+
+      queryBuilder.andWhere(condition, { today: new Date() });
+    }
+
 
     const [featuredAds, total] = await queryBuilder.getManyAndCount();
 

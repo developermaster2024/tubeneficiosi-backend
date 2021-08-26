@@ -1,10 +1,17 @@
 import { PaginationOptions } from "src/support/pagination/pagination-options";
+import queryStringToBoolean from "src/support/query-string-to-boolean";
 
 type FeaturedAdFilters = {
-  id: string;
-  date: string;
-  productId: string;
-  storeCategoryId: string;
+  id: number;
+  priority: number;
+  productName: string;
+  storeName: string;
+  storeCategoryId: number;
+  minDate: string;
+  maxDate: string;
+  minPrice: string;
+  maxPrice: string;
+  isActive: boolean|null;
 };
 
 export class FeaturedAdPaginationOptionsDto extends PaginationOptions {
@@ -17,10 +24,27 @@ export class FeaturedAdPaginationOptionsDto extends PaginationOptions {
       page = 1,
       perPage = 10,
       id,
-      date,
-      productId,
+      priority,
+      productName,
+      storeName,
       storeCategoryId,
+      minDate,
+      maxDate,
+      minPrice,
+      maxPrice,
+      isActive,
     } = query;
-    return new FeaturedAdPaginationOptionsDto(+page, +perPage, {id, date, productId, storeCategoryId});
+    return new FeaturedAdPaginationOptionsDto(+page, +perPage, {
+      id: +id,
+      priority: +priority,
+      productName,
+      storeName,
+      storeCategoryId: +storeCategoryId,
+      minDate,
+      maxDate,
+      minPrice,
+      maxPrice,
+      isActive: queryStringToBoolean(isActive),
+    });
   }
 }
