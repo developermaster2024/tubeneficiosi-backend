@@ -1,5 +1,5 @@
-import { isAfter, isBefore, isEqual } from "date-fns";
 import { Store } from "src/stores/entities/store.entity";
+import isAdActive from "src/support/is-ad-active";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({
@@ -79,8 +79,7 @@ export class MainBannerAd {
   deletedAt: Date;
 
   get isActive(): boolean {
-    const today = new Date();
-    return (isAfter(today, this.from) || isEqual(today, this.from)) && (isBefore(today, this.until) || isEqual(today, this.until));
+    return isAdActive(this.from, this.until);
   }
 
   static create(data: Partial<MainBannerAd>): MainBannerAd {
