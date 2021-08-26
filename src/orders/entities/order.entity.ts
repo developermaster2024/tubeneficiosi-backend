@@ -120,7 +120,7 @@ export class Order {
   deletedAt: Date;
 
   get total(): number {
-    if (!this.delivery) {
+    if (this.delivery) {
       return this.cart.subTotal +  this.delivery.total;
     }
 
