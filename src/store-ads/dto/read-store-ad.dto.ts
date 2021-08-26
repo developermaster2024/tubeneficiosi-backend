@@ -31,4 +31,7 @@ export class ReadStoreAdDto {
   @Transform(({obj}) => obj?.store ? obj?.store?.products : null)
   @Type(() => ReadProductDto)
   readonly products: ReadProductDto[];
+
+  @Expose()
+  readonly isActive: boolean;
 }

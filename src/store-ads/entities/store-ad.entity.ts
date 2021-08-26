@@ -1,4 +1,5 @@
 import { Store } from "src/stores/entities/store.entity";
+import isAdActive from "src/support/is-ad-active";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({
@@ -64,6 +65,10 @@ export class StoreAd {
     select: false
   })
   deletedAt: Date;
+
+  get isActive(): boolean {
+    return isAdActive(this.from, this.until);
+  }
 
   static create(data: Partial<StoreAd>): StoreAd {
     return Object.assign(new StoreAd(), data);
