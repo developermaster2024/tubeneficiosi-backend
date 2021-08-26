@@ -75,7 +75,12 @@ export class AdsService {
   }
 
   async findOne(id: number): Promise<Ad> {
-    const ad = await this.adsRepository.findOne(id);
+    const ad = await this.adsRepository.createQueryBuilder('ad')
+      .leftJoinAndSelect('ad.adsPosition', 'adsPosition')
+      .leftJoinAndSelect('ad.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .where('ad.id = :id', { id })
+      .getOne();
 
     if (!ad) {
       throw new AdNotFound();
