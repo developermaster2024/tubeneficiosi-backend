@@ -46,17 +46,25 @@ export class CartsController {
   async findOneByStoreId(
     @Param('storeId') storeId: string,
     @Body('userId') userId: number,
-    @Query('isExpired') isExpired: string
+    @Query('isExpired') isExpired: string,
+    @Query('isProcessed') isProcessed: string
   ): Promise<ReadCartDto> {
-    return plainToClass(ReadCartDto, await this.cartsRepository.findOneStoreId(userId, +storeId, { isExpired: queryStringToBoolean(isExpired) }));
+    return plainToClass(ReadCartDto, await this.cartsRepository.findOneStoreId(userId, +storeId, {
+      isExpired: queryStringToBoolean(isExpired),
+      isProcessed: queryStringToBoolean(isProcessed),
+    }));
   }
 
   @Get(':id')
   async findOneById(
     @Param('id') id: string,
-    @Query('isExpired') isExpired: string
+    @Query('isExpired') isExpired: string,
+    @Query('isProcessed') isProcessed: string
   ): Promise<ReadCartDto> {
-    return plainToClass(ReadCartDto, await this.cartsRepository.findOneById(+id, { isExpired: queryStringToBoolean(isExpired) }));
+    return plainToClass(ReadCartDto, await this.cartsRepository.findOneById(+id, {
+      isExpired: queryStringToBoolean(isExpired),
+      isProcessed: queryStringToBoolean(isProcessed),
+    }));
   }
 
   @Delete(':cartId/cart-items/:cartItemId')

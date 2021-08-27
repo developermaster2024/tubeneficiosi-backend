@@ -21,6 +21,11 @@ import { CartItemNotFoundException } from './errors/cart-item-not-found.exceptio
 import { CartNotFoundException } from './errors/cart-not-found.exception';
 import { ProductQuantityIsLessThanRequiredQuantityException } from './errors/product-quantity-is-less-than-required-quantity.exception';
 
+type FindOneQueryParams = {
+  isExpired: boolean|null,
+  isProcessed: boolean|null,
+}
+
 @Injectable()
 export class CartsService {
   constructor(
@@ -160,7 +165,13 @@ export class CartsService {
     return await this.cartsRepository.save(cart);
   }
 
-  async findOneStoreId(userId: number, storeId: number, { isExpired }: { isExpired: boolean|null }): Promise<Cart> {
+  async findOneStoreId(userId: number, storeId: number, { isExpired, isProcessed }: FindOneQueryParams ): Promise<Cart> {
+    const user = await this.usersRepository.findOne(userId);
+
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
     const queryBuilder = this.cartsRepository.createQueryBuilder('cart')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
@@ -171,11 +182,19 @@ export class CartsService {
       .where('cart.userId = :userId', { userId })
       .andWhere('cart.storeId = :storeId', { storeId });
 
+    if (user.role === Role.CLIENT) {
+      queryBuilder.andWhere('cart.userId = :userId', { userId });
+    } else if (user.role === Role.STORE) {
+      queryBuilder.andWhere('store.userId = :userId', { userId });
+    }
+
     if (isExpired !== null) {
       const comparator = isExpired ? '<' : '>';
 
       queryBuilder.andWhere(`cart.expiresOn ${comparator} :today`, { today: new Date() });
     }
+
+    if (isProcessed !== null) queryBuilder.andWhere('cart.isProcessed = :isProcessed', { isProcessed: +isProcessed });
 
     const cart = await queryBuilder.getOne();
 
@@ -186,7 +205,7 @@ export class CartsService {
     return cart;
   }
 
-  async findOneById(id: number, { isExpired }: { isExpired: boolean|null }): Promise<Cart> {
+  async findOneById(id: number, { isExpired, isProcessed }: FindOneQueryParams): Promise<Cart> {
     const queryBuilder = this.cartsRepository.createQueryBuilder('cart')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
@@ -201,6 +220,8 @@ export class CartsService {
 
       queryBuilder.andWhere(`cart.expiresOn ${comparator} :today`, { today: new Date() });
     }
+
+    if (isProcessed !== null) queryBuilder.andWhere('cart.isProcessed = :isProcessed', { isProcessed: +isProcessed });
 
     const cart = await queryBuilder.getOne();
 
