@@ -42,6 +42,7 @@ import { OrderStatusesModule } from './order-statuses/order-statuses.module';
 import { CardIssuerTypesModule } from './card-issuer-types/card-issuer-types.module';
 import { BankAccountPurposesModule } from './bank-account-purposes/bank-account-purposes.module';
 import { OrdersModule } from './orders/orders.module';
+import { DeliveryNotesModule } from './delivery-notes/delivery-notes.module';
 
 @Module({
   imports: [
@@ -90,6 +91,7 @@ import { OrdersModule } from './orders/orders.module';
     CardIssuerTypesModule,
     BankAccountPurposesModule,
     OrdersModule,
+    DeliveryNotesModule,
   ],
 })
 export class AppModule {}
