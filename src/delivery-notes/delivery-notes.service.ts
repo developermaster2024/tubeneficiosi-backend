@@ -12,6 +12,7 @@ import { CreateDeliveryNoteDto } from './dto/create-delivery-note.dto';
 import { DeliveryNotePaginationOptionsDto } from './dto/delivery-note-pagination-options.dto';
 import { DeliveryNote } from './entities/delivery-note.entity';
 import { DeliveryNoteNotFoundException } from './errors/delivery-note-not-found.exception';
+import { UnableToAssignOrderStatusException } from './errors/unable-to-assign-order-status.exception';
 
 @Injectable()
 export class DeliveryNotesService {
@@ -98,11 +99,14 @@ export class DeliveryNotesService {
         WHERE
           dn.order_id = :orderId
       )`, { orderId })
-      .andWhere('orderStatus.code = :orderStatusCode', { orderStatusCode: OrderStatuses.SENDING_PRODUCTS })
       .getOne();
 
     if (!order) {
       throw new OrderNotFoundException();
+    }
+
+    if (order.orderStatus.code !== OrderStatuses.SENDING_PRODUCTS) {
+      throw new UnableToAssignOrderStatusException();
     }
 
     const deliveryNote = DeliveryNote.create({
