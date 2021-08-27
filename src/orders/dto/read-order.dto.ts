@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { BankTransfer } from "src/bank-transfers/entities/bank-transfer.entity";
 import { ReadCartDto } from "src/carts/dto/read-cart.dto";
 import { ReadClientDto } from "src/clients/dto/read-client.dto";
-import { Delivery } from "src/deliveries/entities/delivery.entity";
+import { ReadDeliveryDto } from "src/deliveries/dto/read-delivery.dto";
 import { ReadDeliveryMethodDto } from "src/delivery-methods/dto/read-delivery-method.dto";
 import { OrderStatus } from "src/order-statuses/entities/order-status.entity";
 import { ReadPaymentMethodDto } from "src/payment-methods/dto/read-payment-method.dto";
@@ -31,7 +31,8 @@ export class ReadOrderDto {
   readonly deliveryMethod: ReadDeliveryMethodDto;
 
   @Expose()
-  readonly delivery: Delivery;
+  @Type(() => ReadDeliveryDto)
+  readonly delivery: ReadDeliveryDto;
 
   @Expose()
   @Type(() => ReadCartDto)
@@ -41,6 +42,7 @@ export class ReadOrderDto {
   readonly bankTransfers: BankTransfer[];
 
   @Expose()
+  @Type(() => Number)
   readonly total: number;
 
   @Expose()
