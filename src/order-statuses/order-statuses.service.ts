@@ -10,10 +10,12 @@ export class OrderStatusesService {
   constructor(@InjectRepository(OrderStatus) private readonly orderStatusesRepository: Repository<OrderStatus>) {}
 
   async paginate({perPage, offset}: PaginationOptions): Promise<PaginationResult<OrderStatus>> {
-    const [orderStatuses, total] = await this.orderStatusesRepository.findAndCount({
-      take: perPage,
-      skip: offset,
-    });
+    const [orderStatuses, total] = await this.orderStatusesRepository.createQueryBuilder('orderStatus')
+      .take(perPage)
+      .skip(offset)
+      .leftJoinAndSelect('orderStatus.allowedOrderStatuses', 'allowedOrderStatuses')
+      .leftJoinAndSelect('allowedOrderStatuses.allowedOrderStatus', 'allowedOrderStatus')
+      .getManyAndCount();
 
     return new PaginationResult(orderStatuses, total, perPage);
   }
