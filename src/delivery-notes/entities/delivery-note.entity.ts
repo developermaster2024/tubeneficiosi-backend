@@ -14,12 +14,14 @@ export class DeliveryNote {
   @Column({
     name: 'tracking_number',
     type: 'varchar',
+    nullable: true,
   })
   trackingNumber: string;
 
   @Column({
     name: 'url',
     type: 'varchar',
+    nullable: true,
   })
   url: string;
 

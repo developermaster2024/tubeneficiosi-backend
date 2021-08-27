@@ -10,6 +10,7 @@ export class CreateDeliveryNoteDto {
   readonly orderId: number;
 
   @Expose()
+  @ValidateIf(({value}) => value)
   @IsNotEmpty()
   @MaxLength(255)
   readonly trackingNumber: string;
