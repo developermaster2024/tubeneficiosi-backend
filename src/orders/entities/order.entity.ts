@@ -121,10 +121,10 @@ export class Order {
 
   get total(): number {
     if (this.delivery) {
-      return this.cart.subTotal +  this.delivery.total;
+      return Number(this.cart.subTotal +  this.delivery.total);
     }
 
-    return this.cart.subTotal;
+    return +this.cart.subTotal;
   }
 
   static create(data: Partial<Order>): Order {

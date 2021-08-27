@@ -42,7 +42,6 @@ export class ReadOrderDto {
   readonly bankTransfers: BankTransfer[];
 
   @Expose()
-  @Type(() => Number)
   readonly total: number;
 
   @Expose()
