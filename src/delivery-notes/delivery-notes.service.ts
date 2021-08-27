@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { OrderStatuses } from 'src/order-statuses/enums/order-statuses.enum';
 import { Order } from 'src/orders/entities/order.entity';
 import { OrderNotFoundException } from 'src/orders/errors/order-not-found.exception';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
@@ -97,6 +98,7 @@ export class DeliveryNotesService {
         WHERE
           dn.order_id = :orderId
       )`, { orderId })
+      .andWhere('orderStatus.code = :orderStatusCode', { orderStatusCode: OrderStatuses.SENDING_PRODUCTS })
       .getOne();
 
     if (!order) {
