@@ -26,13 +26,6 @@ export class Notification {
   date: Date;
 
   @Column({
-    name: 'read_on',
-    type: 'datetime',
-    nullable: true,
-  })
-  readOn: Date;
-
-  @Column({
     name: 'role',
     type: 'varchar',
     length: 50,
