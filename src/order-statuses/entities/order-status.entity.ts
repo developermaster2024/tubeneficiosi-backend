@@ -25,6 +25,12 @@ export class OrderStatus {
   })
   color: string;
 
+  @Column({
+    name: 'requires_reason',
+    type: 'boolean',
+  })
+  requiresReason: boolean;
+
   @OneToMany(() => OrderStatusToOrderStatus, ostos => ostos.orderStatus)
   allowedOrderStatuses: OrderStatusToOrderStatus[];
 }

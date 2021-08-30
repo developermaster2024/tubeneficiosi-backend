@@ -2,6 +2,7 @@ import { BankTransfer } from "src/bank-transfers/entities/bank-transfer.entity";
 import { Cart } from "src/carts/entities/cart.entity";
 import { Delivery } from "src/deliveries/entities/delivery.entity";
 import { DeliveryMethod } from "src/delivery-methods/entities/delivery-method.entity";
+import { OrderRejectionReason } from "src/order-statuses/entities/order-rejection-reason.entity";
 import { OrderStatus } from "src/order-statuses/entities/order-status.entity";
 import { OrderStatuses } from "src/order-statuses/enums/order-statuses.enum";
 import { PaymentMethod } from "src/payment-methods/entities/payment-method.entity";
@@ -101,6 +102,9 @@ export class Order {
 
   @OneToMany(() => OrderStatusHistory, (history) => history.order, { cascade: ['insert', 'update'] })
   orderStatusHistory: OrderStatusHistory[];
+
+  @OneToOne(() => OrderRejectionReason, orderRejectionReason => orderRejectionReason.order, { cascade: ['insert', 'update'] })
+  orderRejectionReason: OrderRejectionReason;
 
   @CreateDateColumn({
     name: 'created_at',

@@ -33,6 +33,7 @@ import { OrderStatusIsAlreadyInHistoryException } from './errors/order-status-is
 import { UserMustBeAdminException } from './errors/user-must-be-admin.exception';
 import { UserMustBeTheStoreThatOwnsTheProduct } from './errors/user-must-be-the-store-that-owns-the-product.exception';
 import { UserMustBeTheBuyer } from './errors/user-must-be-the-buyer.exception';
+import { OrderRejectionReason } from 'src/order-statuses/entities/order-rejection-reason.entity';
 
 @Injectable()
 export class OrdersService {
@@ -85,7 +86,8 @@ export class OrdersService {
       .leftJoinAndSelect('user.client', 'client')
       .innerJoinAndSelect('order.orderStatusHistory', 'orderStatusHistory')
       .leftJoinAndSelect('orderStatusHistory.prevOrderStatus', 'prevOrderStatus')
-      .innerJoinAndSelect('orderStatusHistory.newOrderStatus', 'newOrderStatus');
+      .innerJoinAndSelect('orderStatusHistory.newOrderStatus', 'newOrderStatus')
+      .leftJoinAndSelect('order.orderRejectionReason', 'orderRejectionReason');
 
     if (user.role === Role.CLIENT) {
       queryBuilder.andWhere('order.userId = :userId', { userId });
@@ -280,6 +282,7 @@ export class OrdersService {
       .innerJoinAndSelect('order.orderStatusHistory', 'orderStatusHistory')
       .leftJoinAndSelect('orderStatusHistory.prevOrderStatus', 'prevOrderStatus')
       .innerJoinAndSelect('orderStatusHistory.newOrderStatus', 'newOrderStatus')
+      .innerJoinAndSelect('order.orderRejectionReason', 'orderRejectionReason')
       .where('order.id = :orderId', { orderId: id });
 
     if (user.role === Role.CLIENT) {
@@ -297,7 +300,7 @@ export class OrdersService {
     return order;
   }
 
-  async updateOrderStatus({id, userId, orderStatusCode}: UpdateOrderStatusDto): Promise<Order> {
+  async updateOrderStatus({id, userId, orderStatusCode, reason}: UpdateOrderStatusDto): Promise<Order> {
     const user = await this.usersRepository.findOne(userId);
 
     if (!user) {
@@ -332,6 +335,7 @@ export class OrdersService {
       .innerJoinAndSelect('order.orderStatusHistory', 'orderStatusHistory')
       .leftJoinAndSelect('orderStatusHistory.prevOrderStatus', 'prevOrderStatus')
       .innerJoinAndSelect('orderStatusHistory.newOrderStatus', 'newOrderStatus')
+      .innerJoinAndSelect('order.orderRejectionReason', 'orderRejectionReason')
       .where('order.id = :id', { id })
 
     const order = await queryBuilder.getOne();
@@ -376,6 +380,10 @@ export class OrdersService {
     }));
 
     order.orderStatus = orderStatus;
+
+    if (orderStatus.requiresReason) {
+      order.orderRejectionReason = OrderRejectionReason.create({ reason });
+    }
 
     return await this.ordersRepository.save(order);
   }
