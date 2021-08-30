@@ -263,7 +263,7 @@ export class OrdersService {
       throw new UserNotFoundException();
     }
 
-    const queryBuilder = await this.ordersRepository.createQueryBuilder('order')
+    const queryBuilder = this.ordersRepository.createQueryBuilder('order')
       .innerJoinAndSelect('order.orderStatus', 'orderStatus')
       .innerJoinAndSelect('order.paymentMethod', 'paymentMethod')
       .innerJoinAndSelect('order.store', 'store')
@@ -282,7 +282,7 @@ export class OrdersService {
       .innerJoinAndSelect('order.orderStatusHistory', 'orderStatusHistory')
       .leftJoinAndSelect('orderStatusHistory.prevOrderStatus', 'prevOrderStatus')
       .innerJoinAndSelect('orderStatusHistory.newOrderStatus', 'newOrderStatus')
-      .innerJoinAndSelect('order.orderRejectionReason', 'orderRejectionReason')
+      .leftJoinAndSelect('order.orderRejectionReason', 'orderRejectionReason')
       .where('order.id = :orderId', { orderId: id });
 
     if (user.role === Role.CLIENT) {
@@ -335,7 +335,7 @@ export class OrdersService {
       .innerJoinAndSelect('order.orderStatusHistory', 'orderStatusHistory')
       .leftJoinAndSelect('orderStatusHistory.prevOrderStatus', 'prevOrderStatus')
       .innerJoinAndSelect('orderStatusHistory.newOrderStatus', 'newOrderStatus')
-      .innerJoinAndSelect('order.orderRejectionReason', 'orderRejectionReason')
+      .leftJoinAndSelect('order.orderRejectionReason', 'orderRejectionReason')
       .where('order.id = :id', { id })
 
     const order = await queryBuilder.getOne();
