@@ -1,6 +1,6 @@
-import { User } from "src/users/entities/user.entity";
 import { Role } from "src/users/enums/roles.enum";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { NotificationTypes } from "../enums/notification-types.enum";
 import { UserToNotification } from "./user-to-notification.entity";
 
 @Entity({
@@ -26,11 +26,32 @@ export class Notification {
   date: Date;
 
   @Column({
+    name: 'read_on',
+    type: 'datetime',
+    nullable: true,
+  })
+  readOn: Date;
+
+  @Column({
     name: 'role',
     type: 'varchar',
     length: 50,
   })
   role: Role;
+
+  @Column({
+    name: 'type',
+    type: 'varchar',
+    length: 50,
+  })
+  type: NotificationTypes;
+
+  @Column({
+    name: 'additional_data',
+    type: 'json',
+    nullable: true,
+  })
+  additionalData: Object;
 
   @OneToMany(() => UserToNotification, userToNotification => userToNotification.notification)
   userToNotifications: UserToNotification[];

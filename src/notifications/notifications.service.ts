@@ -34,7 +34,7 @@ export class NotificationsService {
     return new PaginationResult(notifications, total, perPage);
   }
 
-  async create({role, message}: CreateNotificationDto): Promise<Notification> {
+  async create({role, message, ...createNotificationDto}: CreateNotificationDto): Promise<Notification> {
     const users = await this.usersRepository.find({
       select: ['id'],
       where: {role}
@@ -43,6 +43,7 @@ export class NotificationsService {
     const userToNotifications = users.map(user => UserToNotification.create({user}));
 
     let notification = Notification.create({
+      ...createNotificationDto,
       message,
       role,
       userToNotifications,
