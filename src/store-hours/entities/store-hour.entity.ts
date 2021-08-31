@@ -1,4 +1,6 @@
+import { format, parse } from "date-fns";
 import { Store } from "src/stores/entities/store.entity";
+import isAdActive from "src/support/is-ad-active";
 import { Days } from "src/support/types/days.enum";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
@@ -63,6 +65,16 @@ export class StoreHour {
     select: false
   })
   deletedAt: Date;
+
+  get isActive(): boolean {
+    const dayOfTheWeek = format(new Date(), 'iiii').toUpperCase();
+
+    const now = new Date();
+    const fullDateStartTime = parse(this.startTime.toString(), 'HH:mm:ss', now);
+    const fullDateEndTime = parse(this.endTime.toString(), 'HH:mm:ss', now);
+
+    return dayOfTheWeek === this.day && isAdActive(fullDateStartTime, fullDateEndTime, now);
+  }
 
   static create(data: Partial<StoreHour>): StoreHour {
     return Object.assign(new StoreHour(), data);

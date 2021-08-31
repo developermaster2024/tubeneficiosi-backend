@@ -27,6 +27,7 @@ export class StoresService {
       .innerJoinAndSelect('user.store', 'store')
       .innerJoinAndSelect('store.storeProfile', 'storeProfile')
       .innerJoinAndSelect('store.storeCategory', 'storeCategory')
+      .leftJoinAndSelect('store.storeHours', 'storeHour')
       .take(perPage)
       .skip(offset);
 
@@ -112,6 +113,7 @@ export class StoresService {
       .leftJoinAndSelect('user.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .leftJoinAndSelect('store.storeCategory', 'storeCategory')
+      .leftJoinAndSelect('store.storeHours', 'storeHour')
       .where('store.id = :id', { id })
       .getOne();
 

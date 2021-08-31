@@ -101,6 +101,10 @@ export class Store {
 
   cheapestProduct: Product;
 
+  get isOpen(): boolean {
+    return this.storeHours?.some(storeHour => storeHour.isActive);
+  }
+
   static create(data: Partial<Store>): Store {
     return Object.assign(new Store, data);
   }

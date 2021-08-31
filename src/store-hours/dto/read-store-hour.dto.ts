@@ -25,7 +25,10 @@ export class ReadStoreHourDto {
   @Expose()
   @Transform(({value}) => format(value instanceof Date
     ? value
-    : parse(value, 'HH:mm:ss', new Date()
-  ),'HH:mm:ss'))
+    : parse(value, 'HH:mm:ss', new Date())
+  ,'HH:mm:ss'))
   readonly endTime: Date;
+
+  @Expose()
+  readonly isActive: boolean;
 }

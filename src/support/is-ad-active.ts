@@ -1,8 +1,6 @@
 import { isAfter, isBefore, isEqual } from "date-fns";
 
-export default (from: Date, until: Date) => {
-  const today = new Date();
-
-  return (isAfter(today, from) || isEqual(today, from)) &&
-    (isBefore(today, until) || isEqual(today, until));
+export default (from: Date, until: Date, dateToCompare = new Date()) => {
+  return (isAfter(dateToCompare, from) || isEqual(dateToCompare, from)) &&
+    (isBefore(dateToCompare, until) || isEqual(dateToCompare, until));
 }

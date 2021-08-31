@@ -65,4 +65,8 @@ export class ReadStoreDto extends OmitType(ReadUserDto, ['role']) {
     return plainToClass(ReadProductDto, cheapestProduct);
   })
   readonly cheapestProduct: ReadProductDto;
+
+  @Expose()
+  @Transform(({obj}: {obj: User}) => obj.store.isOpen)
+  readonly isOpen: boolean;
 }
