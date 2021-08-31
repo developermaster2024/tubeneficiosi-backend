@@ -252,6 +252,8 @@ export class CartsService {
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .innerJoinAndSelect('cart.user', 'user')
       .leftJoinAndSelect('user.client', 'client')
+      .leftJoinAndSelect('cart.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .where('cart.userId = :userId', { userId })
       .andWhere('cart.id = :cartId', { cartId })
       .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
