@@ -45,7 +45,6 @@ export class NotificationsService {
     let notification = Notification.create({
       ...createNotificationDto,
       message,
-      role,
       userToNotifications,
     });
 

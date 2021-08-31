@@ -26,13 +26,6 @@ export class Notification {
   date: Date;
 
   @Column({
-    name: 'role',
-    type: 'varchar',
-    length: 50,
-  })
-  role: Role;
-
-  @Column({
     name: 'type',
     type: 'varchar',
     length: 50,

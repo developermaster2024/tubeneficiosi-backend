@@ -16,9 +16,6 @@ export class ReadNotificationDto {
   readonly seen: boolean;
 
   @Expose()
-  readonly role: Role;
-
-  @Expose()
   readonly recipient: User;
 
   @Expose()

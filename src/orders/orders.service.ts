@@ -34,6 +34,10 @@ import { UserMustBeAdminException } from './errors/user-must-be-admin.exception'
 import { UserMustBeTheStoreThatOwnsTheProduct } from './errors/user-must-be-the-store-that-owns-the-product.exception';
 import { UserMustBeTheBuyer } from './errors/user-must-be-the-buyer.exception';
 import { OrderRejectionReason } from 'src/order-statuses/entities/order-rejection-reason.entity';
+import { NotificationsGateway } from 'src/notifications/notifications.gateway';
+import { Notification } from 'src/notifications/entities/notification.entity';
+import { NotificationTypes } from 'src/notifications/enums/notification-types.enum';
+import { UserToNotification } from 'src/notifications/entities/user-to-notification.entity';
 
 @Injectable()
 export class OrdersService {
@@ -45,7 +49,9 @@ export class OrdersService {
     @InjectRepository(Product) private readonly productsRepository: Repository<Product>,
     @InjectRepository(DeliveryMethod) private readonly deliveryMethodsRepository: Repository<DeliveryMethod>,
     @InjectRepository(OrderStatus) private readonly orderStatusesRepository: Repository<OrderStatus>,
-    private readonly deliveryCostCalculatorResolver: DeliveryCostCalculatorResolver
+    @InjectRepository(Notification) private readonly notificationsRepository: Repository<Notification>,
+    private readonly deliveryCostCalculatorResolver: DeliveryCostCalculatorResolver,
+    private readonly notificationsGateway: NotificationsGateway
   ) {}
 
   async paginate({perPage, offset, filters: {
@@ -132,6 +138,7 @@ export class OrdersService {
       .innerJoinAndSelect('cart.user', 'user')
       .leftJoinAndSelect('user.client', 'client')
       .innerJoinAndSelect('cart.store', 'store')
+      .innerJoinAndSelect('store.user', 'storeUser')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .leftJoinAndSelect('cartItem.product', 'product')
@@ -253,7 +260,25 @@ export class OrdersService {
       .where('id IN (:...ids)', { ids: cart.cartItems.map(item => item.productId) })
       .execute();
 
-    return await this.ordersRepository.save(order);
+    const savedOrder = await this.ordersRepository.save(order);
+
+    const admins = await this.usersRepository.find({ role: Role.ADMIN });
+
+    const notification = await this.notificationsRepository.save(Notification.create({
+      message: '¡Orden creada!',
+      type: NotificationTypes.ORDER_CREATED,
+      additionalData: { orderId: savedOrder.id },
+      userToNotifications: [
+        UserToNotification.create({ userId: cart.store.user.id }),
+        ...admins.map((user) => UserToNotification.create({ user })),
+      ],
+    }))
+
+    this.notificationsGateway.notifyUsersById([cart.store.user.id], notification);
+
+    this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification);
+
+    return savedOrder;
   }
 
   async findOne(id: number, userId: number): Promise<Order> {
