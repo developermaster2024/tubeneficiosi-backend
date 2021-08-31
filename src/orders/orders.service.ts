@@ -378,23 +378,89 @@ export class OrdersService {
 
     switch(orderStatusCode) {
       case OrderStatuses.PAYMENT_ACCEPTED:
-      case OrderStatuses.PAYMENT_REJECTED:
+      case OrderStatuses.PAYMENT_REJECTED: {
         if (order.orderStatus.code !== OrderStatuses.CONFIRMING_PAYMENT) throw new IncorrectOrderStatusException();
         if (user.role !== Role.ADMIN) throw new UserMustBeAdminException();
+        const userToNotifications = [
+          UserToNotification.create({ user: order.user }),
+          UserToNotification.create({ user: order.store.user }),
+        ];
+
+        const notification = await this.notificationsRepository.save(Notification.create({
+          message: `¡Estatus de Orden cambiado a ${orderStatus.name}`,
+          type: NotificationTypes.ORDER_STATUS_CHANGE,
+          additionalData: { orderId: order.id },
+          userToNotifications,
+        }));
+
+        this.notificationsGateway.notifyUsersById(userToNotifications.map(ustn => ustn.user.id), notification);
         break;
-      case OrderStatuses.SENDING_PRODUCTS:
+      }
+      case OrderStatuses.SENDING_PRODUCTS: {
         if (order.orderStatus.code !== OrderStatuses.PAYMENT_ACCEPTED) throw new IncorrectOrderStatusException();
         if (order.store.user.id !== userId) throw new UserMustBeTheStoreThatOwnsTheProduct();
+
+        const admins = await this.usersRepository.find({ role: Role.ADMIN });
+
+        const userToNotifications = [
+          UserToNotification.create({ user: order.user }),
+          ...admins.map(user => UserToNotification.create({ user })),
+        ];
+
+        const notification = await this.notificationsRepository.save(Notification.create({
+          message: `¡Estatus de Orden cambiado a ${orderStatus.name}`,
+          type: NotificationTypes.ORDER_STATUS_CHANGE,
+          additionalData: { orderId: order.id },
+          userToNotifications,
+        }));
+
+        this.notificationsGateway.notifyUsersById([order.user.id], notification);
+        this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification);
         break;
+      }
       case OrderStatuses.PRODUCTS_SENT:
-      case OrderStatuses.SHIPPING_ERROR:
+      case OrderStatuses.SHIPPING_ERROR: {
         if (order.orderStatus.code !== OrderStatuses.SENDING_PRODUCTS) throw new IncorrectOrderStatusException();
         if (order.store.user.id !== userId) throw new UserMustBeTheStoreThatOwnsTheProduct();
+        const admins = await this.usersRepository.find({ role: Role.ADMIN });
+
+        const userToNotifications = [
+          UserToNotification.create({ user: order.store.user }),
+          ...admins.map(user => UserToNotification.create({ user })),
+        ];
+
+        const notification = await this.notificationsRepository.save(Notification.create({
+          message: `¡Estatus de Orden cambiado a ${orderStatus.name}`,
+          type: NotificationTypes.ORDER_STATUS_CHANGE,
+          additionalData: { orderId: order.id },
+          userToNotifications,
+        }));
+
+        this.notificationsGateway.notifyUsersById([order.user.id], notification);
+        this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification);
         break;
-      case OrderStatuses.PRODUCTS_RECEIVED:
+      }
+      case OrderStatuses.PRODUCTS_RECEIVED: {
         if (order.orderStatus.code !== OrderStatuses.PRODUCTS_SENT) throw new IncorrectOrderStatusException();
         if (order.user.id !== userId) throw new UserMustBeTheBuyer();
+        const admins = await this.usersRepository.find({ role: Role.ADMIN });
+
+        const userToNotifications = [
+          UserToNotification.create({ user: order.store.user }),
+          ...admins.map(user => UserToNotification.create({ user })),
+        ];
+
+        const notification = await this.notificationsRepository.save(Notification.create({
+          message: `¡Estatus de Orden cambiado a ${orderStatus.name}`,
+          type: NotificationTypes.ORDER_STATUS_CHANGE,
+          additionalData: { orderId: order.id },
+          userToNotifications,
+        }));
+
+        this.notificationsGateway.notifyUsersById([order.store.user.id], notification);
+        this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification);
         break;
+      }
       default:
         throw new UnauthorizedException();
     }
