@@ -4,6 +4,7 @@ import queryStringToBoolean from "src/support/query-string-to-boolean";
 type CartFilters = {
   id: string;
   storeName: string;
+  clientName: string;
   minTotal: number;
   maxTotal: number;
   minDate: string;
@@ -24,6 +25,7 @@ export class CartPaginationOptionsDto extends PaginationOptions {
       perPage = 10,
       id,
       storeName,
+      clientName,
       minTotal,
       maxTotal,
       minDate,
@@ -36,6 +38,7 @@ export class CartPaginationOptionsDto extends PaginationOptions {
     return new CartPaginationOptionsDto(+page, +perPage, {
       id,
       storeName,
+      clientName,
       minTotal: Number(minTotal),
       maxTotal: Number(maxTotal),
       minDate: minDate,

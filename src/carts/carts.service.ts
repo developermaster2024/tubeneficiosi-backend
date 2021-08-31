@@ -40,6 +40,7 @@ export class CartsService {
   async paginate({offset, perPage, filters: {
     id,
     storeName,
+    clientName,
     minTotal,
     maxTotal,
     minDate,
@@ -72,7 +73,9 @@ export class CartsService {
 
     if (id) queryBuilder.andWhere('cart.id = :id', { id });
 
-    if (storeName) queryBuilder.andWhere('store.name LIKE :name', { name: `%${storeName}%` });
+    if (storeName) queryBuilder.andWhere('store.name LIKE :storeName', { storeName: `%${storeName}%` });
+
+    if (clientName) queryBuilder.andWhere('client.name LIKE :clientName', { clientName: `%${clientName}%` });
 
     if (minDate) queryBuilder.andWhere('cart.createdAt >= :minDate', { minDate });
 
