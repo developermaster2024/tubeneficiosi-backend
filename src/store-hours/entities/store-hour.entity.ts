@@ -73,7 +73,11 @@ export class StoreHour {
     const fullDateStartTime = parse(this.startTime.toString(), 'HH:mm:ss', now);
     const fullDateEndTime = parse(this.endTime.toString(), 'HH:mm:ss', now);
 
-    return dayOfTheWeek === this.day && isAdActive(fullDateStartTime, fullDateEndTime, now);
+    return (
+      this.isWorkingDay &&
+      dayOfTheWeek === this.day &&
+      isAdActive(fullDateStartTime, fullDateEndTime, now)
+    );
   }
 
   static create(data: Partial<StoreHour>): StoreHour {
