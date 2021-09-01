@@ -62,6 +62,7 @@ export class CartsService {
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .leftJoinAndSelect('cart.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('store.storeHours', 'storeHour')
       .innerJoinAndSelect('cart.user', 'user')
       .leftJoinAndSelect('user.client', 'client');
 
@@ -182,6 +183,7 @@ export class CartsService {
       .leftJoinAndSelect('user.client', 'client')
       .leftJoinAndSelect('cart.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('store.storeHours', 'storeHour')
       .where('cart.userId = :userId', { userId })
       .andWhere('cart.storeId = :storeId', { storeId });
 
@@ -216,6 +218,7 @@ export class CartsService {
       .leftJoinAndSelect('user.client', 'client')
       .leftJoinAndSelect('cart.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('store.storeHours', 'storeHour')
       .where('cart.id = :cartId', { cartId: id });
 
     if (isExpired !== null) {
@@ -257,6 +260,7 @@ export class CartsService {
       .leftJoinAndSelect('user.client', 'client')
       .leftJoinAndSelect('cart.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('store.storeHours', 'storeHour')
       .where('cart.userId = :userId', { userId })
       .andWhere('cart.id = :cartId', { cartId })
       .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })

@@ -130,6 +130,7 @@ export class StoresService {
       .leftJoinAndSelect('user.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .leftJoinAndSelect('store.storeCategory', 'storeCategory')
+      .leftJoinAndSelect('store.storeHours', 'storeHour')
       .where('store.slug = :slug', { slug })
       .getOne();
 

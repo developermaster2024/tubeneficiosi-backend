@@ -63,6 +63,7 @@ export class ProductsService {
       .leftJoinAndSelect('product.deliveryMethodTypes', 'deliveryMethodType')
       .leftJoinAndSelect('product.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('store.storeHours', 'storeHour')
       .leftJoin('product.tags', 'tag');
 
     if (tagsToSortBy.length > 0) {
@@ -166,6 +167,7 @@ export class ProductsService {
         'productFeatureGroups.productFeatureForGroups',
         'store',
         'store.storeProfile',
+        'store.storeHours',
         'deliveryMethodTypes',
         'productDimensions',
       ],
@@ -190,6 +192,7 @@ export class ProductsService {
         'productFeatureGroups.productFeatureForGroups',
         'store',
         'store.storeProfile',
+        'store.storeHours',
         'deliveryMethodTypes',
         'tags',
       ],
