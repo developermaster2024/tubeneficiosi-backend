@@ -38,6 +38,7 @@ import { NotificationsGateway } from 'src/notifications/notifications.gateway';
 import { Notification } from 'src/notifications/entities/notification.entity';
 import { NotificationTypes } from 'src/notifications/enums/notification-types.enum';
 import { UserToNotification } from 'src/notifications/entities/user-to-notification.entity';
+import { StoreIsClosedException } from './errors/store-is-closed.exception';
 
 @Injectable()
 export class OrdersService {
@@ -140,6 +141,7 @@ export class OrdersService {
       .leftJoinAndSelect('user.client', 'client')
       .innerJoinAndSelect('cart.store', 'store')
       .innerJoinAndSelect('store.user', 'storeUser')
+      .leftJoinAndSelect('store.storeHours', 'storeHour')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .leftJoinAndSelect('cartItem.product', 'product')
@@ -152,6 +154,10 @@ export class OrdersService {
 
     if (!cart) {
       throw new CartNotFoundException();
+    }
+
+    if (!cart.store.isOpen) {
+      throw new StoreIsClosedException();
     }
 
     for (let cartItem of cart.cartItems) {
