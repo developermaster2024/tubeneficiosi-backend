@@ -279,11 +279,11 @@ export class OrdersService {
         UserToNotification.create({ userId: cart.store.user.id }),
         ...admins.map((user) => UserToNotification.create({ user })),
       ],
-    }))
+    }));
 
-    this.notificationsGateway.notifyUsersById([cart.store.user.id], notification);
+    this.notificationsGateway.notifyUsersById([cart.store.user.id], notification.toDto());
 
-    this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification);
+    this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification.toDto());
 
     return savedOrder;
   }
@@ -423,8 +423,8 @@ export class OrdersService {
           userToNotifications,
         }));
 
-        this.notificationsGateway.notifyUsersById([order.user.id], notification);
-        this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification);
+        this.notificationsGateway.notifyUsersById([order.user.id], notification.toDto());
+        this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification.toDto());
         break;
       }
       case OrderStatuses.PRODUCTS_SENT:
@@ -445,8 +445,8 @@ export class OrdersService {
           userToNotifications,
         }));
 
-        this.notificationsGateway.notifyUsersById([order.user.id], notification);
-        this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification);
+        this.notificationsGateway.notifyUsersById([order.user.id], notification.toDto());
+        this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification.toDto());
         break;
       }
       case OrderStatuses.PRODUCTS_RECEIVED: {
@@ -466,8 +466,8 @@ export class OrdersService {
           userToNotifications,
         }));
 
-        this.notificationsGateway.notifyUsersById([order.store.user.id], notification);
-        this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification);
+        this.notificationsGateway.notifyUsersById([order.store.user.id], notification.toDto());
+        this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification.toDto());
         break;
       }
       default:
