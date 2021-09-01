@@ -44,11 +44,19 @@ export class NotificationsController {
     return plainToClass(ReadNotificationDto, await this.notificationService.findOne(+id, userId));
   }
 
-  @Delete(':id')
+  @Delete(':id(\\d+)')
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@Param('id') id: string): Promise<void> {
     await this.notificationService.delete(+id);
+  }
+
+  @Delete('mark-all-as-seen')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async markAllAsSeen(@Body('userId') userId: number): Promise<void> {
+    await this.notificationService.markAllAsRead(userId);
   }
 }

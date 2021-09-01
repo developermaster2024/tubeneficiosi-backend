@@ -17,6 +17,7 @@ export class NotificationsService {
   constructor(
     @InjectRepository(Notification) private readonly notificationsRepository: Repository<Notification>,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    @InjectRepository(UserToNotification) private readonly userToNotificationsRepository: Repository<UserToNotification>,
     private readonly notificationsGateway: NotificationsGateway
   ) {}
 
@@ -120,5 +121,13 @@ export class NotificationsService {
     }
 
     await this.notificationsRepository.softRemove(notification);
+  }
+
+  async markAllAsRead(userId: number): Promise<void> {
+    await this.userToNotificationsRepository.createQueryBuilder('userToNotification')
+      .update(UserToNotification)
+      .set({ seen: true })
+      .where('userId = :userId', { userId })
+      .execute();
   }
 }
