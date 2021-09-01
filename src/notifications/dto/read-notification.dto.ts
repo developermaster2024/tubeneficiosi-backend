@@ -22,5 +22,5 @@ export class ReadNotificationDto {
 
   @Expose()
   @Transform(({value}) => format(value, 'yyyy-MM-dd HH:mm:ss'))
-  readonly date: Date;
+  readonly createdAt: Date;
 }

@@ -46,7 +46,6 @@ export class Notification {
 
   @CreateDateColumn({
     name: 'created_at',
-    select: false,
   })
   createdAt: Date;
 

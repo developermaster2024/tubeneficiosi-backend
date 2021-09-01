@@ -1,14 +1,15 @@
+import { parseSort } from "src/database/utils/sort";
 import { PaginationOptions } from "src/support/pagination/pagination-options";
 
 type NotificationFilters = {
-  id: string;
+  id: number;
   role: string;
   from: string;
   until: string;
 };
 
 export class NotificationPaginationOptionsDto extends PaginationOptions {
-  constructor(public page: number, protected _perPage: number, public filters: NotificationFilters) {
+  constructor(public page: number, protected _perPage: number, public filters: NotificationFilters, public order: ReturnType<typeof parseSort>) {
     super(page, _perPage);
   }
 
@@ -20,7 +21,16 @@ export class NotificationPaginationOptionsDto extends PaginationOptions {
       role,
       from,
       until,
+      sort = '',
     } = query;
-    return new NotificationPaginationOptionsDto(+page, +perPage, {id, role, from, until});
+
+    const order = parseSort(sort, ['createdAt']);
+
+    return new NotificationPaginationOptionsDto(+page, +perPage, {
+      id: +id,
+      role,
+      from,
+      until
+    }, order);
   }
 }

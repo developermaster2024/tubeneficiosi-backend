@@ -24,7 +24,7 @@ export class NotificationsService {
     id,
     from,
     until,
-  }}: NotificationPaginationOptionsDto, userId: number): Promise<PaginationResult<Notification>> {
+  }, order}: NotificationPaginationOptionsDto, userId: number): Promise<PaginationResult<Notification>> {
     const user = await this.usersRepository.findOne(userId);
 
     if (!user) {
@@ -42,6 +42,8 @@ export class NotificationsService {
       )
       .take(perPage)
       .skip(offset);
+
+    Object.keys(order).forEach(key => queryBuilder.addOrderBy(`notification.${key}`, order[key]));
 
     if (user.role !== Role.ADMIN) {
       queryBuilder.andWhere('userToNotifications.userId = :userId', { userId });
