@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { User } from 'src/users/entities/user.entity';
+import { Role } from 'src/users/enums/roles.enum';
+import { UserNotFoundException } from 'src/users/errors/user-not-found.exception';
 import { Repository } from 'typeorm';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { NotificationPaginationOptionsDto } from './dto/notification-pagination-options.dto';
@@ -18,16 +20,31 @@ export class NotificationsService {
     private readonly notificationsGateway: NotificationsGateway
   ) {}
 
-  async paginate({offset, perPage, filters}: NotificationPaginationOptionsDto): Promise<PaginationResult<Notification>> {
+  async paginate({offset, perPage, filters: {
+    id,
+    from,
+    until,
+  }}: NotificationPaginationOptionsDto, userId: number): Promise<PaginationResult<Notification>> {
+    const user = await this.usersRepository.findOne(userId);
+
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
     const queryBuilder = this.notificationsRepository.createQueryBuilder('notification')
+      .leftJoin('notification.userToNotifications', 'userToNotification')
       .take(perPage)
       .skip(offset);
 
-    if (filters.id) queryBuilder.andWhere('notification.id = :id', {id: filters.id});
+    if (user.role !== Role.ADMIN) {
+      queryBuilder.andWhere('userToNotification.userId = :userId', { userId });
+    }
 
-    if (filters.from) queryBuilder.andWhere('notification.createdAt >= :from', {from: filters.from});
+    if (id) queryBuilder.andWhere('notification.id = :id', { id });
 
-    if (filters.until) queryBuilder.andWhere('notification.createdAt <= :until', {until: filters.until});
+    if (from) queryBuilder.andWhere('notification.createdAt >= :from', { from });
+
+    if (until) queryBuilder.andWhere('notification.createdAt <= :until', { until });
 
     const [notifications, total] = await queryBuilder.getManyAndCount();
 
@@ -55,8 +72,22 @@ export class NotificationsService {
     return notification;
   }
 
-  async findOne(id: number): Promise<Notification> {
-    const notification = await this.notificationsRepository.findOne(id);
+  async findOne(id: number, userId: number): Promise<Notification> {
+    const user = await this.usersRepository.findOne(userId);
+
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    const queryBuilder = this.notificationsRepository.createQueryBuilder('notification')
+      .leftJoin('notification.userToNotifications', 'userToNotification')
+      .where('notification.id = :id', { id });
+
+    if (user.role !== Role.ADMIN) {
+      queryBuilder.andWhere('userToNotification.userId = :userId', { userId });
+    }
+
+    const notification = await queryBuilder.getOne();
 
     if (!notification) {
       throw new NotificationNotFoundException();
@@ -66,7 +97,11 @@ export class NotificationsService {
   }
 
   async delete(id: number): Promise<void> {
-    const notification = await this.findOne(id);
+    const notification = await this.notificationsRepository.findOne(id);
+
+    if (!notification) {
+      throw new NotificationNotFoundException();
+    }
 
     await this.notificationsRepository.softRemove(notification);
   }

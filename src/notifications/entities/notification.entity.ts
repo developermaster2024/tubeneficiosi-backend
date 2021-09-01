@@ -1,5 +1,7 @@
+import { plainToClass } from "class-transformer";
 import { Role } from "src/users/enums/roles.enum";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { ReadNotificationDto } from "../dto/read-notification.dto";
 import { NotificationTypes } from "../enums/notification-types.enum";
 import { UserToNotification } from "./user-to-notification.entity";
 
@@ -39,7 +41,7 @@ export class Notification {
   })
   additionalData: Object;
 
-  @OneToMany(() => UserToNotification, userToNotification => userToNotification.notification)
+  @OneToMany(() => UserToNotification, userToNotification => userToNotification.notification, { cascade: ['insert', 'update'] })
   userToNotifications: UserToNotification[];
 
   @CreateDateColumn({
@@ -58,6 +60,10 @@ export class Notification {
     select: false
   })
   deletedAt: Date;
+
+  toDto(): ReadNotificationDto {
+    return plainToClass(ReadNotificationDto, this);
+  }
 
   static create(data: Partial<Notification>): Notification {
     return Object.assign(new Notification(), data);

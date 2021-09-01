@@ -1,7 +1,6 @@
 import { Exclude, Expose, Transform } from "class-transformer";
 import { format } from "date-fns";
 import { User } from "src/users/entities/user.entity";
-import { Role } from "src/users/enums/roles.enum";
 import { NotificationTypes } from "../enums/notification-types.enum";
 
 @Exclude()
