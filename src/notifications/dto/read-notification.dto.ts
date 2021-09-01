@@ -1,6 +1,6 @@
 import { Exclude, Expose, Transform } from "class-transformer";
 import { format } from "date-fns";
-import { User } from "src/users/entities/user.entity";
+import { UserToNotification } from "../entities/user-to-notification.entity";
 import { NotificationTypes } from "../enums/notification-types.enum";
 
 @Exclude()
@@ -12,13 +12,7 @@ export class ReadNotificationDto {
   readonly message: string;
 
   @Expose()
-  readonly seen: boolean;
-
-  @Expose()
-  readonly recipient: User;
-
-  @Expose()
-  readonly sender: User;
+  readonly userToNotification: UserToNotification;
 
   @Expose()
   readonly type: NotificationTypes;
@@ -28,5 +22,5 @@ export class ReadNotificationDto {
 
   @Expose()
   @Transform(({value}) => format(value, 'yyyy-MM-dd HH:mm:ss'))
-  readonly createdAt: Date;
+  readonly date: Date;
 }

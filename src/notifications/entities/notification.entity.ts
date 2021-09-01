@@ -46,6 +46,7 @@ export class Notification {
 
   @CreateDateColumn({
     name: 'created_at',
+    select: false,
   })
   createdAt: Date;
 
@@ -60,6 +61,8 @@ export class Notification {
     select: false
   })
   deletedAt: Date;
+
+  userToNotification: UserToNotification;
 
   toDto(): ReadNotificationDto {
     return plainToClass(ReadNotificationDto, this);

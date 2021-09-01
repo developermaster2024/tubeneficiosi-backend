@@ -32,12 +32,19 @@ export class NotificationsService {
     }
 
     const queryBuilder = this.notificationsRepository.createQueryBuilder('notification')
-      .leftJoin('notification.userToNotifications', 'userToNotification')
+      .leftJoin('notification.userToNotifications', 'userToNotifications')
+      .leftJoinAndMapOne(
+        'notification.userToNotification',
+        'notification.userToNotifications',
+        'userToNotification',
+        'userToNotification.user_id = :userId',
+        { userId }
+      )
       .take(perPage)
       .skip(offset);
 
     if (user.role !== Role.ADMIN) {
-      queryBuilder.andWhere('userToNotification.userId = :userId', { userId });
+      queryBuilder.andWhere('userToNotifications.userId = :userId', { userId });
     }
 
     if (id) queryBuilder.andWhere('notification.id = :id', { id });
@@ -80,7 +87,14 @@ export class NotificationsService {
     }
 
     const queryBuilder = this.notificationsRepository.createQueryBuilder('notification')
-      .leftJoin('notification.userToNotifications', 'userToNotification')
+      .leftJoin('notification.userToNotifications', 'userToNotifications')
+      .leftJoinAndMapOne(
+        'notification.userToNotification',
+        'notification.userToNotifications',
+        'userToNotification',
+        'userToNotification.user_id = :userId',
+        { userId }
+      )
       .where('notification.id = :id', { id });
 
     if (user.role !== Role.ADMIN) {
