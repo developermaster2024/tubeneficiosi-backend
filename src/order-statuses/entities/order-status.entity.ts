@@ -31,6 +31,12 @@ export class OrderStatus {
   })
   requiresReason: boolean;
 
+  @Column({
+    name: 'notification_message',
+    type: 'varchar',
+  })
+  notificationMessage: string;
+
   @OneToMany(() => OrderStatusToOrderStatus, ostos => ostos.orderStatus)
   allowedOrderStatuses: OrderStatusToOrderStatus[];
 }
