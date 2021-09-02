@@ -31,7 +31,8 @@ export class FeaturedAdsService {
       .leftJoinAndSelect('featuredAd.storeCategory', 'storeCategory')
       .leftJoinAndSelect('product.productImages', 'productImage')
       .leftJoinAndSelect('product.store', 'store')
-      .leftJoinAndSelect('store.storeProfile', 'storeProfile');
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('store.storeHours', 'storeHour');
 
     if (id) queryBuilder.andWhere('featuredAd.id = :id', { id });
 
