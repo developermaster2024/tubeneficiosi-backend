@@ -1,7 +1,5 @@
 import { Exclude, Expose } from "class-transformer";
 import { IsNumber, Max, MaxLength, Min, MinLength } from "class-validator";
-import { IsUnique } from "src/validation/is-unique.constrain";
-import { ProfileAddress } from "../entities/profile-address.entity";
 
 @Exclude()
 export class CreateProfileAddressDto {
