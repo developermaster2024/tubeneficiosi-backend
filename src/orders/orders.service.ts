@@ -66,7 +66,7 @@ export class OrdersService {
     maxDate,
     orderStatusCode,
     paymentMethodCode,
-  }}: OrderPaginationOptionsDto, userId: number): Promise<PaginationResult<Order>> {
+  }, order}: OrderPaginationOptionsDto, userId: number): Promise<PaginationResult<Order>> {
     const user = await this.usersRepository.findOne(userId);
 
     if (!user) {
@@ -102,6 +102,8 @@ export class OrdersService {
     } else if (user.role === Role.STORE) {
       queryBuilder.andWhere('store.userId = :userId', { userId });
     }
+
+    Object.keys(order).forEach(key => queryBuilder.addOrderBy(`order.${key}`, order[key]));
 
     if (id) queryBuilder.andWhere('order.id = :id', { id });
 

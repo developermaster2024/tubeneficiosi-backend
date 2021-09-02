@@ -1,3 +1,4 @@
+import { parseSort } from "src/database/utils/sort";
 import { PaginationOptions } from "src/support/pagination/pagination-options";
 
 type OrderFilters = {
@@ -14,7 +15,12 @@ type OrderFilters = {
 };
 
 export class OrderPaginationOptionsDto extends PaginationOptions {
-  constructor(public page: number, protected _perPage: number, public filters: OrderFilters) {
+  constructor(
+    public page: number,
+    protected _perPage: number,
+    public filters: OrderFilters,
+    public order: ReturnType<typeof parseSort>
+  ) {
     super(page, _perPage);
   }
 
@@ -32,6 +38,7 @@ export class OrderPaginationOptionsDto extends PaginationOptions {
       maxDate,
       orderStatusCode,
       paymentMethodCode,
+      sort = '',
     } = query;
 
     return new OrderPaginationOptionsDto(+page, +perPage, {
@@ -45,6 +52,6 @@ export class OrderPaginationOptionsDto extends PaginationOptions {
       maxDate: maxDate,
       orderStatusCode,
       paymentMethodCode,
-    });
+    }, parseSort(sort, ['createdAt']));
   }
 }
