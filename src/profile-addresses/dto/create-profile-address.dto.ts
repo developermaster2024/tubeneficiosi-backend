@@ -11,7 +11,6 @@ export class CreateProfileAddressDto {
   @Expose()
   @MinLength(2)
   @MaxLength(150)
-  @IsUnique(ProfileAddress)
   readonly name: string;
 
   @Expose()
