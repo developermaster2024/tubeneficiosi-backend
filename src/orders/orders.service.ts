@@ -180,7 +180,9 @@ export class OrdersService {
     order.userId = cart.user.id;
     order.orderStatusCode = OrderStatuses.CONFIRMING_PAYMENT;
     order.paymentMethodCode = paymentMethodCode;
-    order.orderStatusHistory = [OrderStatusHistory.create({newOrderStatusCode: OrderStatuses.CONFIRMING_PAYMENT})];
+    const orderStatus = await this.orderStatusesRepository.findOne({ code: OrderStatuses.CONFIRMING_PAYMENT });
+    if (!orderStatus) throw new OrderStatusNotFoundException();
+    order.orderStatusHistory = [OrderStatusHistory.create({newOrderStatus: orderStatus})];
 
     if (deliveryMethodId) {
       order.deliveryMethodId = deliveryMethodId;
@@ -269,7 +271,7 @@ export class OrdersService {
     const notification = await this.notificationsRepository.save(Notification.create({
       message: '¡Orden creada!',
       type: NotificationTypes.ORDER_CREATED,
-      additionalData: { orderId: savedOrder.id },
+      additionalData: { orderId: savedOrder.id, color: orderStatus.color },
       userToNotifications: [
         UserToNotification.create({ userId: cart.store.user.id }),
         ...admins.map((user) => UserToNotification.create({ user })),
@@ -393,7 +395,7 @@ export class OrdersService {
         const notification = await this.notificationsRepository.save(Notification.create({
           message: `¡Estatus de Orden cambiado a ${orderStatus.name}`,
           type: NotificationTypes.ORDER_STATUS_CHANGE,
-          additionalData: { orderId: order.id },
+          additionalData: { orderId: order.id, color: orderStatus.color },
           userToNotifications,
         }));
 
@@ -414,7 +416,7 @@ export class OrdersService {
         const notification = await this.notificationsRepository.save(Notification.create({
           message: `¡Estatus de Orden cambiado a ${orderStatus.name}`,
           type: NotificationTypes.ORDER_STATUS_CHANGE,
-          additionalData: { orderId: order.id },
+          additionalData: { orderId: order.id, color: orderStatus.color },
           userToNotifications,
         }));
 
@@ -436,7 +438,7 @@ export class OrdersService {
         const notification = await this.notificationsRepository.save(Notification.create({
           message: `¡Estatus de Orden cambiado a ${orderStatus.name}`,
           type: NotificationTypes.ORDER_STATUS_CHANGE,
-          additionalData: { orderId: order.id },
+          additionalData: { orderId: order.id, color: orderStatus.color },
           userToNotifications,
         }));
 
@@ -457,7 +459,7 @@ export class OrdersService {
         const notification = await this.notificationsRepository.save(Notification.create({
           message: `¡Estatus de Orden cambiado a ${orderStatus.name}`,
           type: NotificationTypes.ORDER_STATUS_CHANGE,
-          additionalData: { orderId: order.id },
+          additionalData: { orderId: order.id, color: orderStatus.color },
           userToNotifications,
         }));
 
