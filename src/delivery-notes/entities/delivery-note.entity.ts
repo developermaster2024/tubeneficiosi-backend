@@ -1,5 +1,5 @@
 import { Order } from "src/orders/entities/order.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({
   name: 'delivery_notes',
@@ -10,7 +10,6 @@ export class DeliveryNote {
   })
   readonly id: number;
 
-  @Index({ unique: true })
   @Column({
     name: 'tracking_number',
     type: 'varchar',
