@@ -29,24 +29,18 @@ export class ShippingCostCalculator {
 
     const zone = await this.deliveryZonesRepository.createQueryBuilder('deliveryZone')
       .leftJoinAndSelect('deliveryZone.deliveryZoneToShippingRanges', 'deliveryZoneToShippingRange')
-      .where('deliveryZone.deliveryMethodId = :deliveryMethodId', { deliveryMethodId })
-      .andWhere(`EXISTS(
+      .innerJoin('deliveryZone.locations', 'location', `ST_CONTAINS(location.area, (
         SELECT
-          lo.id
+          POINT(address.latitude, address.longitude)
         FROM
-          delivery_zone_to_location dztl
-        INNER JOIN
-          locations lo ON lo.id = dztl.location_id
-        WHERE ST_CONTAINS(lo.area, (
-          SELECT
-            POINT(address.latitude, address.longitude)
-          FROM
-            client_addresses address
-          WHERE
-            address.id = :addressId AND address.deleted_at IS NULL
-          LIMIT 1
-        )) AND dztl.delivery_zone_id = deliveryZone.id
-      )`, { addressId })
+          client_addresses address
+        WHERE
+          address.id = :addressId AND address.deleted_at IS NULL
+        LIMIT 1
+      ))`, {  addressId })
+      .andWhere('deliveryMethod.id = :deliveryMethodId', { deliveryMethodId })
+      .where('deliveryZone.deliveryMethodId = :deliveryMethodId', { deliveryMethodId })
+      .orderBy('location.createdAt', 'DESC')
       .getOne();
 
     if (!zone) {

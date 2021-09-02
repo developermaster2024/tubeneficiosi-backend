@@ -185,24 +185,17 @@ export class OrdersService {
 
       const deliveryZone = await this.deliveryZoneRepository.createQueryBuilder('deliveryZone')
         .innerJoin('deliveryZone.deliveryMethod', 'deliveryMethod')
-        .where(`EXISTS(
+        .innerJoin('deliveryZone.locations', 'location', `ST_CONTAINS(location.area, (
           SELECT
-            lo.id
+            POINT(address.latitude, address.longitude)
           FROM
-            delivery_zone_to_location dztl
-          INNER JOIN
-            locations lo ON lo.id = dztl.location_id
-          WHERE ST_CONTAINS(lo.area, (
-            SELECT
-              POINT(address.latitude, address.longitude)
-            FROM
-              client_addresses address
-            WHERE
-              address.id = :addressId AND address.deleted_at IS NULL
-            LIMIT 1
-          )) AND dztl.delivery_zone_id = deliveryZone.id
-        )`, { addressId: profileAddressId })
+            client_addresses address
+          WHERE
+            address.id = :addressId AND address.deleted_at IS NULL
+          LIMIT 1
+        ))`, {  addressId: profileAddressId })
         .andWhere('deliveryMethod.id = :deliveryMethodId', { deliveryMethodId })
+        .orderBy('location.createdAt', 'DESC')
         .getOne();
 
       if (!deliveryZone) {

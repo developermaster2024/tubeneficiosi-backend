@@ -56,14 +56,9 @@ export class DeliveryMethodsService {
     if (storeId) queryBuilder.andWhere('deliveryMethod.storeId = :storeId', { storeId });
 
     if (addressId) {
-      queryBuilder.innerJoin('deliveryMethod.deliveryZones', 'deliveryZone', `EXISTS(
-        SELECT
-          lo.id
-        FROM
-          delivery_zone_to_location dztl
-        INNER JOIN
-          locations lo ON lo.id = dztl.location_id
-        WHERE ST_CONTAINS(lo.area, (
+      queryBuilder
+        .innerJoin('deliveryMethod.deliveryZones', 'deliveryZone')
+        .innerJoin('deliveryZone.locations', 'location', `ST_CONTAINS(location.area, (
           SELECT
             POINT(address.latitude, address.longitude)
           FROM
@@ -71,8 +66,7 @@ export class DeliveryMethodsService {
           WHERE
             address.id = :addressId AND address.deleted_at IS NULL
           LIMIT 1
-        )) AND dztl.delivery_zone_id = deliveryZone.id
-      )`, { addressId });
+        ))`, { addressId });
     }
 
     const [deliveryMethods, total] = await queryBuilder.getManyAndCount();
