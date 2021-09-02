@@ -3,9 +3,9 @@ import { PaginationOptions } from "src/support/pagination/pagination-options";
 
 type NotificationFilters = {
   id: number;
-  role: string;
   from: string;
   until: string;
+  forUserId: number;
 };
 
 export class NotificationPaginationOptionsDto extends PaginationOptions {
@@ -18,9 +18,9 @@ export class NotificationPaginationOptionsDto extends PaginationOptions {
       page = 1,
       perPage = 10,
       id,
-      role,
       from,
       until,
+      forUserId,
       sort = '',
     } = query;
 
@@ -28,9 +28,9 @@ export class NotificationPaginationOptionsDto extends PaginationOptions {
 
     return new NotificationPaginationOptionsDto(+page, +perPage, {
       id: +id,
-      role,
       from,
-      until
+      until,
+      forUserId: +forUserId,
     }, order);
   }
 }

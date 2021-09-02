@@ -25,6 +25,7 @@ export class NotificationsService {
     id,
     from,
     until,
+    forUserId,
   }, order}: NotificationPaginationOptionsDto, userId: number): Promise<PaginationResult<Notification>> {
     const user = await this.usersRepository.findOne(userId);
 
@@ -48,6 +49,8 @@ export class NotificationsService {
 
     if (user.role !== Role.ADMIN) {
       queryBuilder.andWhere('userToNotifications.userId = :userId', { userId });
+    } else if (forUserId) {
+      queryBuilder.andWhere('userToNotifications.userId = :userId', { userId: forUserId });
     }
 
     if (id) queryBuilder.andWhere('notification.id = :id', { id });
