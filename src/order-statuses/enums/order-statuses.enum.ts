@@ -6,4 +6,5 @@ export enum OrderStatuses {
   PRODUCTS_SENT = 'ors-005',
   SHIPPING_ERROR = 'ors-006',
   PRODUCTS_RECEIVED = 'ors-007',
+  WAITING_FOR_PICKUP_AT_STORE = 'ors-008',
 }

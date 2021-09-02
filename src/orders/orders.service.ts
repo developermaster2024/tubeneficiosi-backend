@@ -479,7 +479,22 @@ export class OrdersService {
       newOrderStatus: orderStatus,
     }));
 
-    order.orderStatus = orderStatus;
+    let finalStatus = orderStatus;
+
+    if (orderStatus.code === OrderStatuses.PAYMENT_ACCEPTED && !order.delivery) {
+      const newOrderStatus = await this.orderStatusesRepository.findOne({ code: OrderStatuses.WAITING_FOR_PICKUP_AT_STORE });
+
+      if (!newOrderStatus) throw new OrderStatusNotFoundException();
+
+      order.orderStatusHistory.push(OrderStatusHistory.create({
+        prevOrderStatus: orderStatus,
+        newOrderStatus,
+      }));
+
+      finalStatus = newOrderStatus;
+    }
+
+    order.orderStatus = finalStatus;
 
     if (orderStatus.requiresReason) {
       order.orderRejectionReason = OrderRejectionReason.create({ reason });
