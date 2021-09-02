@@ -1,7 +1,8 @@
 import { isAfter } from "date-fns";
+import { Order } from "src/orders/entities/order.entity";
 import { Store } from "src/stores/entities/store.entity";
 import { User } from "src/users/entities/user.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { CartItem } from "./cart-item.entity";
 
 @Entity({
@@ -56,6 +57,9 @@ export class Cart {
     type: 'datetime',
   })
   expiresOn: Date;
+
+  @OneToOne(() => Order, order => order.cart)
+  order: Order;
 
   @CreateDateColumn({
     name: 'created_at',

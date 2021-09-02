@@ -124,11 +124,14 @@ export class Order {
   deletedAt: Date;
 
   get total(): number {
+    // @TODO: Guardar total en BD
+    const subTotal = this?.cart?.subTotal ?? 0;
+
     if (this.delivery) {
-      return this.cart.subTotal + Number(this.delivery.total);
+      return subTotal + Number(this.delivery.total);
     }
 
-    return this.cart.subTotal;
+    return subTotal;
   }
 
   static create(data: Partial<Order>): Order {

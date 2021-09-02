@@ -1,6 +1,7 @@
 import { Exclude, Expose, plainToClass, Transform, Type } from "class-transformer";
 import { format } from "date-fns";
 import { ReadClientDto } from "src/clients/dto/read-client.dto";
+import { ReadOrderDto } from "src/orders/dto/read-order.dto";
 import { ReadStoreDto } from "src/stores/dto/read-store.dto";
 import { User } from "src/users/entities/user.entity";
 import { ReadCartItemDto } from "./read-cart-item.dto";
@@ -44,4 +45,8 @@ export class ReadCartDto {
   @Expose()
   @Type(() => ReadClientDto)
   readonly user: ReadClientDto;
+
+  @Expose()
+  @Type(() => ReadOrderDto)
+  readonly order: ReadOrderDto;
 }
