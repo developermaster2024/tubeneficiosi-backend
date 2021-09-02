@@ -4,6 +4,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { parse } from 'date-fns';
 import { Client } from 'src/clients/entities/client.entity';
 import { MailService } from 'src/mail/mail.service';
+import { Notification } from 'src/notifications/entities/notification.entity';
+import { UserToNotification } from 'src/notifications/entities/user-to-notification.entity';
+import { NotificationTypes } from 'src/notifications/enums/notification-types.enum';
+import { NotificationsGateway } from 'src/notifications/notifications.gateway';
 import { StoreHour } from 'src/store-hours/entities/store-hour.entity';
 import { Store } from 'src/stores/entities/store.entity';
 import { HashingService } from 'src/support/hashing.service';
@@ -28,9 +32,11 @@ export class AuthService {
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     @InjectRepository(StoreHour) private readonly storeHourRepository: Repository<StoreHour>,
     @InjectRepository(PasswordReset) private readonly passwordResetsRepository: Repository<PasswordReset>,
+    @InjectRepository(Notification) private readonly notificationsRepository: Repository<Notification>,
     private readonly jwtService: JwtService,
     private readonly hashingService: HashingService,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
+    private readonly notificationsGateway: NotificationsGateway
   ) {}
 
   async validateUser(email: string, password: string, role: Role): Promise<Partial<User>> {
@@ -75,10 +81,25 @@ export class AuthService {
 
     const {password, ...userWithoutPassword} = user;
 
+    const userToNotifications = (await this.getAdmins()).map(admin => UserToNotification.create({ userId: admin.id }));
+
+    const notification = await this.notificationsRepository.save(Notification.create({
+      message: 'Nuevo cliente registrado',
+      type: NotificationTypes.REGISTERED_CUSTOMER,
+      additionalData: { clientId: user.id },
+      userToNotifications,
+    }));
+
+    this.notificationsGateway.notifyUsersById(userToNotifications.map(utn => utn.userId), notification.toDto());
+
     return {
       user,
       accessToken: this.jwtService.sign({...userWithoutPassword}),
     };
+  }
+
+  async getAdmins(): Promise<User[]> {
+    return await this.usersRepository.find({ role: Role.ADMIN });
   }
 
   async registerStore({email, password, latitude, longitude, ...storeData}: RegisterStoreDto): Promise<RegisterResponse> {
@@ -109,6 +130,17 @@ export class AuthService {
     await this.storeHourRepository.save(storeHours);
 
     const {password: hashedPassword, ...userWithoutPassword} = user;
+
+    const userToNotifications = (await this.getAdmins()).map(admin => UserToNotification.create({ userId: admin.id }));
+
+    const notification = await this.notificationsRepository.save(Notification.create({
+      message: 'Nueva tienda registrada',
+      type: NotificationTypes.REGISTERED_STORE,
+      additionalData: { storeId: user.store.id },
+      userToNotifications,
+    }));
+
+    this.notificationsGateway.notifyUsersById(userToNotifications.map(utn => utn.userId), notification.toDto());
 
     return {
       user,
