@@ -268,19 +268,19 @@ export class OrdersService {
 
     const admins = await this.usersRepository.find({ role: Role.ADMIN });
 
+    const userToNotifications = [
+      UserToNotification.create({ userId: cart.store.user.id }),
+      ...admins.map((user) => UserToNotification.create({ user })),
+    ]
+
     const notification = await this.notificationsRepository.save(Notification.create({
-      message: '¡Orden creada!',
+      message: orderStatus.notificationMessage,
       type: NotificationTypes.ORDER_CREATED,
       additionalData: { orderId: savedOrder.id, color: orderStatus.color },
-      userToNotifications: [
-        UserToNotification.create({ userId: cart.store.user.id }),
-        ...admins.map((user) => UserToNotification.create({ user })),
-      ],
+      userToNotifications,
     }));
 
-    this.notificationsGateway.notifyUsersById([cart.store.user.id], notification.toDto());
-
-    this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification.toDto());
+    this.notificationsGateway.notifyUsersById(userToNotifications.map(utn => utn.user?.id ?? userId), notification.toDto());
 
     return savedOrder;
   }
@@ -382,24 +382,18 @@ export class OrdersService {
       throw new OrderStatusIsAlreadyInHistoryException();
     }
 
+    const userToNotifications: UserToNotification[] = [];
+
     switch(orderStatusCode) {
       case OrderStatuses.PAYMENT_ACCEPTED:
       case OrderStatuses.PAYMENT_REJECTED: {
         if (order.orderStatus.code !== OrderStatuses.CONFIRMING_PAYMENT) throw new IncorrectOrderStatusException();
         if (user.role !== Role.ADMIN) throw new UserMustBeAdminException();
-        const userToNotifications = [
-          UserToNotification.create({ user: order.user }),
-          UserToNotification.create({ user: order.store.user }),
-        ];
 
-        const notification = await this.notificationsRepository.save(Notification.create({
-          message: `¡Estatus de Orden cambiado a ${orderStatus.name}`,
-          type: NotificationTypes.ORDER_STATUS_CHANGE,
-          additionalData: { orderId: order.id, color: orderStatus.color },
-          userToNotifications,
-        }));
-
-        this.notificationsGateway.notifyUsersById(userToNotifications.map(ustn => ustn.user.id), notification);
+        userToNotifications.push(...[
+          UserToNotification.create({ userId: order.user.id }),
+          UserToNotification.create({ userId: order.store.user.id }),
+        ]);
         break;
       }
       case OrderStatuses.SENDING_PRODUCTS: {
@@ -408,20 +402,10 @@ export class OrdersService {
 
         const admins = await this.usersRepository.find({ role: Role.ADMIN });
 
-        const userToNotifications = [
-          UserToNotification.create({ user: order.user }),
-          ...admins.map(user => UserToNotification.create({ user })),
-        ];
-
-        const notification = await this.notificationsRepository.save(Notification.create({
-          message: `¡Estatus de Orden cambiado a ${orderStatus.name}`,
-          type: NotificationTypes.ORDER_STATUS_CHANGE,
-          additionalData: { orderId: order.id, color: orderStatus.color },
-          userToNotifications,
-        }));
-
-        this.notificationsGateway.notifyUsersById([order.user.id], notification.toDto());
-        this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification.toDto());
+        userToNotifications.push(...[
+          UserToNotification.create({ userId: order.user.id }),
+          ...admins.map(user => UserToNotification.create({ userId: user.id })),
+        ]);
         break;
       }
       case OrderStatuses.PRODUCTS_SENT:
@@ -430,20 +414,10 @@ export class OrdersService {
         if (order.store.user.id !== userId) throw new UserMustBeTheStoreThatOwnsTheProduct();
         const admins = await this.usersRepository.find({ role: Role.ADMIN });
 
-        const userToNotifications = [
-          UserToNotification.create({ user: order.store.user }),
-          ...admins.map(user => UserToNotification.create({ user })),
-        ];
-
-        const notification = await this.notificationsRepository.save(Notification.create({
-          message: `¡Estatus de Orden cambiado a ${orderStatus.name}`,
-          type: NotificationTypes.ORDER_STATUS_CHANGE,
-          additionalData: { orderId: order.id, color: orderStatus.color },
-          userToNotifications,
-        }));
-
-        this.notificationsGateway.notifyUsersById([order.user.id], notification.toDto());
-        this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification.toDto());
+        userToNotifications.push(...[
+          UserToNotification.create({ userId: order.store.user.id }),
+          ...admins.map(user => UserToNotification.create({ userId: user.id })),
+        ]);
         break;
       }
       case OrderStatuses.PRODUCTS_RECEIVED: {
@@ -451,20 +425,10 @@ export class OrdersService {
         if (order.user.id !== userId) throw new UserMustBeTheBuyer();
         const admins = await this.usersRepository.find({ role: Role.ADMIN });
 
-        const userToNotifications = [
-          UserToNotification.create({ user: order.store.user }),
-          ...admins.map(user => UserToNotification.create({ user })),
-        ];
-
-        const notification = await this.notificationsRepository.save(Notification.create({
-          message: `¡Estatus de Orden cambiado a ${orderStatus.name}`,
-          type: NotificationTypes.ORDER_STATUS_CHANGE,
-          additionalData: { orderId: order.id, color: orderStatus.color },
-          userToNotifications,
-        }));
-
-        this.notificationsGateway.notifyUsersById([order.store.user.id], notification.toDto());
-        this.notificationsGateway.notifyUsersByRole([Role.ADMIN], notification.toDto());
+        userToNotifications.push(...[
+          UserToNotification.create({ userId: order.store.user.id }),
+          ...admins.map(user => UserToNotification.create({ userId: user.id })),
+        ]);
         break;
       }
       default:
@@ -496,6 +460,15 @@ export class OrdersService {
     if (orderStatus.requiresReason) {
       order.orderRejectionReason = OrderRejectionReason.create({ reason });
     }
+
+    const notification = await this.notificationsRepository.save(Notification.create({
+      message: finalStatus.notificationMessage.replace('[order_number]', order.orderNumber),
+      type: NotificationTypes.ORDER_STATUS_CHANGE,
+      additionalData: { orderId: order.id, color: finalStatus.color },
+      userToNotifications,
+    }));
+
+    this.notificationsGateway.notifyUsersById(userToNotifications.map(utn => utn.userId), notification.toDto());
 
     return await this.ordersRepository.save(order);
   }
