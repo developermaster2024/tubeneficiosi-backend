@@ -1,5 +1,6 @@
 import { plainToClass } from "class-transformer";
-import { Role } from "src/users/enums/roles.enum";
+import { formatDistance } from "date-fns";
+import { es } from "date-fns/locale";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { ReadNotificationDto } from "../dto/read-notification.dto";
 import { NotificationTypes } from "../enums/notification-types.enum";
@@ -62,6 +63,11 @@ export class Notification {
   deletedAt: Date;
 
   userToNotification: UserToNotification;
+
+  get distanceInWords(): string {
+    console.log(this.createdAt)
+    return formatDistance(this.createdAt, new Date(), { addSuffix: true, locale: es });
+  }
 
   toDto(): ReadNotificationDto {
     return plainToClass(ReadNotificationDto, this);

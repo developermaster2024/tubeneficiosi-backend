@@ -23,4 +23,7 @@ export class ReadNotificationDto {
   @Expose()
   @Transform(({value}) => format(value, 'yyyy-MM-dd HH:mm:ss'))
   readonly createdAt: Date;
+
+  @Expose()
+  readonly distanceInWords: string;
 }
