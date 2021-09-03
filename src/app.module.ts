@@ -43,6 +43,7 @@ import { CardIssuerTypesModule } from './card-issuer-types/card-issuer-types.mod
 import { BankAccountPurposesModule } from './bank-account-purposes/bank-account-purposes.module';
 import { OrdersModule } from './orders/orders.module';
 import { DeliveryNotesModule } from './delivery-notes/delivery-notes.module';
+import { DiscountTypesModule } from './discount-types/discount-types.module';
 
 @Module({
   imports: [
@@ -92,6 +93,7 @@ import { DeliveryNotesModule } from './delivery-notes/delivery-notes.module';
     BankAccountPurposesModule,
     OrdersModule,
     DeliveryNotesModule,
+    DiscountTypesModule,
   ],
 })
 export class AppModule {}
