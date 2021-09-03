@@ -44,6 +44,7 @@ import { BankAccountPurposesModule } from './bank-account-purposes/bank-account-
 import { OrdersModule } from './orders/orders.module';
 import { DeliveryNotesModule } from './delivery-notes/delivery-notes.module';
 import { DiscountTypesModule } from './discount-types/discount-types.module';
+import { DiscountsModule } from './discounts/discounts.module';
 
 @Module({
   imports: [
@@ -94,6 +95,7 @@ import { DiscountTypesModule } from './discount-types/discount-types.module';
     OrdersModule,
     DeliveryNotesModule,
     DiscountTypesModule,
+    DiscountsModule,
   ],
 })
 export class AppModule {}
