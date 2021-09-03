@@ -4,6 +4,7 @@ type CardFilters = {
   id: string;
   name: string;
   cardIssuerId: number;
+  cardIssuerName: string;
   cardTypeId: number;
 };
 
@@ -19,6 +20,7 @@ export class CardPaginationOptionsDto extends PaginationOptions {
       id,
       name,
       cardIssuerId,
+      cardIssuerName,
       cardTypeId,
     } = query;
 
@@ -26,6 +28,7 @@ export class CardPaginationOptionsDto extends PaginationOptions {
       id,
       name,
       cardIssuerId: Number(cardIssuerId),
+      cardIssuerName,
       cardTypeId: Number(cardTypeId),
     });
   }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
-import { FindConditions, Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CardPaginationOptionsDto } from './dto/card-pagination-options.dto';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
@@ -12,24 +12,30 @@ import { CardNotFoundException } from './errors/card-not-found.exception';
 export class CardsService {
   constructor(@InjectRepository(Card) private readonly cardsRepository: Repository<Card>) {}
 
-  async paginate({perPage, offset, filters}: CardPaginationOptionsDto): Promise<PaginationResult<Card>> {
-    const where: FindConditions<Card> = {};
+  async paginate({perPage, offset, filters: {
+    id,
+    name,
+    cardIssuerId,
+    cardIssuerName,
+    cardTypeId,
+  }}: CardPaginationOptionsDto): Promise<PaginationResult<Card>> {
+    const queryBuilder = this.cardsRepository.createQueryBuilder('card')
+      .take(perPage)
+      .skip(offset)
+      .innerJoinAndSelect('card.cardIssuer', 'cardIssuer')
+      .innerJoinAndSelect('card.cardType', 'cardType');
 
-    // @ts-ignore
-    if (filters.id) where.id = +filters.id;
+    if (id) queryBuilder.andWhere('card.id = :id', { id });
 
-    if (filters.name) where.name = Like(`%${filters.name}%`);
+    if (name) queryBuilder.andWhere('card.name LIKE :name', { name: `%${name}%` });
 
-    if (filters.cardIssuerId) where.cardIssuerId = filters.cardIssuerId;
+    if (cardIssuerId) queryBuilder.andWhere('card.cardIssuerId = :cardIssuerId', { cardIssuerId });
 
-    if (filters.cardTypeId) where.cardTypeId = filters.cardTypeId;
+    if (cardTypeId) queryBuilder.andWhere('card.cardTypeId = :cardTypeId', { cardTypeId });
 
-    const [cards, total] = await this.cardsRepository.findAndCount({
-      take: perPage,
-      skip: offset,
-      where,
-      relations: ['cardIssuer', 'cardType'],
-    });
+    if (cardIssuerName) queryBuilder.andWhere('cardIssuer.name LIKE :cardIssuerName', { cardIssuerName: `%${cardIssuerName}%` });
+
+    const [cards, total] = await queryBuilder.getManyAndCount();
 
     return new PaginationResult(cards, total, perPage);
   }
