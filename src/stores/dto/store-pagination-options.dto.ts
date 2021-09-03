@@ -6,7 +6,7 @@ type StoreFilters = {
   email: string;
   status: string;
   phoneNumber: string;
-  storeCategoryId: string;
+  storeCategoryIds: number[];
   userStatusCode: string;
   withCheapestProduct: boolean;
 };
@@ -25,7 +25,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       email,
       status,
       phoneNumber,
-      storeCategoryId,
+      storeCategoryIds = '',
       userStatusCode,
       withCheapestProduct,
     } = query;
@@ -36,7 +36,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       email,
       status,
       phoneNumber,
-      storeCategoryId,
+      storeCategoryIds: storeCategoryIds.split(',').filter(id => id).map(id => Number(id)),
       userStatusCode,
       withCheapestProduct: withCheapestProduct === 'true',
     });

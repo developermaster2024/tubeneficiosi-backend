@@ -21,7 +21,15 @@ export class StoresService {
     private readonly hashingService: HashingService
   ) {}
 
-  async paginate({offset, perPage, filters}: StorePaginationOptionsDto): Promise<PaginationResult<User>> {
+  async paginate({offset, perPage, filters: {
+    id,
+    userStatusCode,
+    email,
+    name,
+    storeCategoryIds,
+    phoneNumber,
+    withCheapestProduct,
+  }}: StorePaginationOptionsDto): Promise<PaginationResult<User>> {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.userStatus', 'userStatus')
       .innerJoinAndSelect('user.store', 'store')
@@ -31,19 +39,19 @@ export class StoresService {
       .take(perPage)
       .skip(offset);
 
-    if (filters.id) queryBuilder.andWhere('store.id = :id', {id: filters.id});
+    if (id) queryBuilder.andWhere('store.id = :id', { id });
 
-    if (filters.userStatusCode) queryBuilder.andWhere('user.userStatusCode = :userStatusCode', {userStatusCode: filters.userStatusCode});
+    if (userStatusCode) queryBuilder.andWhere('user.userStatusCode = :userStatusCode', { userStatusCode });
 
-    if (filters.email) queryBuilder.andWhere('user.email LIKE :email', {email: `%${filters.email}%`});
+    if (email) queryBuilder.andWhere('user.email LIKE :email', {email: `%${email}%`});
 
-    if (filters.name) queryBuilder.andWhere('store.name LIKE :name', {name: `%${filters.name}%`});
+    if (name) queryBuilder.andWhere('store.name LIKE :name', {name: `%${name}%`});
 
-    if (filters.storeCategoryId) queryBuilder.andWhere('store.storeCategoryId = :storeCategoryId', {storeCategoryId: filters.storeCategoryId});
+    if (storeCategoryIds.length > 0) queryBuilder.andWhere('store.storeCategoryId In (:...storeCategoryIds)', { storeCategoryIds });
 
-    if (filters.phoneNumber) queryBuilder.andWhere('store.phoneNumber LIKE :phoneNumber', {phoneNumber: `%${filters.phoneNumber}%`});
+    if (phoneNumber) queryBuilder.andWhere('store.phoneNumber LIKE :phoneNumber', {phoneNumber: `%${phoneNumber}%`});
 
-    if (filters.withCheapestProduct) {
+    if (withCheapestProduct) {
       queryBuilder.leftJoinAndMapOne(
         'store.cheapestProduct',
         'store.products',
