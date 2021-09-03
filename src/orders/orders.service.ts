@@ -39,6 +39,7 @@ import { Notification } from 'src/notifications/entities/notification.entity';
 import { NotificationTypes } from 'src/notifications/enums/notification-types.enum';
 import { UserToNotification } from 'src/notifications/entities/user-to-notification.entity';
 import { StoreIsClosedException } from './errors/store-is-closed.exception';
+import { OrdersCountDto } from './dto/orders-count.dto';
 
 @Injectable()
 export class OrdersService {
@@ -471,5 +472,55 @@ export class OrdersService {
     this.notificationsGateway.notifyUsersById(userToNotifications.map(utn => utn.userId), notification.toDto());
 
     return await this.ordersRepository.save(order);
+  }
+
+  async ordersCount(userId: number): Promise<OrdersCountDto> {
+    const user = await this.usersRepository.findOne(userId);
+
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    const queryBuilder = this.ordersRepository.createQueryBuilder('order')
+      .innerJoin('order.store', 'store')
+      .innerJoin('order.orderStatus', 'orderStatus');
+
+    if (user.role === Role.CLIENT) {
+      queryBuilder.andWhere('order.userId = :userId', { userId });
+    } else if (user.role === Role.STORE) {
+      queryBuilder.andWhere('store.userId = :userId', { userId });
+    }
+
+    const processing = await queryBuilder
+      .clone()
+      .andWhere('orderStatus.code IN (:...code)', { code: [
+        OrderStatuses.CONFIRMING_PAYMENT,
+        OrderStatuses.PAYMENT_ACCEPTED,
+        OrderStatuses.SENDING_PRODUCTS,
+        OrderStatuses.PRODUCTS_SENT,
+        OrderStatuses.WAITING_FOR_PICKUP_AT_STORE,
+      ]})
+      .getCount();
+
+    const completed = await queryBuilder
+      .clone()
+      .andWhere('orderStatus.code IN (:...code)', { code: [
+        OrderStatuses.PRODUCTS_RECEIVED,
+      ]})
+      .getCount();
+
+    const canceled = await queryBuilder
+      .clone()
+      .andWhere('orderStatus.code IN (:...code)', { code: [
+        OrderStatuses.PAYMENT_REJECTED,
+        OrderStatuses.SHIPPING_ERROR,
+      ]})
+      .getCount();
+
+    return {
+      processing,
+      completed,
+      canceled,
+    };
   }
 }

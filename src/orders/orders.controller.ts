@@ -8,6 +8,7 @@ import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { OrdersCountDto } from './dto/orders-count.dto';
 import { ReadOrderDto } from './dto/read-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { OrdersService } from './orders.service';
@@ -36,7 +37,7 @@ export class OrdersController {
     return plainToClass(ReadOrderDto, await this.ordersService.create(createOrderDto));
   }
 
-  @Get(':id')
+  @Get(':id(\\d+)')
   @Roles(Role.CLIENT, Role.STORE, Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor())
@@ -53,5 +54,13 @@ export class OrdersController {
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ id: 'id' }))
   async updateStatus(@Body() updateOrderStatusDto: UpdateOrderStatusDto): Promise<ReadOrderDto> {
     return plainToClass(ReadOrderDto, await this.ordersService.updateOrderStatus(updateOrderStatusDto));
+  }
+
+  @Get('orders-count')
+  @Roles(Role.ADMIN, Role.STORE, Role.CLIENT)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async ordersCount(@Body('userId') userId: number): Promise<OrdersCountDto> {
+    return await this.ordersService.ordersCount(userId);
   }
 }
