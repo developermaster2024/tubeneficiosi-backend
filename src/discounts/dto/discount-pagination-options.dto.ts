@@ -9,6 +9,9 @@ type DiscountFilters = {
   minValue: number;
   maxValue: number;
   isActive: boolean|null;
+  minDate: string;
+  maxDate: string;
+  name: string;
 };
 
 export class DiscountPaginationOptionsDto extends PaginationOptions {
@@ -27,6 +30,9 @@ export class DiscountPaginationOptionsDto extends PaginationOptions {
       minValue,
       maxValue,
       isActive,
+      minDate,
+      maxDate,
+      name,
     } = query;
 
     return new DiscountPaginationOptionsDto(+page, +perPage, {
@@ -37,6 +43,9 @@ export class DiscountPaginationOptionsDto extends PaginationOptions {
       minValue: +minValue,
       maxValue: +maxValue,
       isActive: queryStringToBoolean(isActive),
+      minDate,
+      maxDate,
+      name,
     });
   }
 }

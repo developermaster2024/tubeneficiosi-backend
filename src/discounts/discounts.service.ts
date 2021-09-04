@@ -28,6 +28,9 @@ export class DiscountsService {
     minValue,
     maxValue,
     isActive,
+    minDate,
+    maxDate,
+    name,
   }}: DiscountPaginationOptionsDto): Promise<PaginationResult<Discount>> {
     const queryBuilder = this.discountsRepository.createQueryBuilder('discount')
       .innerJoin('discount.store', 'store')
@@ -55,6 +58,12 @@ export class DiscountsService {
 
       queryBuilder.andWhere(condition, { today: new Date() });
     }
+
+    if (minDate) queryBuilder.andWhere('discount.from >= :minDate', { minDate });
+
+    if (maxDate) queryBuilder.andWhere('discount.until <= :maxDate', { maxDate });
+
+    if (name) queryBuilder.andWhere('discount.name LIKE :name', { name: `%${name}%` });
 
     const [discounts, total] = await queryBuilder.getManyAndCount();
 
