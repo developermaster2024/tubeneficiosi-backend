@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { CreateDiscountDto } from './dto/create-discount.dto';
 import { DiscountPaginationOptionsDto } from './dto/discount-pagination-options.dto';
 import { Discount } from './entities/discount.entity';
+import { DiscountNotFoundException } from './errors/discount-not-found.exception';
 
 @Injectable()
 export class DiscountsService {
@@ -85,5 +86,19 @@ export class DiscountsService {
     });
 
     return await this.discountsRepository.save(discount);
+  }
+
+  async delete(id: number, userId: number): Promise<void> {
+    const discount = await this.discountsRepository.createQueryBuilder('discount')
+      .innerJoin('discount.store', 'store')
+      .where('discount.id = :id', { id })
+      .andWhere('store.userId = :userId', { userId })
+      .getOne();
+
+    if (!discount) {
+      throw new DiscountNotFoundException();
+    }
+
+    await this.discountsRepository.softRemove(discount);
   }
 }

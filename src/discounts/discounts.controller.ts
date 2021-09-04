@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
@@ -28,5 +28,16 @@ export class DiscountsController {
   @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'), new JwtUserToBodyInterceptor())
   async create(@Body() createDiscountDto: CreateDiscountDto): Promise<ReadDiscountDto> {
     return plainToClass(ReadDiscountDto, await this.discountsService.create(createDiscountDto));
+  }
+
+  @Delete(':id')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async delete(
+    @Param('id') id: string,
+    @Body('userId') userId: number
+  ): Promise<void> {
+    await this.discountsService.delete(+id, userId);
   }
 }
