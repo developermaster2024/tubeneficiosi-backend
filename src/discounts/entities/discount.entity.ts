@@ -72,7 +72,7 @@ export class Discount {
   @JoinColumn({ name: 'store_id' })
   store: Store;
 
-  @ManyToMany(() => Card, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToMany(() => Card, { nullable: false, onDelete: 'CASCADE', cascade: ['insert', 'update'] })
   @JoinTable({
     name: 'discount_to_card',
     joinColumn: { name: 'discount_id' },
@@ -80,7 +80,7 @@ export class Discount {
   })
   cards: Card[];
 
-  @ManyToMany(() => CardIssuer, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToMany(() => CardIssuer, { nullable: false, onDelete: 'CASCADE', cascade: ['insert', 'update'] })
   @JoinTable({
     name: 'discount_to_card_issuer',
     joinColumn: { name: 'discount_id' },

@@ -4,8 +4,10 @@ import { CardIssuer } from 'src/card-issuers/entities/card-issuer.entity';
 import { Card } from 'src/cards/entities/card.entity';
 import { Store } from 'src/stores/entities/store.entity';
 import { StoreNotFoundException } from 'src/stores/erros/store-not-found.exception';
+import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Repository } from 'typeorm';
 import { CreateDiscountDto } from './dto/create-discount.dto';
+import { DiscountPaginationOptionsDto } from './dto/discount-pagination-options.dto';
 import { Discount } from './entities/discount.entity';
 
 @Injectable()
@@ -16,6 +18,47 @@ export class DiscountsService {
     @InjectRepository(CardIssuer) private readonly cardIssuerRepository: Repository<CardIssuer>,
     @InjectRepository(Store) private readonly storesRepository: Repository<Store>
   ) {}
+
+  async paginate({perPage, offset, filters: {
+    id,
+    storeIds,
+    cardIssuerIds,
+    cardIds,
+    minValue,
+    maxValue,
+    isActive,
+  }}: DiscountPaginationOptionsDto): Promise<PaginationResult<Discount>> {
+    const queryBuilder = this.discountsRepository.createQueryBuilder('discount')
+      .innerJoin('discount.store', 'store')
+      .leftJoin('discount.cardIssuers', 'cardIssuer')
+      .leftJoin('discount.cards', 'card')
+      .take(perPage)
+      .skip(offset);
+
+    if (id) queryBuilder.andWhere('discount.id = :id', { id });
+
+    if (storeIds.length > 0) queryBuilder.andWhere('store.id In (:...storeIds)', { storeIds });
+
+    if (cardIssuerIds.length > 0) queryBuilder.andWhere('cardIssuer.id In (:...cardIssuerIds)', { cardIssuerIds });
+
+    if (cardIds.length > 0) queryBuilder.andWhere('card.id In (:...cardIds)', { cardIds });
+
+    if (minValue) queryBuilder.andWhere('discount.value >= :minValue', { minValue });
+
+    if (maxValue) queryBuilder.andWhere('discount.value <= :maxValue', { maxValue });
+
+    if (isActive !== null) {
+      const condition = isActive
+        ? 'discount.from <= :today AND discount.until >= :today'
+        : 'discount.from >= :today OR discount.until <= :today';
+
+      queryBuilder.andWhere(condition, { today: new Date() });
+    }
+
+    const [discounts, total] = await queryBuilder.getManyAndCount();
+
+    return new PaginationResult(discounts, total, perPage);
+  }
 
   async create({cardIds, cardIssuerIds, userId, image, ...createDiscountDto}: CreateDiscountDto): Promise<Discount> {
     const store = await this.storesRepository.createQueryBuilder('store')
