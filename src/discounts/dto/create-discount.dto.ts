@@ -48,12 +48,12 @@ export class CreateDiscountDto {
   readonly discountTypeCode: DiscountTypes;
 
   @Expose()
-  @ValidateIf(({value}) => value)
+  @ValidateIf((obj) => obj.discountTypeCode === DiscountTypes.CARDS)
   @IsArray()
   readonly cardIds: number[];
 
   @Expose()
-  @ValidateIf(({value}) => value)
+  @ValidateIf((obj) => obj.discountTypeCode === DiscountTypes.BANK)
   @IsArray()
   readonly cardIssuerIds: number[];
 }
