@@ -8,6 +8,7 @@ import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Repository } from 'typeorm';
 import { CreateDiscountDto } from './dto/create-discount.dto';
 import { DiscountPaginationOptionsDto } from './dto/discount-pagination-options.dto';
+import { UpdateDiscountDto } from './dto/update-discount.dto';
 import { Discount } from './entities/discount.entity';
 import { DiscountNotFoundException } from './errors/discount-not-found.exception';
 
@@ -93,6 +94,52 @@ export class DiscountsService {
       cards,
       cardIssuers,
     });
+
+    return await this.discountsRepository.save(discount);
+  }
+
+  async findOne(id: number): Promise<Discount> {
+    const discount = await this.discountsRepository.createQueryBuilder('discount')
+      .leftJoinAndSelect('discount.cardIssuers', 'cardIssuer')
+      .leftJoinAndSelect('discount.cards', 'card')
+      .where('discount.id = :id', { id })
+      .getOne();
+
+    if (!discount) {
+      throw new DiscountNotFoundException();
+    }
+
+    return discount;
+  }
+
+  async update({id, cardIds, cardIssuerIds, userId, image, ...updateDiscountDto}: UpdateDiscountDto): Promise<Discount> {
+    const discount = await this.discountsRepository.createQueryBuilder('discount')
+      .innerJoin('discount.store', 'store')
+      .leftJoinAndSelect('discount.cardIssuers', 'cardIssuer')
+      .leftJoinAndSelect('discount.cards', 'card')
+      .where('discount.id = :id', { id })
+      .andWhere('store.userId = :userId', { userId })
+      .getOne();
+
+    if (!discount) throw new DiscountNotFoundException();
+
+    const cards = await this.cardsRepository.createQueryBuilder('card')
+      .where('card.id IN (:...cardIds)', { cardIds })
+      .getMany();
+
+    const cardIssuers = await this.cardIssuerRepository.createQueryBuilder('cardIssuer')
+      .where('cardIssuer.id IN (:...cardIssuerIds)', { cardIssuerIds })
+      .getMany();
+
+    Object.assign(discount, {
+      ...updateDiscountDto,
+      cards,
+      cardIssuers,
+    });
+
+    if (image) {
+      discount.imgPath = image.path;
+    }
 
     return await this.discountsRepository.save(discount);
   }
