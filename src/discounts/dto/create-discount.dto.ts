@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { IsArray, IsDate, IsNotEmpty, IsNumber, Max, MaxLength, Min } from "class-validator";
+import { IsArray, IsDate, IsNotEmpty, IsNumber, Max, MaxLength, Min, ValidateIf } from "class-validator";
 import { DiscountType } from "src/discount-types/entities/discount-type.entity";
 import { DiscountTypes } from "src/discount-types/enums/discount-types.enum";
 import { DateAfterField } from "src/validation/date-after-field.constrain";
@@ -48,10 +48,12 @@ export class CreateDiscountDto {
   readonly discountTypeCode: DiscountTypes;
 
   @Expose()
+  @ValidateIf(({value}) => value)
   @IsArray()
   readonly cardIds: number[];
 
   @Expose()
+  @ValidateIf(({value}) => value)
   @IsArray()
   readonly cardIssuerIds: number[];
 }
