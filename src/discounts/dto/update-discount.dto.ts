@@ -5,7 +5,14 @@ import { IsMimeType } from "src/validation/mime-type.constrain";
 import { CreateDiscountDto } from "./create-discount.dto";
 
 @Exclude()
-export class UpdateDiscountDto extends OmitType(CreateDiscountDto, [] as const) {
+export class UpdateDiscountDto extends OmitType(CreateDiscountDto, [
+  'value',
+  'cardIds',
+  'cardIssuerIds',
+  'discountTypeCode',
+  'until',
+  'from',
+] as const) {
   @Expose()
   @Type(() => Number)
   readonly id: number;

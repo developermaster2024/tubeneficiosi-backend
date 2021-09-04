@@ -112,7 +112,7 @@ export class DiscountsService {
     return discount;
   }
 
-  async update({id, cardIds, cardIssuerIds, userId, image, ...updateDiscountDto}: UpdateDiscountDto): Promise<Discount> {
+  async update({id, userId, image, ...updateDiscountDto}: UpdateDiscountDto): Promise<Discount> {
     const discount = await this.discountsRepository.createQueryBuilder('discount')
       .innerJoin('discount.store', 'store')
       .leftJoinAndSelect('discount.cardIssuers', 'cardIssuer')
@@ -123,19 +123,7 @@ export class DiscountsService {
 
     if (!discount) throw new DiscountNotFoundException();
 
-    const cards = await this.cardsRepository.createQueryBuilder('card')
-      .where('card.id IN (:...cardIds)', { cardIds })
-      .getMany();
-
-    const cardIssuers = await this.cardIssuerRepository.createQueryBuilder('cardIssuer')
-      .where('cardIssuer.id IN (:...cardIssuerIds)', { cardIssuerIds })
-      .getMany();
-
-    Object.assign(discount, {
-      ...updateDiscountDto,
-      cards,
-      cardIssuers,
-    });
+    Object.assign(discount, updateDiscountDto);
 
     if (image) {
       discount.imgPath = image.path;
