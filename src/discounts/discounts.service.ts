@@ -34,7 +34,9 @@ export class DiscountsService {
     name,
   }}: DiscountPaginationOptionsDto): Promise<PaginationResult<Discount>> {
     const queryBuilder = this.discountsRepository.createQueryBuilder('discount')
-      .innerJoin('discount.store', 'store')
+      .innerJoinAndSelect('discount.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .innerJoinAndSelect('store.storeHours', 'storeHour')
       .leftJoin('discount.cardIssuers', 'cardIssuer')
       .leftJoin('discount.cards', 'card')
       .take(perPage)
@@ -100,6 +102,9 @@ export class DiscountsService {
 
   async findOne(id: number): Promise<Discount> {
     const discount = await this.discountsRepository.createQueryBuilder('discount')
+      .innerJoinAndSelect('discount.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .innerJoinAndSelect('store.storeHours', 'storeHour')
       .leftJoinAndSelect('discount.cardIssuers', 'cardIssuer')
       .leftJoinAndSelect('discount.cards', 'card')
       .where('discount.id = :id', { id })

@@ -1,8 +1,10 @@
-import { Exclude, Expose, Transform, Type } from "class-transformer";
+import { Exclude, Expose, plainToClass, Transform, Type } from "class-transformer";
 import { format } from "date-fns";
 import { ReadCardIssuerDto } from "src/card-issuers/dto/read-card-issuer.dto";
 import { ReadCardDto } from "src/cards/dto/read-card.dto";
 import { DiscountType } from "src/discount-types/entities/discount-type.entity";
+import { ReadStoreDto } from "src/stores/dto/read-store.dto";
+import { User } from "src/users/entities/user.entity";
 
 @Exclude()
 export class ReadDiscountDto {
@@ -39,4 +41,8 @@ export class ReadDiscountDto {
   @Expose()
   @Type(() => ReadCardIssuerDto)
   readonly cardIssuers: ReadCardIssuerDto[];
+
+  @Expose()
+  @Transform(({obj}) => obj.store ? plainToClass(ReadStoreDto, User.create({store: obj.store})) : null)
+  readonly store: ReadStoreDto;
 }
