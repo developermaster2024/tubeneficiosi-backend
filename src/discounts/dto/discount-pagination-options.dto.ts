@@ -12,6 +12,7 @@ type DiscountFilters = {
   minDate: string;
   maxDate: string;
   name: string;
+  storeCategoryIds: number[];
 };
 
 export class DiscountPaginationOptionsDto extends PaginationOptions {
@@ -33,6 +34,7 @@ export class DiscountPaginationOptionsDto extends PaginationOptions {
       minDate,
       maxDate,
       name,
+      storeCategoryIds = '',
     } = query;
 
     return new DiscountPaginationOptionsDto(+page, +perPage, {
@@ -46,6 +48,7 @@ export class DiscountPaginationOptionsDto extends PaginationOptions {
       minDate,
       maxDate,
       name,
+      storeCategoryIds: storeCategoryIds.split(',').filter(id => id).map(id => Number(id)),
     });
   }
 }
