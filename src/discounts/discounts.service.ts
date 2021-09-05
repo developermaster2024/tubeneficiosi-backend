@@ -39,6 +39,8 @@ export class DiscountsService {
       .innerJoinAndSelect('store.storeHours', 'storeHour')
       .leftJoinAndSelect('discount.cardIssuers', 'cardIssuer')
       .leftJoinAndSelect('discount.cards', 'card')
+      .leftJoinAndSelect('card.cardIssuer', 'cardIssuerFromCard')
+      .leftJoinAndSelect('card.cardType', 'cardType')
       .leftJoinAndSelect('discount.discountType', 'discountType')
       .take(perPage)
       .skip(offset);
@@ -108,6 +110,8 @@ export class DiscountsService {
       .innerJoinAndSelect('store.storeHours', 'storeHour')
       .leftJoinAndSelect('discount.cardIssuers', 'cardIssuer')
       .leftJoinAndSelect('discount.cards', 'card')
+      .leftJoinAndSelect('card.cardIssuer', 'cardIssuerFromCard')
+      .leftJoinAndSelect('card.cardType', 'cardType')
       .leftJoinAndSelect('discount.discountType', 'discountType')
       .where('discount.id = :id', { id })
       .getOne();
