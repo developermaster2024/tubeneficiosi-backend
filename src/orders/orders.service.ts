@@ -210,8 +210,8 @@ export class OrdersService {
       }
 
       const deliveryMethod = await this.deliveryMethodsRepository.findOne({
-        select: ['id', 'deliveryMethodTypeCode'],
-        where: { id: deliveryMethodId },
+        select: ['id', 'deliveryMethodTypeCode', 'storeId'],
+        where: { id: deliveryMethodId, storeId: cart.store.id },
       });
 
       if (!deliveryMethod) {
