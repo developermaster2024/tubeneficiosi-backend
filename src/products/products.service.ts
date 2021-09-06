@@ -162,22 +162,26 @@ export class ProductsService {
   }
 
   async findOneById(id: number): Promise<Product> {
-    const product = await this.productsRepository.findOne({
-      where: { id },
-      relations: [
-        'brand',
-        'categories',
-        'productImages',
-        'productFeatures',
-        'productFeatureGroups',
-        'productFeatureGroups.productFeatureForGroups',
-        'store',
-        'store.storeProfile',
-        'store.storeHours',
-        'deliveryMethodTypes',
-        'productDimensions',
-      ],
-    });
+    const product = await this.productsRepository.createQueryBuilder('product')
+      .leftJoinAndSelect('product.brand', 'brand')
+      .leftJoinAndSelect('product.categories', 'category')
+      .leftJoinAndSelect('product.productImages', 'productImage')
+      .leftJoinAndSelect('product.productFeatures', 'productFeature')
+      .leftJoinAndSelect('product.productFeatureGroups', 'productFeatureGroup')
+      .leftJoinAndSelect('productFeatureGroups.productFeatureForGroups', 'productFeatureForGroup')
+      .leftJoinAndSelect('product.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('store.storeHours', 'storeHour')
+      .leftJoinAndMapOne(
+        'store.latestActiveDiscount',
+        'store.discounts',
+        'latestActiveDiscount',
+        'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
+      , { today: new Date() })
+      .leftJoinAndSelect('product.deliveryMethodTypes', 'deliveryMethodType')
+      .leftJoinAndSelect('product.productDimensions', 'productDimension')
+      .where('product.id = :id', { id })
+      .getOne();
 
     if (!product) {
       throw new ProductNotFoundException();
@@ -187,22 +191,26 @@ export class ProductsService {
   }
 
   async findOneBySlug(slug: string): Promise<Product> {
-    const product = await this.productsRepository.findOne({
-      where: { slug },
-      relations: [
-        'brand',
-        'categories',
-        'productImages',
-        'productFeatures',
-        'productFeatureGroups',
-        'productFeatureGroups.productFeatureForGroups',
-        'store',
-        'store.storeProfile',
-        'store.storeHours',
-        'deliveryMethodTypes',
-        'tags',
-      ],
-    });
+    const product = await this.productsRepository.createQueryBuilder('product')
+      .leftJoinAndSelect('product.brand', 'brand')
+      .leftJoinAndSelect('product.categories', 'category')
+      .leftJoinAndSelect('product.productImages', 'productImage')
+      .leftJoinAndSelect('product.productFeatures', 'productFeature')
+      .leftJoinAndSelect('product.productFeatureGroups', 'productFeatureGroup')
+      .leftJoinAndSelect('productFeatureGroups.productFeatureForGroups', 'productFeatureForGroup')
+      .leftJoinAndSelect('product.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('store.storeHours', 'storeHour')
+      .leftJoinAndMapOne(
+        'store.latestActiveDiscount',
+        'store.discounts',
+        'latestActiveDiscount',
+        'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
+      , { today: new Date() })
+      .leftJoinAndSelect('product.deliveryMethodTypes', 'deliveryMethodType')
+      .leftJoinAndSelect('product.tags', 'tag')
+      .where('product.slug = :slug', { slug })
+      .getOne();
 
     if (!product) {
       throw new ProductNotFoundException();
