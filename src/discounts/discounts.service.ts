@@ -5,7 +5,7 @@ import { Card } from 'src/cards/entities/card.entity';
 import { Store } from 'src/stores/entities/store.entity';
 import { StoreNotFoundException } from 'src/stores/erros/store-not-found.exception';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { CreateDiscountDto } from './dto/create-discount.dto';
 import { DiscountPaginationOptionsDto } from './dto/discount-pagination-options.dto';
 import { UpdateDiscountDto } from './dto/update-discount.dto';
@@ -33,6 +33,7 @@ export class DiscountsService {
     maxDate,
     name,
     storeCategoryIds,
+    discountTypeCode,
   }}: DiscountPaginationOptionsDto): Promise<PaginationResult<Discount>> {
     const queryBuilder = this.discountsRepository.createQueryBuilder('discount')
       .innerJoinAndSelect('discount.store', 'store')
@@ -50,7 +51,12 @@ export class DiscountsService {
 
     if (storeIds.length > 0) queryBuilder.andWhere('store.id In (:...storeIds)', { storeIds });
 
-    if (cardIssuerIds.length > 0) queryBuilder.andWhere('cardIssuer.id In (:...cardIssuerIds)', { cardIssuerIds });
+    if (cardIssuerIds.length > 0) queryBuilder
+      .andWhere(new Brackets(qb => {
+        qb
+          .andWhere('cardIssuer.id In (:...cardIssuerIds)', { cardIssuerIds })
+          .orWhere('cardIssuerFromCard.id IN (:...cardIssuerIds)', { cardIssuerIds });
+      }));
 
     if (cardIds.length > 0) queryBuilder.andWhere('card.id In (:...cardIds)', { cardIds });
 
@@ -73,6 +79,8 @@ export class DiscountsService {
     if (name) queryBuilder.andWhere('discount.name LIKE :name', { name: `%${name}%` });
 
     if (storeCategoryIds.length > 0) queryBuilder.andWhere('store.storeCategoryId IN (:...storeCategoryIds)', { storeCategoryIds });
+
+    if (discountTypeCode) queryBuilder.andWhere('discount.discountTypeCode = :discountTypeCode', { discountTypeCode });
 
     const [discounts, total] = await queryBuilder.getManyAndCount();
 
