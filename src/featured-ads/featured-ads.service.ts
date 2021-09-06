@@ -32,7 +32,13 @@ export class FeaturedAdsService {
       .leftJoinAndSelect('product.productImages', 'productImage')
       .leftJoinAndSelect('product.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
-      .leftJoinAndSelect('store.storeHours', 'storeHour');
+      .leftJoinAndSelect('store.storeHours', 'storeHour')
+      .leftJoinAndMapOne(
+        'store.latestActiveDiscount',
+        'store.discounts',
+        'latestActiveDiscount',
+        'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
+      , { today: new Date() });
 
     if (id) queryBuilder.andWhere('featuredAd.id = :id', { id });
 
