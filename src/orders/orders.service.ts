@@ -40,6 +40,7 @@ import { NotificationTypes } from 'src/notifications/enums/notification-types.en
 import { UserToNotification } from 'src/notifications/entities/user-to-notification.entity';
 import { StoreIsClosedException } from './errors/store-is-closed.exception';
 import { OrdersCountDto } from './dto/orders-count.dto';
+import { DeliveryMethodNotAllowedByProductException } from './errors/delivery-method-not-allowed-by-product.exception';
 
 @Injectable()
 export class OrdersService {
@@ -149,6 +150,7 @@ export class OrdersService {
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .leftJoinAndSelect('cartItem.product', 'product')
       .leftJoinAndSelect('product.productDimensions', 'productDimensions')
+      .leftJoinAndSelect('product.deliveryMethodTypes', 'deliveryMethodType')
       .where('cart.id = :cartId', { cartId })
       .andWhere('cart.userId = :userId', { userId })
       .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
@@ -215,6 +217,14 @@ export class OrdersService {
       if (!deliveryMethod) {
         throw new DeliveryMethodNotFoundException();
       }
+
+      cart.cartItems.forEach(({product}) => {
+        const productAllowsDeliveryMethodType = product.deliveryMethodTypes.map(dmt => dmt.code).includes(deliveryMethod.deliveryMethodTypeCode);
+
+        if (productAllowsDeliveryMethodType) {
+          throw new DeliveryMethodNotAllowedByProductException(product);
+        }
+      });
 
       order.delivery = Delivery.create({
         profileAddressId,
