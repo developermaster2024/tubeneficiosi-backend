@@ -36,6 +36,12 @@ export class StoresService {
       .innerJoinAndSelect('store.storeProfile', 'storeProfile')
       .innerJoinAndSelect('store.storeCategory', 'storeCategory')
       .leftJoinAndSelect('store.storeHours', 'storeHour')
+      .leftJoinAndMapOne(
+        'store.latestActiveDiscount',
+        'store.discounts',
+        'latestActiveDiscount',
+        'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
+      , { today: new Date() })
       .take(perPage)
       .skip(offset);
 
@@ -122,6 +128,12 @@ export class StoresService {
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .leftJoinAndSelect('store.storeCategory', 'storeCategory')
       .leftJoinAndSelect('store.storeHours', 'storeHour')
+      .leftJoinAndMapOne(
+        'store.latestActiveDiscount',
+        'store.discounts',
+        'latestActiveDiscount',
+        'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
+      , { today: new Date() })
       .where('store.id = :id', { id })
       .getOne();
 
@@ -139,6 +151,12 @@ export class StoresService {
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .leftJoinAndSelect('store.storeCategory', 'storeCategory')
       .leftJoinAndSelect('store.storeHours', 'storeHour')
+      .leftJoinAndMapOne(
+        'store.latestActiveDiscount',
+        'store.discounts',
+        'latestActiveDiscount',
+        'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
+      , { today: new Date() })
       .where('store.slug = :slug', { slug })
       .getOne();
 

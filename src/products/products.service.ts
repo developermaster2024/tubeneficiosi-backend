@@ -64,6 +64,12 @@ export class ProductsService {
       .leftJoinAndSelect('product.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .leftJoinAndSelect('store.storeHours', 'storeHour')
+      .leftJoinAndMapOne(
+        'store.latestActiveDiscount',
+        'store.discounts',
+        'latestActiveDiscount',
+        'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
+      , { today: new Date() })
       .leftJoin('product.tags', 'tag');
 
     if (tagsToSortBy.length > 0) {

@@ -1,3 +1,4 @@
+import { Discount } from "src/discounts/entities/discount.entity";
 import { Product } from "src/products/entities/product.entity";
 import { StoreCategory } from "src/store-categories/entities/store-category.entity";
 import { StoreHour } from "src/store-hours/entities/store-hour.entity";
@@ -99,7 +100,12 @@ export class Store {
   @OneToMany(() => StoreHour, storeHour => storeHour.store, {cascade: ['insert', 'update']})
   storeHours: StoreHour[];
 
+  @OneToMany(() => Discount, discount => discount.store)
+  discounts: Discount[];
+
   cheapestProduct: Product;
+
+  latestActiveDiscount: Discount;
 
   get isOpen(): boolean {
     return this.storeHours?.some(storeHour => storeHour.isActive);
