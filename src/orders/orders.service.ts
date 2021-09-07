@@ -239,7 +239,7 @@ export class OrdersService {
       });
     }
 
-    if (paymentMethodCode === PaymentMethods.BANK_TRANSFER || paymentMethodCode === PaymentMethods.CASH) {
+    if (paymentMethodCode === PaymentMethods.BANK_TRANSFER) {
       order.bankTransfers = bankTransfers.map(bankTransfer => BankTransfer.create(bankTransfer));
 
       const bankTransfersTotal = order.bankTransfers.reduce((total, transfer) => Number(total) + Number(transfer.amount), 0);

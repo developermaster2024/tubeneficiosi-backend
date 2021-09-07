@@ -33,7 +33,7 @@ export class CreateOrderDto {
   readonly paymentMethodCode: PaymentMethods;
 
   @Expose()
-  @ValidateIf((obj) => obj.paymentMethodCode === PaymentMethods.BANK_TRANSFER || obj.paymentMethodCode === PaymentMethods.CASH)
+  @ValidateIf((obj) => obj.paymentMethodCode === PaymentMethods.BANK_TRANSFER)
   @ArrayMinSize(1)
   @ValidateNested({each: true})
   readonly bankTransfers: CreateBankTransferDto[];
