@@ -8,6 +8,7 @@ type BankAccountFilters = {
   bankAccountTypeName: string;
   cbu: string;
   cardIssuerName: string;
+  cardIssuerIds: number[];
   branchOffice: string;
   paymentMethodCode: string;
 };
@@ -28,6 +29,7 @@ export class BankAccountPaginationOptionsDto extends PaginationOptions {
       bankAccountTypeName,
       cbu,
       cardIssuerName,
+      cardIssuerIds = '',
       branchOffice,
       paymentMethodCode,
     } = query;
@@ -40,6 +42,7 @@ export class BankAccountPaginationOptionsDto extends PaginationOptions {
       bankAccountTypeName,
       cbu,
       cardIssuerName,
+      cardIssuerIds: cardIssuerIds.split(',').filter(id => id).map(id => Number(id)),
       branchOffice,
       paymentMethodCode,
     });

@@ -20,6 +20,7 @@ export class BankAccountsService {
     bankAccountTypeName,
     cbu,
     cardIssuerName,
+    cardIssuerIds,
     branchOffice,
     paymentMethodCode,
   }}: BankAccountPaginationOptionsDto): Promise<PaginationResult<BankAccount>> {
@@ -43,6 +44,8 @@ export class BankAccountsService {
     if (cbu) queryBuilder.andWhere('bankAccount.cbu LIKE :cbu', { cbu: `%${cbu}%` });
 
     if (cardIssuerName) queryBuilder.andWhere('cardIssuer.name LIKE :cardIssuerName', { cardIssuerName: `%${cardIssuerName}%` });
+
+    if (cardIssuerIds.length > 0) queryBuilder.andWhere('cardIssuer.id IN (:...cardIssuerIds)', { cardIssuerIds });
 
     if (branchOffice) queryBuilder.andWhere('bankAccount.branchOffice LIKE :branchOffice', { branchOffice: `%${branchOffice}%` });
 
