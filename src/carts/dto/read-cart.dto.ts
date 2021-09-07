@@ -1,6 +1,7 @@
 import { Exclude, Expose, plainToClass, Transform, Type } from "class-transformer";
 import { format } from "date-fns";
 import { ReadClientDto } from "src/clients/dto/read-client.dto";
+import { ReadDiscountDto } from "src/discounts/dto/read-discount.dto";
 import { ReadOrderDto } from "src/orders/dto/read-order.dto";
 import { ReadStoreDto } from "src/stores/dto/read-store.dto";
 import { User } from "src/users/entities/user.entity";
@@ -28,6 +29,9 @@ export class ReadCartDto {
   readonly subTotal: number;
 
   @Expose()
+  readonly subTotalWithDiscount: number;
+
+  @Expose()
   @Type(() => ReadCartItemDto)
   readonly cartItems: ReadCartItemDto[];
 
@@ -49,4 +53,8 @@ export class ReadCartDto {
   @Expose()
   @Type(() => ReadOrderDto)
   readonly order: ReadOrderDto;
+
+  @Expose()
+  @Type(() => ReadDiscountDto)
+  readonly discount: ReadDiscountDto;
 }

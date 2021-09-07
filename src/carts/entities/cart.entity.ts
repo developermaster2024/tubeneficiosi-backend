@@ -1,4 +1,5 @@
 import { isAfter } from "date-fns";
+import { Discount } from "src/discounts/entities/discount.entity";
 import { Order } from "src/orders/entities/order.entity";
 import { Store } from "src/stores/entities/store.entity";
 import { User } from "src/users/entities/user.entity";
@@ -61,6 +62,18 @@ export class Cart {
   @OneToOne(() => Order, order => order.cart)
   order: Order;
 
+  @Column({
+    name: 'discount_id',
+    type: 'int',
+    nullable: true,
+    select: false,
+  })
+  discountId: number;
+
+  @ManyToOne(() => Discount, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'discount_id' })
+  discount: Discount;
+
   @CreateDateColumn({
     name: 'created_at',
   })
@@ -82,6 +95,16 @@ export class Cart {
     return this.cartItems
       .map(item => Number(item.total))
       .reduce(((total, currentValue) => total + currentValue), 0);
+  }
+
+  get subTotalWithDiscount(): number {
+    const subTotal = this.subTotal;
+
+    const percentage = Number(this?.discount?.value) ?? 0;
+
+    const discountAmount = subTotal * percentage / 100;
+
+    return subTotal - discountAmount;
   }
 
   get isExpired(): boolean {

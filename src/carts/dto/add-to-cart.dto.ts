@@ -33,4 +33,7 @@ export class AddToCartDto {
   @Expose()
   @IsBoolean()
   readonly isDirectPurchase: boolean;
+
+  @Expose()
+  readonly discountId: number;
 }

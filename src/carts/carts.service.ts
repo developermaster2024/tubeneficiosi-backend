@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { add } from 'date-fns';
+import { Discount } from 'src/discounts/entities/discount.entity';
 import { ProductFeature } from 'src/product-features/entities/product-feature.entity';
 import { ProductFeatureForGroup } from 'src/products/entities/product-feature-for-group.entity';
 import { Product } from 'src/products/entities/product.entity';
@@ -34,7 +35,8 @@ export class CartsService {
     @InjectRepository(Product) private readonly productsRepository: Repository<Product>,
     @InjectRepository(ProductFeature) private readonly productFeaturesRepository: Repository<ProductFeature>,
     @InjectRepository(ProductFeatureForGroup) private readonly productFeatureForGroupsRepository: Repository<ProductFeatureForGroup>,
-    @InjectRepository(User) private readonly usersRepository: Repository<User>
+    @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    @InjectRepository(Discount) private readonly discountsRepository: Repository<Discount>
   ) {}
 
   async paginate({offset, perPage, filters: {
@@ -60,6 +62,7 @@ export class CartsService {
       .skip(offset)
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .leftJoinAndSelect('cart.discount', 'discount')
       .leftJoinAndSelect('cart.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .leftJoinAndSelect('store.storeHours', 'storeHour')
@@ -110,7 +113,15 @@ export class CartsService {
     return new PaginationResult(carts, total, perPage);
   }
 
-  async addToCart({userId, storeId, productId, quantity, productFeaturesData, isDirectPurchase}: AddToCartDto): Promise<Cart> {
+  async addToCart({
+    userId,
+    storeId,
+    productId,
+    quantity,
+    productFeaturesData,
+    isDirectPurchase,
+    discountId,
+  }: AddToCartDto): Promise<Cart> {
     const featureIds = productFeaturesData?.featureIds ?? [];
     const featureForGroupIds = productFeaturesData?.featureForGroupIds ?? [];
 
@@ -129,6 +140,7 @@ export class CartsService {
       cart = await this.cartsRepository.createQueryBuilder('cart')
         .leftJoinAndSelect('cart.cartItems', 'cartItem')
         .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+        .leftJoinAndSelect('cart.discount', 'discount')
         .where('cart.userId = :userId', { userId })
         .andWhere('cart.storeId = :storeId', { storeId })
         .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
@@ -147,6 +159,15 @@ export class CartsService {
         expiresOn: add(new Date(), isDirectPurchase ? { hours: 1 } : { days: 2 }),
       });
     }
+
+    const discount = await this.discountsRepository.createQueryBuilder('discount')
+      .leftJoin('discount.store', 'store')
+      .where('discount.id = :discountId', { discountId })
+      .andWhere('discount.from <= :today AND discount.until >= :today', { today: new Date() })
+      .andWhere('store.id = :storeId', { storeId })
+      .getOne();
+
+    cart.discount = discount ?? null;
 
     const cartItem = cart.cartItems.find(cartItem => cartItem.productId === Number(productId));
 
@@ -192,6 +213,7 @@ export class CartsService {
     const queryBuilder = this.cartsRepository.createQueryBuilder('cart')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .leftJoinAndSelect('cart.discount', 'discount')
       .innerJoinAndSelect('cart.user', 'user')
       .leftJoinAndSelect('user.client', 'client')
       .leftJoinAndSelect('cart.store', 'store')
@@ -240,6 +262,7 @@ export class CartsService {
     const queryBuilder = this.cartsRepository.createQueryBuilder('cart')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .leftJoinAndSelect('cart.discount', 'discount')
       .innerJoinAndSelect('cart.user', 'user')
       .leftJoinAndSelect('user.client', 'client')
       .leftJoinAndSelect('cart.store', 'store')
@@ -295,6 +318,7 @@ export class CartsService {
     const cart = await this.cartsRepository.createQueryBuilder('cart')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .leftJoinAndSelect('cart.discount', 'discount')
       .innerJoinAndSelect('cart.user', 'user')
       .leftJoinAndSelect('user.client', 'client')
       .leftJoinAndSelect('cart.store', 'store')
