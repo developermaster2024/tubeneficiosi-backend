@@ -125,7 +125,7 @@ export class Order {
 
   get total(): number {
     // @TODO: Guardar total en BD
-    const subTotal = this?.cart?.subTotalWithDiscount ?? 0;
+    const subTotal = this?.cart?.subTotalWithDiscount || 0;
 
     if (this.delivery) {
       return subTotal + Number(this.delivery.total);

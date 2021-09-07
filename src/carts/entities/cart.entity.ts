@@ -100,7 +100,7 @@ export class Cart {
   get subTotalWithDiscount(): number {
     const subTotal = this.subTotal;
 
-    const percentage = Number(this?.discount?.value) ?? 0;
+    const percentage = Number(this?.discount?.value) || 0;
 
     const discountAmount = subTotal * percentage / 100;
 
