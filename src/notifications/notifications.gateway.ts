@@ -4,12 +4,8 @@ import { Role } from 'src/users/enums/roles.enum';
 
 @WebSocketGateway()
 export class NotificationsGateway implements OnGatewayConnection {
-  static clientsCount = 0;
-
   handleConnection(client: any, ...args: any[]) {
-    NotificationsGateway.clientsCount++;
-
-    console.log({clientsCount: NotificationsGateway.clientsCount});
+    console.log({sockets: this.server.engine.clientsCount});
   }
 
   @WebSocketServer()
