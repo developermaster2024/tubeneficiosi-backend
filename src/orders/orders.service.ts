@@ -319,6 +319,8 @@ export class OrdersService {
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .leftJoinAndSelect('cart.discount', 'discount')
       .leftJoinAndSelect('discount.discountType', 'discountType')
+      .leftJoinAndSelect('discount.cards', 'cards')
+      .leftJoinAndSelect('discount.cardIssuers', 'cardIssuer')
       .leftJoinAndSelect('order.bankTransfers', 'bankTransfer')
       .leftJoinAndSelect('bankTransfer.bankAccount', 'bankAccount')
       .leftJoinAndSelect('bankAccount.cardIssuer', 'cardIssuer')
