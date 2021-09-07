@@ -4,6 +4,7 @@ import { HashingService } from 'src/support/hashing.service';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/roles.enum';
+import { UserNotFoundException } from 'src/users/errors/user-not-found.exception';
 import { Repository } from 'typeorm';
 import { ClientPaginationOptionsDto } from './dto/client-pagination-options.dto';
 import { CreateClientDto } from './dto/create-client.dto';
@@ -19,12 +20,20 @@ export class ClientsService {
     private readonly hashingService: HashingService
   ) {}
 
-  async paginate({offset, perPage, filters}: ClientPaginationOptionsDto): Promise<PaginationResult<User>> {
+  async paginate({offset, perPage, filters}: ClientPaginationOptionsDto, userId: number): Promise<PaginationResult<User>> {
+    const user = await this.usersRepository.findOne(userId);
+
+    if (!user) throw new UserNotFoundException();
+
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.client', 'client')
       .innerJoinAndSelect('user.userStatus', 'userStatus')
       .take(perPage)
       .skip(offset);
+
+    if (user.role === Role.STORE) {
+      queryBuilder.innerJoin('user.order', 'order');
+    }
 
     if (filters.id) queryBuilder.andWhere('user.id = :id', {id: filters.id});
 

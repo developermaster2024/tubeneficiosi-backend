@@ -5,6 +5,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { FileToBodyInterceptor } from 'src/support/interceptors/file-to-body.interceptor';
+import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-body.interceptor';
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
@@ -21,10 +22,14 @@ export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
   @Get()
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.STORE)
   @UseGuards(RolesGuard)
-  async paginate(@Query(ClientPaginationPipe) options: any): Promise<PaginationResult<ReadClientDto>> {
-    return (await this.clientsService.paginate(options)).toClass(ReadClientDto);
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async paginate(
+    @Query(ClientPaginationPipe) options: any,
+    @Body('userId') userId: number
+  ): Promise<PaginationResult<ReadClientDto>> {
+    return (await this.clientsService.paginate(options, userId)).toClass(ReadClientDto);
   }
 
   @Post()
