@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
-import { FindConditions, Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { PaymentMethodPaginationOptionsDto } from './dto/payment-method-pagination-options.dto';
 import { UpdatePaymentMethodDto } from './dto/update-payment-method.dto';
 import { PaymentMethod } from './entities/payment-method.entity';
@@ -12,22 +12,24 @@ import { PaymentMethodNotFoundException } from './errors/payment-method-not-foun
 export class PaymentMethodsService {
   constructor(@InjectRepository(PaymentMethod) private readonly paymentMethodsRepository: Repository<PaymentMethod>) {}
 
-  async paginate({offset, perPage, filters}: PaymentMethodPaginationOptionsDto): Promise<PaginationResult<PaymentMethod>> {
-    const where: FindConditions<PaymentMethod> = {};
+  async paginate({offset, perPage, filters: {
+    codes,
+    name,
+    usesBankAccounts,
+  }}: PaymentMethodPaginationOptionsDto): Promise<PaginationResult<PaymentMethod>> {
+    const queryBuilder = this.paymentMethodsRepository.createQueryBuilder('paymentMethod')
+      .leftJoinAndSelect('paymentMethod.bankAccounts', 'bankAccount')
+      .leftJoinAndSelect('bankAccount.cardIssuer', 'cardIssuer')
+      .take(perPage)
+      .skip(offset);
 
-    // @ts-ignore
-    if (filters.id) where.id = +filters.id;
+    if (codes.length > 0) queryBuilder.andWhere('paymentMethod.code IN (:...codes)', { codes });
 
-    if (filters.name) where.name = Like(`%${filters.name}%`);
+    if (name) queryBuilder.andWhere('paymentMethod.name LIKE :name', { name: `%${name}%` });
 
-    if (filters.usesBankAccounts) where.usesBankAccounts = true;
+    if (usesBankAccounts !== null) queryBuilder.andWhere('paymentMethod.usesBankAccounts = :usesBankAccounts', { usesBankAccounts: +usesBankAccounts });
 
-    const [paymentMethods, total] = await this.paymentMethodsRepository.findAndCount({
-      take: perPage,
-      skip: offset,
-      where,
-      relations: ['bankAccounts', 'bankAccounts.cardIssuer'],
-    });
+    const [paymentMethods, total] = await queryBuilder.getManyAndCount();
 
     return new PaginationResult(paymentMethods, total, perPage);
   }

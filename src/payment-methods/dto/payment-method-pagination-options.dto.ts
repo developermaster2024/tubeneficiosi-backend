@@ -1,7 +1,8 @@
 import { PaginationOptions } from "src/support/pagination/pagination-options";
+import queryStringToBoolean from "src/support/query-string-to-boolean";
 
 type PaymentMethodFilters = {
-  id: string;
+  codes: string[];
   name: string;
   usesBankAccounts: boolean;
 };
@@ -15,15 +16,15 @@ export class PaymentMethodPaginationOptionsDto extends PaginationOptions {
     const {
       page = 1,
       perPage = 10,
-      id,
+      codes = '',
       name,
       usesBankAccounts,
     } = query;
 
     return new PaymentMethodPaginationOptionsDto(+page, +perPage, {
-      id,
+      codes: codes.split(',').filter(code => code),
       name,
-      usesBankAccounts: usesBankAccounts === 'true',
+      usesBankAccounts: queryStringToBoolean(usesBankAccounts),
     });
   }
 }
