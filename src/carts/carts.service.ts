@@ -14,6 +14,7 @@ import { In, Repository } from 'typeorm';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { CartPaginationOptionsDto } from './dto/cart-pagination-options.dto';
 import { DeleteCartitemDto } from './dto/delete-cart-item.dto';
+import { UpdateCartDiscountDto } from './dto/update-cart-discount.dto';
 import { UpdateCartItemQuantityDto } from './dto/update-cart-item-quantity.dto';
 import { CartItemFeature } from './entities/cart-item-feature.entity';
 import { CartItem } from './entities/cart-item.entity';
@@ -200,6 +201,33 @@ export class CartsService {
     if (itemQuantity > product.quantity) {
       throw new ProductQuantityIsLessThanRequiredQuantityException();
     }
+
+    return await this.cartsRepository.save(cart);
+  }
+
+  async updateCartDiscount({id, userId, storeId, discountId}: UpdateCartDiscountDto): Promise<Cart> {
+    const cart = await this.cartsRepository.createQueryBuilder('cart')
+      .leftJoinAndSelect('cart.cartItems', 'cartItem')
+      .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .leftJoinAndSelect('cart.discount', 'discount')
+      .where('cart.userId = :userId', { userId })
+      .andWhere('cart.id = :id', { id })
+      .andWhere('cart.storeId = :storeId', { storeId })
+      .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
+      .andWhere('cart.isDirectPurchase = :isDirectPurchase', { isDirectPurchase: 0 })
+      .andWhere(':today < cart.expiresOn', { today: new Date() })
+      .getOne();
+
+    if (!cart) throw new CartNotFoundException();
+
+    const discount = await this.discountsRepository.createQueryBuilder('discount')
+      .leftJoin('discount.store', 'store')
+      .where('discount.id = :discountId', { discountId })
+      .andWhere('discount.from <= :today AND discount.until >= :today', { today: new Date() })
+      .andWhere('store.id = :storeId', { storeId })
+      .getOne();
+
+    cart.discount = discount ?? null;
 
     return await this.cartsRepository.save(cart);
   }

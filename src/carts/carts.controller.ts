@@ -12,6 +12,7 @@ import { CartsService } from './carts.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { DeleteCartitemDto } from './dto/delete-cart-item.dto';
 import { ReadCartDto } from './dto/read-cart.dto';
+import { UpdateCartDiscountDto } from './dto/update-cart-discount.dto';
 import { UpdateCartItemQuantityDto } from './dto/update-cart-item-quantity.dto';
 import { CartItem } from './entities/cart-item.entity';
 import { CartPaginationPipe } from './pipes/cart-pagination.pipe';
@@ -37,6 +38,14 @@ export class CartsController {
   @UseInterceptors(new JwtUserToBodyInterceptor())
   async addToCart(@Body() addToCartDto: AddToCartDto): Promise<ReadCartDto> {
     return plainToClass(ReadCartDto, await this.cartsRepository.addToCart(addToCartDto));
+  }
+
+  @Put(':id/update-discount')
+  @Roles(Role.CLIENT)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({id: 'id'}))
+  async updateCartDiscount(@Body() updateCartDiscountDto: UpdateCartDiscountDto): Promise<ReadCartDto> {
+    return plainToClass(ReadCartDto, await this.cartsRepository.updateCartDiscount(updateCartDiscountDto));
   }
 
   @Get('stores/:storeId')
