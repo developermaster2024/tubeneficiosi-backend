@@ -5,7 +5,7 @@ import { HashingService } from 'src/support/hashing.service';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/roles.enum';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { StorePaginationOptionsDto } from './dto/store-pagination-options.dto';
 import { UpdateStorePasswordDto } from './dto/update-store-password.dto';
@@ -29,6 +29,7 @@ export class StoresService {
     storeCategoryIds,
     phoneNumber,
     withCheapestProduct,
+    cardIssuerIds,
   }}: StorePaginationOptionsDto): Promise<PaginationResult<User>> {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.userStatus', 'userStatus')
@@ -64,6 +65,19 @@ export class StoresService {
         'product',
         'product.price = (SELECT MIN(product2.price) FROM products AS product2 WHERE product2.store_id = store.id AND product2.deleted_at IS NULL)'
       );
+    }
+
+    if (cardIssuerIds.length > 0) {
+      queryBuilder
+        .leftJoin('store.discounts', 'discount')
+        .leftJoinAndSelect('discount.cardIssuers', 'cardIssuerFromDiscount')
+        .leftJoinAndSelect('discount.cards', 'card')
+        .leftJoinAndSelect('card.cardIssuer', 'cardIssuerFromCard')
+        .andWhere(new Brackets(qb => {
+          qb
+            .andWhere('cardIssuerFromDiscount.id In (:...cardIssuerIds)', { cardIssuerIds })
+            .orWhere('cardIssuerFromCard.id IN (:...cardIssuerIds)', { cardIssuerIds });
+        }));
     }
 
     const [stores, total] = await queryBuilder.getManyAndCount();

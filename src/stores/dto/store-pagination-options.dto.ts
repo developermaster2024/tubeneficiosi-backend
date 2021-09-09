@@ -9,6 +9,7 @@ type StoreFilters = {
   storeCategoryIds: number[];
   userStatusCode: string;
   withCheapestProduct: boolean;
+  cardIssuerIds: number[];
 };
 
 export class StorePaginationOptionsDto extends PaginationOptions {
@@ -28,6 +29,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       storeCategoryIds = '',
       userStatusCode,
       withCheapestProduct,
+      cardIssuerIds = '',
     } = query;
 
     return new StorePaginationOptionsDto(+page, +perPage, {
@@ -39,6 +41,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       storeCategoryIds: storeCategoryIds.split(',').filter(id => id).map(id => Number(id)),
       userStatusCode,
       withCheapestProduct: withCheapestProduct === 'true',
+      cardIssuerIds: cardIssuerIds.split(',').filter(id => id).map(id => Number(id)),
     });
   }
 }
