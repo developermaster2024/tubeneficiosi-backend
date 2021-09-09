@@ -30,6 +30,7 @@ export class StoresService {
     phoneNumber,
     withCheapestProduct,
     cardIssuerIds,
+    cardIds,
   }}: StorePaginationOptionsDto): Promise<PaginationResult<User>> {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.userStatus', 'userStatus')
@@ -43,6 +44,10 @@ export class StoresService {
         'latestActiveDiscount',
         'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
       , { today: new Date() })
+      .leftJoin('store.discounts', 'discount')
+      .leftJoinAndSelect('discount.cardIssuers', 'cardIssuerFromDiscount')
+      .leftJoinAndSelect('discount.cards', 'card')
+      .leftJoinAndSelect('card.cardIssuer', 'cardIssuerFromCard')
       .take(perPage)
       .skip(offset);
 
@@ -68,16 +73,15 @@ export class StoresService {
     }
 
     if (cardIssuerIds.length > 0) {
-      queryBuilder
-        .leftJoin('store.discounts', 'discount')
-        .leftJoinAndSelect('discount.cardIssuers', 'cardIssuerFromDiscount')
-        .leftJoinAndSelect('discount.cards', 'card')
-        .leftJoinAndSelect('card.cardIssuer', 'cardIssuerFromCard')
-        .andWhere(new Brackets(qb => {
+      queryBuilder.andWhere(new Brackets(qb => {
           qb
             .andWhere('cardIssuerFromDiscount.id In (:...cardIssuerIds)', { cardIssuerIds })
             .orWhere('cardIssuerFromCard.id IN (:...cardIssuerIds)', { cardIssuerIds });
         }));
+    }
+
+    if (cardIds.length > 0) {
+      queryBuilder.andWhere('card.id In (:...cardIds)', { cardIds });
     }
 
     const [stores, total] = await queryBuilder.getManyAndCount();
