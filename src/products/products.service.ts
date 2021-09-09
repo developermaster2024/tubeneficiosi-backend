@@ -80,7 +80,7 @@ export class ProductsService {
             product_to_tag.product_id = product.id AND
             product_to_tag.tag_id IN(:...tagIds))
         `, 'tags_count')
-        .setParameter('tagIds', [1,2,3])
+        .setParameter('tagIds', tagsToSortBy)
         .orderBy('tags_count', 'DESC');
     }
 
