@@ -51,6 +51,7 @@ export class ProductsService {
     storeName,
     storeCategoryIds,
     cardIssuerIds,
+    cardIds,
   }, tagsToSortBy}: ProductPaginationOptionsDto): Promise<PaginationResult<Product>> {
     const queryBuilder = this.productsRepository.createQueryBuilder('product')
       .take(perPage)
@@ -71,7 +72,11 @@ export class ProductsService {
         'latestActiveDiscount',
         'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
       , { today: new Date() })
-      .leftJoin('product.tags', 'tag');
+      .leftJoin('product.tags', 'tag')
+      .leftJoin('store.discounts', 'discount')
+      .leftJoinAndSelect('discount.cardIssuers', 'cardIssuerFromDiscount')
+      .leftJoinAndSelect('discount.cards', 'card')
+      .leftJoinAndSelect('card.cardIssuer', 'cardIssuerFromCard');
 
     if (tagsToSortBy.length > 0) {
       queryBuilder.addSelect(`
@@ -112,16 +117,15 @@ export class ProductsService {
     if (tagIds.length > 0) queryBuilder.andWhere('tag.id In (:...tagIds)', { tagIds });
 
     if (cardIssuerIds.length > 0) {
-      queryBuilder
-        .leftJoin('store.discounts', 'discount')
-        .leftJoinAndSelect('discount.cardIssuers', 'cardIssuerFromDiscount')
-        .leftJoinAndSelect('discount.cards', 'card')
-        .leftJoinAndSelect('card.cardIssuer', 'cardIssuerFromCard')
-        .andWhere(new Brackets(qb => {
-          qb
-            .andWhere('cardIssuerFromDiscount.id In (:...cardIssuerIds)', { cardIssuerIds })
-            .orWhere('cardIssuerFromCard.id IN (:...cardIssuerIds)', { cardIssuerIds });
-        }));
+      queryBuilder.andWhere(new Brackets(qb => {
+        qb
+          .andWhere('cardIssuerFromDiscount.id In (:...cardIssuerIds)', { cardIssuerIds })
+          .orWhere('cardIssuerFromCard.id IN (:...cardIssuerIds)', { cardIssuerIds });
+      }));
+    }
+
+    if (cardIds.length > 0) {
+      queryBuilder.andWhere('card.id In (:...cardIds)', { cardIds });
     }
 
     const [products, total] = await queryBuilder.getManyAndCount();
