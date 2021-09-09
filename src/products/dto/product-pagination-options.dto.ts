@@ -14,6 +14,7 @@ type ProductFilters = {
   storeId: number;
   storeName: string;
   storeCategoryIds: number[];
+  cardIssuerIds: number[];
 };
 
 export class ProductPaginationOptionsDto extends PaginationOptions {
@@ -39,6 +40,7 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       storeName,
       storeCategoryIds = '',
       sortByTags = '',
+      cardIssuerIds = '',
     } = query;
 
     return new ProductPaginationOptionsDto(+page, +perPage, {
@@ -55,6 +57,7 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       storeId: Number(storeId),
       storeName,
       storeCategoryIds: storeCategoryIds.split(',').filter(id => id).map(id => Number(id)),
+      cardIssuerIds: cardIssuerIds.split(',').filter(id => id).map(id => Number(id)),
     }, sortByTags.split(',').filter(id => id).map(id => Number()));
   }
 }

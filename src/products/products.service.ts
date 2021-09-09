@@ -9,7 +9,7 @@ import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Tag } from 'src/tags/entities/tag.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/roles.enum';
-import { FindConditions, In, Repository } from 'typeorm';
+import { Brackets, FindConditions, In, Repository } from 'typeorm';
 import { CreateProductImageDto } from './dto/create-product-image.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { DeleteProductImageDto } from './dto/delete-product-image.dto';
@@ -50,6 +50,7 @@ export class ProductsService {
     storeId,
     storeName,
     storeCategoryIds,
+    cardIssuerIds,
   }, tagsToSortBy}: ProductPaginationOptionsDto): Promise<PaginationResult<Product>> {
     const queryBuilder = this.productsRepository.createQueryBuilder('product')
       .take(perPage)
@@ -109,6 +110,19 @@ export class ProductsService {
     if (categoryName) queryBuilder.andWhere('category.name LIKE :categoryName', { categoryName: `%${categoryName}%` });
 
     if (tagIds.length > 0) queryBuilder.andWhere('tag.id In (:...tagIds)', { tagIds });
+
+    if (cardIssuerIds.length > 0) {
+      queryBuilder
+        .leftJoin('store.discounts', 'discount')
+        .leftJoinAndSelect('discount.cardIssuers', 'cardIssuerFromDiscount')
+        .leftJoinAndSelect('discount.cards', 'card')
+        .leftJoinAndSelect('card.cardIssuer', 'cardIssuerFromCard')
+        .andWhere(new Brackets(qb => {
+          qb
+            .andWhere('cardIssuerFromDiscount.id In (:...cardIssuerIds)', { cardIssuerIds })
+            .orWhere('cardIssuerFromCard.id IN (:...cardIssuerIds)', { cardIssuerIds });
+        }));
+    }
 
     const [products, total] = await queryBuilder.getManyAndCount();
 
