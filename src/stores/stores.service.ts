@@ -44,10 +44,10 @@ export class StoresService {
         'latestActiveDiscount',
         'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
       , { today: new Date() })
-      .leftJoin('store.discounts', 'discount')
-      .leftJoinAndSelect('discount.cardIssuers', 'cardIssuerFromDiscount')
-      .leftJoinAndSelect('discount.cards', 'card')
-      .leftJoinAndSelect('card.cardIssuer', 'cardIssuerFromCard')
+      .leftJoin('store.discounts', 'discount', 'discount.from <= :today AND discount.until >= :today', { today: new Date() })
+      .leftJoin('discount.cardIssuers', 'cardIssuerFromDiscount')
+      .leftJoin('discount.cards', 'card', '')
+      .leftJoin('card.cardIssuer', 'cardIssuerFromCard')
       .take(perPage)
       .skip(offset);
 
@@ -71,6 +71,10 @@ export class StoresService {
         'product.price = (SELECT MIN(product2.price) FROM products AS product2 WHERE product2.store_id = store.id AND product2.deleted_at IS NULL)'
       );
     }
+
+    // if (cardIssuerIds.length > 0 || cardIds.length > 0) {
+    //   queryBuilder.andWhere('discount.from <= :today AND discount.until >= :today', { today: new Date() });
+    // }
 
     if (cardIssuerIds.length > 0) {
       queryBuilder.andWhere(new Brackets(qb => {

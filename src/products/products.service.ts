@@ -73,10 +73,10 @@ export class ProductsService {
         'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
       , { today: new Date() })
       .leftJoin('product.tags', 'tag')
-      .leftJoin('store.discounts', 'discount')
-      .leftJoinAndSelect('discount.cardIssuers', 'cardIssuerFromDiscount')
-      .leftJoinAndSelect('discount.cards', 'card')
-      .leftJoinAndSelect('card.cardIssuer', 'cardIssuerFromCard');
+      .leftJoin('store.discounts', 'discount', 'discount.from <= :today AND discount.until >= :today', { today: new Date() })
+      .leftJoin('discount.cardIssuers', 'cardIssuerFromDiscount')
+      .leftJoin('discount.cards', 'card')
+      .leftJoin('card.cardIssuer', 'cardIssuerFromCard');
 
     if (tagsToSortBy.length > 0) {
       queryBuilder.addSelect(`
