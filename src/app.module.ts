@@ -46,6 +46,7 @@ import { DeliveryNotesModule } from './delivery-notes/delivery-notes.module';
 import { DiscountTypesModule } from './discount-types/discount-types.module';
 import { DiscountsModule } from './discounts/discounts.module';
 import { FavoriteProductsModule } from './favorite-products/favorite-products.module';
+import { FavoriteStoresModule } from './favorite-stores/favorite-stores.module';
 
 @Module({
   imports: [
@@ -98,6 +99,7 @@ import { FavoriteProductsModule } from './favorite-products/favorite-products.mo
     DiscountTypesModule,
     DiscountsModule,
     FavoriteProductsModule,
+    FavoriteStoresModule,
   ],
 })
 export class AppModule {}
