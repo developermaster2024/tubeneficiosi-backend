@@ -26,7 +26,7 @@ export class TagsService {
       take: perPage,
       skip: offset,
       where,
-      relations: ['storeCategory'],
+      relations: ['storeCategory', 'parentTags'],
     });
 
     return new PaginationResult(tags, total, perPage);

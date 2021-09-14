@@ -12,4 +12,8 @@ export class ReadTagDto {
   @Expose()
   @Type(() => ReadStoreCategoryDto)
   readonly storeCategory: ReadStoreCategoryDto;
+
+  @Expose()
+  @Type(() => ReadTagDto)
+  readonly parentTags: ReadTagDto[];
 }
