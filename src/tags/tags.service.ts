@@ -45,7 +45,7 @@ export class TagsService {
   async findOne(id: number): Promise<Tag> {
     const tag = await this.tagsRepository.findOne({
       where: {id},
-      relations: ['storeCategory'],
+      relations: ['storeCategory', 'parentTags'],
     });
 
     if (!tag) {
