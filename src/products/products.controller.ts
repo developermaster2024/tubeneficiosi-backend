@@ -4,6 +4,7 @@ import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { AllowAny } from 'src/support/custom-decorators/allow-any';
 import { FileToBodyInterceptor } from 'src/support/interceptors/file-to-body.interceptor';
 import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-body.interceptor';
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
@@ -24,8 +25,14 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  async paginate(@Query(ProductPaginationPipe) options: any): Promise<PaginationResult<ReadProductDto>> {
-    return (await this.productsService.paginate(options)).toClass(ReadProductDto);
+  @AllowAny()
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async paginate(
+    @Query(ProductPaginationPipe) options: any,
+    @Body('userId') userId: number
+  ): Promise<PaginationResult<ReadProductDto>> {
+    return (await this.productsService.paginate(options, userId)).toClass(ReadProductDto);
   }
 
   @Post()

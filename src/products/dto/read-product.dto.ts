@@ -70,4 +70,7 @@ export class ReadProductDto {
   @Expose()
   @Type(() => ReadTagDto)
   readonly tags: ReadTagDto[];
+
+  @Expose()
+  readonly isFavorite: boolean;
 }

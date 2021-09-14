@@ -53,7 +53,7 @@ export class ProductsService {
     cardIssuerIds,
     cardIds,
     isFavoriteFor,
-  }, tagsToSortBy}: ProductPaginationOptionsDto): Promise<PaginationResult<Product>> {
+  }, tagsToSortBy}: ProductPaginationOptionsDto, userId: number): Promise<PaginationResult<Product>> {
     const queryBuilder = this.productsRepository.createQueryBuilder('product')
       .take(perPage)
       .skip(offset)
@@ -132,6 +132,14 @@ export class ProductsService {
     if (isFavoriteFor) {
       queryBuilder.innerJoin('product.favoriteProducts', 'favoriteProduct', 'favoriteProduct.userId = :isFavoriteFor', { isFavoriteFor });
     }
+
+    queryBuilder.leftJoinAndMapOne(
+      'product.favoriteProduct',
+      'product.favoriteProducts',
+      'favoriteProductAlone',
+      'favoriteProductAlone.userId = :userId',
+      { userId }
+    );
 
     const [products, total] = await queryBuilder.getManyAndCount();
 

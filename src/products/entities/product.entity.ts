@@ -135,6 +135,8 @@ export class Product {
   @OneToMany(() => FavoriteProduct, (favoriteProduct) => favoriteProduct.product)
   favoriteProducts: FavoriteProduct[];
 
+  favoriteProduct: FavoriteProduct;
+
   @CreateDateColumn({
     name: 'created_at',
     select: false,
@@ -155,6 +157,10 @@ export class Product {
 
   get finalPrice(): number {
     return this.price;
+  }
+
+  get isFavorite(): boolean {
+    return !!this.favoriteProduct;
   }
 
   static create(data: Partial<Product>): Product {
