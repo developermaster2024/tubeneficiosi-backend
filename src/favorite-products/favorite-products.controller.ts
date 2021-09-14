@@ -6,7 +6,6 @@ import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-b
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
 import { Role } from 'src/users/enums/roles.enum';
 import { ToggleFavoriteProductDto } from './dto/toggle-favorite-product.dto';
-import { FavoriteProduct } from './entities/favorite-product.entity';
 import { FavoriteProductsService } from './favorite-products.service';
 
 @Controller('favorite-products')

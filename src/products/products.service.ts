@@ -52,6 +52,7 @@ export class ProductsService {
     storeCategoryIds,
     cardIssuerIds,
     cardIds,
+    isFavoriteFor,
   }, tagsToSortBy}: ProductPaginationOptionsDto): Promise<PaginationResult<Product>> {
     const queryBuilder = this.productsRepository.createQueryBuilder('product')
       .take(perPage)
@@ -126,6 +127,10 @@ export class ProductsService {
 
     if (cardIds.length > 0) {
       queryBuilder.andWhere('card.id In (:...cardIds)', { cardIds });
+    }
+
+    if (isFavoriteFor) {
+      queryBuilder.innerJoin('product.favoriteProducts', 'favoriteProduct', 'favoriteProduct.userId = :isFavoriteFor', { isFavoriteFor });
     }
 
     const [products, total] = await queryBuilder.getManyAndCount();

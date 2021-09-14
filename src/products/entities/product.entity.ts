@@ -1,6 +1,7 @@
 import { Brand } from "src/brands/entities/brand.entity";
 import { Category } from "src/categories/entities/category.entity";
 import { DeliveryMethodType } from "src/delivery-method-types/entities/delivery-method-type.entity";
+import { FavoriteProduct } from "src/favorite-products/entities/favorite-product.entity";
 import { ProductFeature } from "src/product-features/entities/product-feature.entity";
 import { Store } from "src/stores/entities/store.entity";
 import { Tag } from "src/tags/entities/tag.entity";
@@ -130,6 +131,9 @@ export class Product {
 
   @OneToOne(() => ProductDimension, productDimension => productDimension.product, {cascade: ['insert', 'update']})
   productDimensions: ProductDimension;
+
+  @OneToMany(() => FavoriteProduct, (favoriteProduct) => favoriteProduct.product)
+  favoriteProducts: FavoriteProduct[];
 
   @CreateDateColumn({
     name: 'created_at',
