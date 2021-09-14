@@ -12,22 +12,27 @@ import { TagNotFoundException } from './errors/tag-not-found.exception';
 export class TagsService {
   constructor(@InjectRepository(Tag) private readonly tagsRepository: Repository<Tag>) {}
 
-  async paginate({perPage, offset, filters}: TagPaginationOptionsDto): Promise<PaginationResult<Tag>> {
-    const where: FindConditions<Tag> = {};
+  async paginate({perPage, offset, filters: {
+    id,
+    name,
+    storeCategoryIds,
+    excludeIds,
+  }}: TagPaginationOptionsDto): Promise<PaginationResult<Tag>> {
+    const queryBuilder = this.tagsRepository.createQueryBuilder('tag')
+      .take(perPage)
+      .skip(offset)
+      .innerJoinAndSelect('tag.storeCategory', 'storeCategory')
+      .leftJoinAndSelect('tag.parentTags', 'parentTag');
 
-    // @ts-ignore: set id filter
-    if (filters.id) where.id = +filters.id;
+    if (id) queryBuilder.andWhere('tag.id = :id', { id });
 
-    if (filters.name) where.name = Like(`%${filters.name}%`);
+    if (name) queryBuilder.andWhere('tag.name LIKE :name', { name: `%${name}%` });
 
-    if (filters.storeCategoryIds.length > 0) where.storeCategoryId = In(filters.storeCategoryIds);
+    if (storeCategoryIds.length > 0) queryBuilder.andWhere('tag.storeCategoryId IN (:...storeCategoryIds)', { storeCategoryIds });
 
-    const [tags, total] = await this.tagsRepository.findAndCount({
-      take: perPage,
-      skip: offset,
-      where,
-      relations: ['storeCategory', 'parentTags'],
-    });
+    if (excludeIds.length > 0) queryBuilder.andWhere('tag.id NOT IN (:...excludeIds)', { excludeIds });
+
+    const [tags, total] = await queryBuilder.getManyAndCount();
 
     return new PaginationResult(tags, total, perPage);
   }

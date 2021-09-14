@@ -1,9 +1,10 @@
 import { PaginationOptions } from "src/support/pagination/pagination-options";
 
 type TagFilters = {
-  id: string;
+  id: number;
   name: string;
   storeCategoryIds: number[];
+  excludeIds: number[];
 };
 
 export class TagPaginationOptionsDto extends PaginationOptions {
@@ -18,11 +19,13 @@ export class TagPaginationOptionsDto extends PaginationOptions {
       id,
       name,
       storeCategoryIds = '',
+      excludeIds = '',
     } = query;
     return new TagPaginationOptionsDto(+page, +perPage, {
-      id,
+      id: +id,
       name,
       storeCategoryIds: storeCategoryIds.split(',').filter(id => id).map(id => Number(id)),
+      excludeIds: excludeIds.split(',').filter(id => id).map(id => Number(id)),
     });
   }
 }
