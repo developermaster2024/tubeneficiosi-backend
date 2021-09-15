@@ -4,6 +4,8 @@ import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { AllowAny } from 'src/support/custom-decorators/allow-any';
+import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-body.interceptor';
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
@@ -19,8 +21,14 @@ export class StoresController {
   constructor(private readonly storesService: StoresService) {}
 
   @Get()
-  async paginate(@Query(StorePaginationPipe) options: any): Promise<PaginationResult<ReadStoreDto>> {
-    return (await this.storesService.paginate(options)).toClass(ReadStoreDto);
+  @AllowAny()
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async paginate(
+    @Query(StorePaginationPipe) options: any,
+    @Body('userId') userId: number
+  ): Promise<PaginationResult<ReadStoreDto>> {
+    return (await this.storesService.paginate(options, userId)).toClass(ReadStoreDto);
   }
 
   @Post()
@@ -48,8 +56,14 @@ export class StoresController {
   }
 
   @Get(':slug')
-  async findOneBySlug(@Param('slug') slug: string): Promise<ReadStoreDto> {
-    return plainToClass(ReadStoreDto, await this.storesService.findOneBySlug(slug));
+  @AllowAny()
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async findOneBySlug(
+    @Param('slug') slug: string,
+    @Body('userId') userId: number
+  ): Promise<ReadStoreDto> {
+    return plainToClass(ReadStoreDto, await this.storesService.findOneBySlug(slug, userId));
   }
 
   @Put(':id')

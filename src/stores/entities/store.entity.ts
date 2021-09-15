@@ -1,4 +1,5 @@
 import { Discount } from "src/discounts/entities/discount.entity";
+import { StoreToUser } from "src/favorite-stores/entities/store-to-user.entity";
 import { Product } from "src/products/entities/product.entity";
 import { StoreCategory } from "src/store-categories/entities/store-category.entity";
 import { StoreHour } from "src/store-hours/entities/store-hour.entity";
@@ -107,8 +108,17 @@ export class Store {
 
   latestActiveDiscount: Discount;
 
+  @OneToMany(() => StoreToUser, (storeToUser) => storeToUser.store)
+  storeToUsers: StoreToUser[];
+
+  storeToUser: StoreToUser;
+
   get isOpen(): boolean {
     return this.storeHours?.some(storeHour => storeHour.isActive);
+  }
+
+  get isFavorite(): boolean {
+    return !!this.storeToUser;
   }
 
   static create(data: Partial<Store>): Store {

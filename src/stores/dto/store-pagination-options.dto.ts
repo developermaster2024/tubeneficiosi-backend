@@ -11,6 +11,7 @@ type StoreFilters = {
   withCheapestProduct: boolean;
   cardIssuerIds: number[];
   cardIds: number[];
+  isFavoriteFor: number;
 };
 
 export class StorePaginationOptionsDto extends PaginationOptions {
@@ -32,6 +33,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       withCheapestProduct,
       cardIssuerIds = '',
       cardIds = '',
+      isFavoriteFor,
     } = query;
 
     return new StorePaginationOptionsDto(+page, +perPage, {
@@ -45,6 +47,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       withCheapestProduct: withCheapestProduct === 'true',
       cardIssuerIds: cardIssuerIds.split(',').filter(id => id).map(id => Number(id)),
       cardIds: cardIds.split(',').filter(id => id).map(id => Number(id)),
+      isFavoriteFor: +isFavoriteFor,
     });
   }
 }

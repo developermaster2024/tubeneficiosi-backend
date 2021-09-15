@@ -31,7 +31,8 @@ export class StoresService {
     withCheapestProduct,
     cardIssuerIds,
     cardIds,
-  }}: StorePaginationOptionsDto): Promise<PaginationResult<User>> {
+    isFavoriteFor,
+  }}: StorePaginationOptionsDto, userId: number): Promise<PaginationResult<User>> {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.userStatus', 'userStatus')
       .innerJoinAndSelect('user.store', 'store')
@@ -72,10 +73,6 @@ export class StoresService {
       );
     }
 
-    // if (cardIssuerIds.length > 0 || cardIds.length > 0) {
-    //   queryBuilder.andWhere('discount.from <= :today AND discount.until >= :today', { today: new Date() });
-    // }
-
     if (cardIssuerIds.length > 0) {
       queryBuilder.andWhere(new Brackets(qb => {
           qb
@@ -87,6 +84,18 @@ export class StoresService {
     if (cardIds.length > 0) {
       queryBuilder.andWhere('card.id In (:...cardIds)', { cardIds });
     }
+
+    if (isFavoriteFor) {
+      queryBuilder.innerJoin('store.storeToUsers', 'storeToUser', 'storeToUser.userId = :isFavoriteFor', { isFavoriteFor });
+    }
+
+    queryBuilder.leftJoinAndMapOne(
+      'store.storeToUser',
+      'store.storeToUsers',
+      'storeToUserAlone',
+      'storeToUserAlone.userId = :userId',
+      { userId }
+    );
 
     const [stores, total] = await queryBuilder.getManyAndCount();
 
@@ -166,7 +175,7 @@ export class StoresService {
     return user;
   }
 
-  async findOneBySlug(slug: string): Promise<User> {
+  async findOneBySlug(slug: string, userId: number): Promise<User> {
     const user = await this.usersRepository.createQueryBuilder('user')
       .leftJoinAndSelect('user.userStatus', 'userStatus')
       .leftJoinAndSelect('user.store', 'store')
@@ -179,6 +188,13 @@ export class StoresService {
         'latestActiveDiscount',
         'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
       , { today: new Date() })
+      .leftJoinAndMapOne(
+        'store.storeToUser',
+        'store.storeToUsers',
+        'storeToUserAlone',
+        'storeToUserAlone.userId = :userId',
+        { userId }
+      )
       .where('store.slug = :slug', { slug })
       .getOne();
 
