@@ -163,6 +163,14 @@ export class Product {
     return !!this.favoriteProduct;
   }
 
+  @Column({
+    type: 'int',
+    insert: false,
+    update: false,
+    select: false,
+  })
+  rating: number;
+
   static create(data: Partial<Product>): Product {
     return Object.assign(new Product(), data);
   }

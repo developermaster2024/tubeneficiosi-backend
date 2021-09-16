@@ -13,6 +13,7 @@ import { ProductFeature } from 'src/product-features/entities/product-feature.en
 import { ProductFeatureGroup } from './entities/product-feature-group.entity';
 import { ProductImage } from './entities/product-image.entity';
 import { User } from 'src/users/entities/user.entity';
+import { ProductRating } from 'src/product-ratings/entities/product-rating.entity';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { User } from 'src/users/entities/user.entity';
       Category,
       Store,
       User,
+      ProductRating,
     ]),
     MulterModule.register({
       storage: diskStorage({
