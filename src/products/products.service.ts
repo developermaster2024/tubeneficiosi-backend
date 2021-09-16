@@ -53,6 +53,7 @@ export class ProductsService {
     cardIssuerIds,
     cardIds,
     isFavoriteFor,
+    minRating,
   }, tagsToSortBy}: ProductPaginationOptionsDto, userId: number): Promise<PaginationResult<Product>> {
     const queryBuilder = this.productsRepository.createQueryBuilder('product')
       .addSelect('(SELECT AVG(`value`) FROM product_ratings WHERE product_ratings.product_id = product.id)', 'product_rating')
@@ -141,6 +142,17 @@ export class ProductsService {
       'favoriteProductAlone.userId = :userId',
       { userId }
     );
+
+    if (minRating) {
+      queryBuilder.andWhere(`(
+        SELECT
+          ROUND(AVG(productRating.value))
+        FROM
+          product_ratings productRating
+        WHERE
+          productRating.product_id = product.id
+      ) >= :minRating`, { minRating });
+    }
 
     const [products, total] = await queryBuilder.getManyAndCount();
 
