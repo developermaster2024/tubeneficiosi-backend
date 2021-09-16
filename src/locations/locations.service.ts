@@ -54,10 +54,11 @@ export class LocationsService {
   async update({id, area, ...updateLocationDto}: UpdateLocationDto): Promise<Location> {
     const location = await this.findOne(+id);
 
-    Object.assign(location, {
-      ...updateLocationDto,
-      area: `MULTIPOLYGON(${area})`
-    });
+    Object.assign(location, updateLocationDto);
+
+    if (area) {
+      location.area = `MULTIPOLYGON(${area})`;
+    }
 
     return await this.locationsRepository.save(location);
   }
