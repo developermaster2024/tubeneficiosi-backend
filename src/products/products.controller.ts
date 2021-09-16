@@ -52,8 +52,14 @@ export class ProductsController {
   }
 
   @Get(':slug')
-  async findOne(@Param('slug') slug: string): Promise<ReadProductDto> {
-    return plainToClass(ReadProductDto, await this.productsService.findOneBySlug(slug));
+  @AllowAny()
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async findOne(
+    @Param('slug') slug: string,
+    @Body('userId') userId: number
+  ): Promise<ReadProductDto> {
+    return plainToClass(ReadProductDto, await this.productsService.findOneBySlug(slug, userId));
   }
 
   @Put(':id')

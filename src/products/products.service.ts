@@ -221,7 +221,7 @@ export class ProductsService {
     return product;
   }
 
-  async findOneBySlug(slug: string): Promise<Product> {
+  async findOneBySlug(slug: string, userId: number): Promise<Product> {
     const product = await this.productsRepository.createQueryBuilder('product')
       .leftJoinAndSelect('product.brand', 'brand')
       .leftJoinAndSelect('product.categories', 'category')
@@ -240,6 +240,13 @@ export class ProductsService {
       , { today: new Date() })
       .leftJoinAndSelect('product.deliveryMethodTypes', 'deliveryMethodType')
       .leftJoinAndSelect('product.tags', 'tag')
+      .leftJoinAndMapOne(
+        'product.favoriteProduct',
+        'product.favoriteProducts',
+        'favoriteProductAlone',
+        'favoriteProductAlone.userId = :userId',
+        { userId }
+      )
       .where('product.slug = :slug', { slug })
       .getOne();
 
