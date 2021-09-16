@@ -42,7 +42,10 @@ export class LocationsService {
   }
 
   async findOne(id: number): Promise<Location> {
-    const location = await this.locationsRepository.findOne(id);
+    const location = await this.locationsRepository.findOne({
+      where: { id },
+      relations: ['parentLocation'],
+    });
 
     if (!location) {
       throw new LocationNotFoundException();
