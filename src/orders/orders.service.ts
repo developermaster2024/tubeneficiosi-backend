@@ -449,8 +449,7 @@ export class OrdersService {
           throw new IncorrectOrderStatusException();
         }
 
-        if (order.orderStatus.code === OrderStatuses.PRODUCTS_SENT && order.user.id !== userId) throw new UserMustBeTheBuyer();
-        if (order.orderStatus.code === OrderStatuses.WAITING_FOR_PICKUP_AT_STORE && order.store.user.id !== userId) throw new UserMustBeTheStoreThatOwnsTheProduct();
+        if (order.user.id !== userId) throw new UserMustBeTheBuyer();
         const admins = await this.usersRepository.find({ role: Role.ADMIN });
 
         userToNotifications.push(...[
