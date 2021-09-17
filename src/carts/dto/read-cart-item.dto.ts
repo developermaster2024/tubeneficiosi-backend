@@ -14,6 +14,9 @@ export class ReadCartItemDto {
   readonly total: number;
 
   @Expose()
+  readonly productId: number;
+
+  @Expose()
   readonly productName: string;
 
   @Expose()
