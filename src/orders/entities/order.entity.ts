@@ -7,6 +7,7 @@ import { OrderStatus } from "src/order-statuses/entities/order-status.entity";
 import { OrderStatuses } from "src/order-statuses/enums/order-statuses.enum";
 import { PaymentMethod } from "src/payment-methods/entities/payment-method.entity";
 import { PaymentMethods } from "src/payment-methods/enum/payment-methods.enum";
+import { ProductRating } from "src/product-ratings/entities/product-rating.entity";
 import { Store } from "src/stores/entities/store.entity";
 import { User } from "src/users/entities/user.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
@@ -105,6 +106,9 @@ export class Order {
 
   @OneToOne(() => OrderRejectionReason, orderRejectionReason => orderRejectionReason.order, { cascade: ['insert', 'update'] })
   orderRejectionReason: OrderRejectionReason;
+
+  @OneToMany(() => ProductRating, productRating => productRating.order)
+  productRatings: ProductRating[];
 
   @CreateDateColumn({
     name: 'created_at',

@@ -21,7 +21,6 @@ export class ProductRating {
   @Column({
     name: 'product_id',
     type: 'int',
-    select: false,
   })
   productId: number;
 

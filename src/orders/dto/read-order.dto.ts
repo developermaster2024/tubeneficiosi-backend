@@ -8,6 +8,7 @@ import { ReadDeliveryMethodDto } from "src/delivery-methods/dto/read-delivery-me
 import { OrderRejectionReason } from "src/order-statuses/entities/order-rejection-reason.entity";
 import { OrderStatus } from "src/order-statuses/entities/order-status.entity";
 import { ReadPaymentMethodDto } from "src/payment-methods/dto/read-payment-method.dto";
+import { ProductRating } from "src/product-ratings/entities/product-rating.entity";
 import { ReadStoreDto } from "src/stores/dto/read-store.dto";
 import { User } from "src/users/entities/user.entity";
 import { ReadOrderStatusHistoryDto } from "./read-order-status-history.dto";
@@ -63,4 +64,11 @@ export class ReadOrderDto {
 
   @Expose()
   readonly orderRejectionReason: OrderRejectionReason;
+
+  @Expose()
+  readonly productRatings: ProductRating[];
+
+  @Expose()
+  @Transform(({obj}: {obj: ReadOrderDto}) => obj.productRatings?.map(rating => rating.productId) ?? [])
+  readonly productIdsFromRatings: number[];
 }
