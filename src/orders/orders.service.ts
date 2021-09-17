@@ -409,7 +409,10 @@ export class OrdersService {
       case OrderStatuses.PAYMENT_ACCEPTED:
       case OrderStatuses.PAYMENT_REJECTED: {
         if (order.orderStatus.code !== OrderStatuses.CONFIRMING_PAYMENT) throw new IncorrectOrderStatusException();
-        if (user.role !== Role.ADMIN) throw new UserMustBeAdminException();
+
+        const paymentMethodIsCardOrCash = order.paymentMethod.code === PaymentMethods.CARD || order.paymentMethod.code === PaymentMethods.CASH;
+        if (paymentMethodIsCardOrCash && order.store.user.id !== userId) throw new UserMustBeTheStoreThatOwnsTheProduct();
+        else if (!paymentMethodIsCardOrCash && user.role !== Role.ADMIN) throw new UserMustBeAdminException();
 
         userToNotifications.push(...[
           UserToNotification.create({ userId: order.user.id }),
