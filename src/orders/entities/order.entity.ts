@@ -2,6 +2,7 @@ import { BankTransfer } from "src/bank-transfers/entities/bank-transfer.entity";
 import { Cart } from "src/carts/entities/cart.entity";
 import { Delivery } from "src/deliveries/entities/delivery.entity";
 import { DeliveryMethod } from "src/delivery-methods/entities/delivery-method.entity";
+import { DeliveryNote } from "src/delivery-notes/entities/delivery-note.entity";
 import { OrderRejectionReason } from "src/order-statuses/entities/order-rejection-reason.entity";
 import { OrderStatus } from "src/order-statuses/entities/order-status.entity";
 import { OrderStatuses } from "src/order-statuses/enums/order-statuses.enum";
@@ -86,6 +87,9 @@ export class Order {
 
   @OneToOne(() => Delivery, delivery => delivery.order, { cascade: ['insert', 'update'] })
   delivery: Delivery;
+
+  @OneToOne(() => DeliveryNote, delivery => delivery.order)
+  deliveryNote: DeliveryNote;
 
   @Column({
     name: 'cart_id',

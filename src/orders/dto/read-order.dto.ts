@@ -5,6 +5,7 @@ import { ReadCartDto } from "src/carts/dto/read-cart.dto";
 import { ReadClientDto } from "src/clients/dto/read-client.dto";
 import { ReadDeliveryDto } from "src/deliveries/dto/read-delivery.dto";
 import { ReadDeliveryMethodDto } from "src/delivery-methods/dto/read-delivery-method.dto";
+import { ReadDeliveryNoteDto } from "src/delivery-notes/dto/read-delivery-note.dto";
 import { OrderRejectionReason } from "src/order-statuses/entities/order-rejection-reason.entity";
 import { OrderStatus } from "src/order-statuses/entities/order-status.entity";
 import { ReadPaymentMethodDto } from "src/payment-methods/dto/read-payment-method.dto";
@@ -71,4 +72,8 @@ export class ReadOrderDto {
   @Expose()
   @Transform(({obj}: {obj: ReadOrderDto}) => obj.productRatings?.map(rating => rating.productId) ?? [])
   readonly productIdsFromRatings: number[];
+
+  @Expose()
+  @Type(() => ReadDeliveryNoteDto)
+  readonly deliveryNote: ReadDeliveryNoteDto;
 }

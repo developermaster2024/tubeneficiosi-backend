@@ -332,6 +332,7 @@ export class OrdersService {
       .innerJoinAndSelect('orderStatusHistory.newOrderStatus', 'newOrderStatus')
       .leftJoinAndSelect('order.orderRejectionReason', 'orderRejectionReason')
       .leftJoinAndSelect('order.productRatings', 'productRating')
+      .leftJoinAndSelect('order.deliveryNote', 'deliveryNote')
       .where('order.id = :orderId', { orderId: id });
 
     if (user.role === Role.CLIENT) {
