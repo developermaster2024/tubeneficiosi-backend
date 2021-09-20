@@ -164,10 +164,9 @@ export class Product {
   }
 
   @Column({
+    name: 'rating',
     type: 'int',
-    insert: false,
-    update: false,
-    select: false,
+    default: 0,
   })
   rating: number;
 

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { OrderStatuses } from 'src/order-statuses/enums/order-statuses.enum';
 import { Order } from 'src/orders/entities/order.entity';
 import { OrderNotFoundException } from 'src/orders/errors/order-not-found.exception';
+import { Product } from 'src/products/entities/product.entity';
 import { Repository } from 'typeorm';
 import { RateProductDto } from './dto/rate-product.dto';
 import { ProductRating } from './entities/product-rating.entity';
@@ -12,7 +13,8 @@ import { ProductAlreadyRatedException } from './errors/product-already-rated.exc
 export class ProductRatingsService {
   constructor(
     @InjectRepository(ProductRating) private readonly productRatingsRepository: Repository<ProductRating>,
-    @InjectRepository(Order) private readonly ordersReposiory: Repository<Order>
+    @InjectRepository(Order) private readonly ordersReposiory: Repository<Order>,
+    @InjectRepository(Product) private readonly productsRepository: Repository<Product>
   ) {}
 
   async rateProduct({productId, userId, orderId, ...rateProductDto}: RateProductDto): Promise<ProductRating> {
@@ -42,6 +44,23 @@ export class ProductRatingsService {
 
     const productRating = ProductRating.create({ orderId, productId, userId, ...rateProductDto });
 
-    return await this.productRatingsRepository.save(productRating);
+    const savedRating = await this.productRatingsRepository.save(productRating);
+
+    await this.productsRepository.createQueryBuilder('product')
+      .update(Product)
+      .set({
+        rating: () => `
+          (SELECT
+            ROUND(AVG(value))
+          FROM
+            product_ratings
+          WHERE
+            product_ratings.product_id = products.id)
+        `
+      })
+      .where('id = :productId', { productId })
+      .execute();
+
+    return savedRating;
   }
 }
