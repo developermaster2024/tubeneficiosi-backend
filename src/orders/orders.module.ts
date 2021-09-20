@@ -7,6 +7,7 @@ import { DeliveryZone } from 'src/delivery-methods/entities/delivery-zone.entity
 import { Notification } from 'src/notifications/entities/notification.entity';
 import { NotificationsModule } from 'src/notifications/notifications.module';
 import { OrderStatus } from 'src/order-statuses/entities/order-status.entity';
+import { PaymentGatewaysModule } from 'src/payment-gateways/payment-gateways.module';
 import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Order } from './entities/order.entity';
@@ -16,6 +17,7 @@ import { OrdersService } from './orders.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Order, Cart, DeliveryZone, User, Product, DeliveryMethod, OrderStatus, Notification]),
+    PaymentGatewaysModule,
     DeliveryMethodsModule,
     NotificationsModule,
   ],

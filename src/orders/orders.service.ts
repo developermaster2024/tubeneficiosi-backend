@@ -41,6 +41,7 @@ import { UserToNotification } from 'src/notifications/entities/user-to-notificat
 import { StoreIsClosedException } from './errors/store-is-closed.exception';
 import { OrdersCountDto } from './dto/orders-count.dto';
 import { DeliveryMethodNotAllowedByProductException } from './errors/delivery-method-not-allowed-by-product.exception';
+import { MercadoPagoPaymentGateway } from 'src/payment-gateways/mercado-pago-payment-gateway';
 
 @Injectable()
 export class OrdersService {
@@ -54,7 +55,8 @@ export class OrdersService {
     @InjectRepository(OrderStatus) private readonly orderStatusesRepository: Repository<OrderStatus>,
     @InjectRepository(Notification) private readonly notificationsRepository: Repository<Notification>,
     private readonly deliveryCostCalculatorResolver: DeliveryCostCalculatorResolver,
-    private readonly notificationsGateway: NotificationsGateway
+    private readonly notificationsGateway: NotificationsGateway,
+    private readonly mercadoPagoPaymentGateway: MercadoPagoPaymentGateway
   ) {}
 
   async paginate({perPage, offset, filters: {
@@ -139,7 +141,7 @@ export class OrdersService {
     profileAddressId,
     paymentMethodCode,
     bankTransfers = [],
-  }: CreateOrderDto): Promise<Order> {
+  }: CreateOrderDto): Promise<{order: Order, url: string}> {
     const order = Order.create({});
 
     const cart = await this.cartsRepository.createQueryBuilder('cart')
@@ -183,7 +185,7 @@ export class OrdersService {
     order.orderNumber = (lastOrder ? +lastOrder.orderNumber + 1 : 1).toString().padStart(6, '0');
     order.cart = cart;
     order.storeId = cart.store.id;
-    order.userId = cart.user.id;
+    order.user = cart.user;
     order.orderStatusCode = OrderStatuses.CONFIRMING_PAYMENT;
     order.paymentMethodCode = paymentMethodCode;
     const orderStatus = await this.orderStatusesRepository.findOne({ code: OrderStatuses.CONFIRMING_PAYMENT });
@@ -252,10 +254,6 @@ export class OrdersService {
       }
     }
 
-    if (paymentMethodCode === PaymentMethods.MERCADO_PAGO) {
-      // @TODO: Crear url de mercado pago
-    }
-
     cart.isProcessed = true;
     await this.cartsRepository.save(cart);
 
@@ -280,6 +278,12 @@ export class OrdersService {
 
     const savedOrder = await this.ordersRepository.save(order);
 
+    let url: string = null;
+
+    if (paymentMethodCode === PaymentMethods.MERCADO_PAGO) {
+      url = await this.mercadoPagoPaymentGateway.getPaymentUrl(savedOrder);
+    }
+
     const admins = await this.usersRepository.find({ role: Role.ADMIN });
 
     const userToNotifications = [
@@ -296,7 +300,10 @@ export class OrdersService {
 
     this.notificationsGateway.notifyUsersById(userToNotifications.map(utn => utn.user?.id ?? userId), notification.toDto());
 
-    return savedOrder;
+    return {
+      order: savedOrder,
+      url
+    };
   }
 
   async findOne(id: number, userId: number): Promise<Order> {

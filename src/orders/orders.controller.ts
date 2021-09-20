@@ -7,6 +7,7 @@ import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-b
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
+import { CreateOrderResponseDto } from './dto/create-order-response.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrdersCountDto } from './dto/orders-count.dto';
 import { ReadOrderDto } from './dto/read-order.dto';
@@ -33,8 +34,8 @@ export class OrdersController {
   @Roles(Role.CLIENT)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor())
-  async create(@Body() createOrderDto: CreateOrderDto): Promise<ReadOrderDto> {
-    return plainToClass(ReadOrderDto, await this.ordersService.create(createOrderDto));
+  async create(@Body() createOrderDto: CreateOrderDto): Promise<CreateOrderResponseDto> {
+    return plainToClass(CreateOrderResponseDto, await this.ordersService.create(createOrderDto));
   }
 
   @Get(':id(\\d+)')

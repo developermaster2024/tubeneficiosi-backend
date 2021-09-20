@@ -48,6 +48,7 @@ import { DiscountsModule } from './discounts/discounts.module';
 import { FavoriteProductsModule } from './favorite-products/favorite-products.module';
 import { FavoriteStoresModule } from './favorite-stores/favorite-stores.module';
 import { ProductRatingsModule } from './product-ratings/product-ratings.module';
+import { PaymentGatewaysModule } from './payment-gateways/payment-gateways.module';
 
 @Module({
   imports: [
@@ -102,6 +103,7 @@ import { ProductRatingsModule } from './product-ratings/product-ratings.module';
     FavoriteProductsModule,
     FavoriteStoresModule,
     ProductRatingsModule,
+    PaymentGatewaysModule,
   ],
 })
 export class AppModule {}
