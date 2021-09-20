@@ -75,6 +75,5 @@ export class ReadProductDto {
   readonly isFavorite: boolean;
 
   @Expose()
-  @Transform(({value}) => value ? Math.round(+value) : 0)
   readonly rating: number;
 }

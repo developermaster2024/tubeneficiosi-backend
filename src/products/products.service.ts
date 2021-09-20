@@ -56,7 +56,6 @@ export class ProductsService {
     minRating,
   }, tagsToSortBy}: ProductPaginationOptionsDto, userId: number): Promise<PaginationResult<Product>> {
     const queryBuilder = this.productsRepository.createQueryBuilder('product')
-      .addSelect('(SELECT AVG(`value`) FROM product_ratings WHERE product_ratings.product_id = product.id)', 'product_rating')
       .take(perPage)
       .skip(offset)
       .leftJoinAndSelect('product.brand', 'brand')
@@ -144,14 +143,7 @@ export class ProductsService {
     );
 
     if (minRating) {
-      queryBuilder.andWhere(`(
-        SELECT
-          ROUND(AVG(productRating.value))
-        FROM
-          product_ratings productRating
-        WHERE
-          productRating.product_id = product.id
-      ) >= :minRating`, { minRating });
+      queryBuilder.andWhere(`product.rating >= :minRating`, { minRating });
     }
 
     const [products, total] = await queryBuilder.getManyAndCount();
@@ -207,7 +199,6 @@ export class ProductsService {
 
   async findOneById(id: number): Promise<Product> {
     const product = await this.productsRepository.createQueryBuilder('product')
-      .addSelect('(SELECT AVG(`value`) FROM product_ratings WHERE product_ratings.product_id = product.id)', 'product_rating')
       .leftJoinAndSelect('product.brand', 'brand')
       .leftJoinAndSelect('product.categories', 'category')
       .leftJoinAndSelect('product.productImages', 'productImage')
@@ -237,7 +228,6 @@ export class ProductsService {
 
   async findOneBySlug(slug: string, userId: number): Promise<Product> {
     const product = await this.productsRepository.createQueryBuilder('product')
-      .addSelect('(SELECT AVG(`value`) FROM product_ratings WHERE product_ratings.product_id = product.id)', 'product_rating')
       .leftJoinAndSelect('product.brand', 'brand')
       .leftJoinAndSelect('product.categories', 'category')
       .leftJoinAndSelect('product.productImages', 'productImage')
