@@ -4,6 +4,8 @@ import { OrderStatuses } from 'src/order-statuses/enums/order-statuses.enum';
 import { Order } from 'src/orders/entities/order.entity';
 import { OrderNotFoundException } from 'src/orders/errors/order-not-found.exception';
 import { Product } from 'src/products/entities/product.entity';
+import { ProductNotFoundException } from 'src/products/errors/product-not-found.exception';
+import { Store } from 'src/stores/entities/store.entity';
 import { Repository } from 'typeorm';
 import { RateProductDto } from './dto/rate-product.dto';
 import { ProductRating } from './entities/product-rating.entity';
@@ -14,7 +16,8 @@ export class ProductRatingsService {
   constructor(
     @InjectRepository(ProductRating) private readonly productRatingsRepository: Repository<ProductRating>,
     @InjectRepository(Order) private readonly ordersReposiory: Repository<Order>,
-    @InjectRepository(Product) private readonly productsRepository: Repository<Product>
+    @InjectRepository(Product) private readonly productsRepository: Repository<Product>,
+    @InjectRepository(Store) private readonly storesRepository: Repository<Store>
   ) {}
 
   async rateProduct({productId, userId, orderId, ...rateProductDto}: RateProductDto): Promise<ProductRating> {
@@ -49,16 +52,39 @@ export class ProductRatingsService {
     await this.productsRepository.createQueryBuilder('product')
       .update(Product)
       .set({
-        rating: () => `
-          (SELECT
+        rating: () => `(
+          SELECT
             ROUND(AVG(value))
           FROM
             product_ratings
           WHERE
-            product_ratings.product_id = products.id)
-        `
+            product_ratings.product_id = products.id
+        )`
       })
       .where('id = :productId', { productId })
+      .execute();
+
+    const product = await this.productsRepository.createQueryBuilder('product')
+      .select([
+        'product.id',
+        'product.storeId',
+      ])
+      .where('product.id = :productId', { productId })
+      .getOne();
+
+    if (!product) throw new ProductNotFoundException();
+
+    const { rating } = await this.productRatingsRepository.createQueryBuilder('productRating')
+      .select('ROUND(AVG(value))', 'rating')
+      .innerJoin('productRating.product', 'product')
+      .innerJoin('product.store', 'store')
+      .where('store.id = :storeId', { storeId: product.storeId })
+      .getRawOne();
+
+    await this.storesRepository.createQueryBuilder('store')
+      .update(Store)
+      .set({ rating })
+      .where('stores.id = :storeId', { storeId: product.storeId })
       .execute();
 
     return savedRating;

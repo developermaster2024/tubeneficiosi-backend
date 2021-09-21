@@ -68,6 +68,13 @@ export class Store {
   longitude: number;
 
   @Column({
+    name: 'rating',
+    type: 'int',
+    default: 0,
+  })
+  rating: number;
+
+  @Column({
     name: 'user_id',
     type: 'int',
     select: false,

@@ -76,6 +76,10 @@ export class ReadStoreDto extends OmitType(ReadUserDto, ['role']) {
   readonly isFavorite: boolean;
 
   @Expose()
+  @Transform(({obj}: {obj: User}) => obj.store.rating)
+  readonly rating: boolean;
+
+  @Expose()
   @Transform(({obj: {store: {latestActiveDiscount}}}: {obj: User}) => {
     if (!latestActiveDiscount || latestActiveDiscount instanceof ReadDiscountDto) {
       return latestActiveDiscount;
