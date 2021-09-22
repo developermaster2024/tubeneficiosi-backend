@@ -167,7 +167,7 @@ export class DeliveryMethodsService {
     return deliveryMethod;
   }
 
-  async update({id, userId, ...updateDeliveryMethodDto}: UpdateDeliveryMethodDto): Promise<DeliveryMethod> {
+  async update({id, userId, image, ...updateDeliveryMethodDto}: UpdateDeliveryMethodDto): Promise<DeliveryMethod> {
     const store = await this.findStoreByUserId(userId);
 
     const deliveryMethod = await this.deliveryMethodsRepository.findOne({
@@ -180,6 +180,10 @@ export class DeliveryMethodsService {
     }
 
     Object.assign(deliveryMethod, updateDeliveryMethodDto);
+
+    if (image) {
+      deliveryMethod.imgPath = image.path;
+    }
 
     return await this.deliveryMethodsRepository.save(deliveryMethod);
   }
