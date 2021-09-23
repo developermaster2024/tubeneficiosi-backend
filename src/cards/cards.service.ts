@@ -18,12 +18,14 @@ export class CardsService {
     cardIssuerId,
     cardIssuerName,
     cardTypeId,
+    isOwnedById,
   }}: CardPaginationOptionsDto): Promise<PaginationResult<Card>> {
     const queryBuilder = this.cardsRepository.createQueryBuilder('card')
       .take(perPage)
       .skip(offset)
       .innerJoinAndSelect('card.cardIssuer', 'cardIssuer')
-      .innerJoinAndSelect('card.cardType', 'cardType');
+      .innerJoinAndSelect('card.cardType', 'cardType')
+      .leftJoin('card.clientToCards', 'clientToCard');
 
     if (id) queryBuilder.andWhere('card.id = :id', { id });
 
@@ -34,6 +36,8 @@ export class CardsService {
     if (cardTypeId) queryBuilder.andWhere('card.cardTypeId = :cardTypeId', { cardTypeId });
 
     if (cardIssuerName) queryBuilder.andWhere('cardIssuer.name LIKE :cardIssuerName', { cardIssuerName: `%${cardIssuerName}%` });
+
+    if (isOwnedById) queryBuilder.andWhere('clientToCard.userId = :isOwnedById', { isOwnedById });
 
     const [cards, total] = await queryBuilder.getManyAndCount();
 

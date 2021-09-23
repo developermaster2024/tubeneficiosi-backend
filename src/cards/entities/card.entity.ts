@@ -1,6 +1,7 @@
 import { CardIssuer } from "src/card-issuers/entities/card-issuer.entity";
 import { CardType } from "src/card-types/entities/card-type.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { ClientToCard } from "src/client-cards/entities/client-to-card.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({
   name: 'cards',
@@ -43,6 +44,9 @@ export class Card {
   @ManyToOne(() => CardType, {nullable: false, onDelete: 'CASCADE'})
   @JoinColumn({name: 'card_type_id'})
   cardType: CardType;
+
+  @OneToMany(() => ClientToCard, clientToCard => clientToCard.card)
+  clientToCards: ClientToCard[];
 
   @CreateDateColumn({
     name: 'created_at',

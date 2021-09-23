@@ -6,6 +6,7 @@ type CardFilters = {
   cardIssuerId: number;
   cardIssuerName: string;
   cardTypeId: number;
+  isOwnedById: number;
 };
 
 export class CardPaginationOptionsDto extends PaginationOptions {
@@ -22,6 +23,7 @@ export class CardPaginationOptionsDto extends PaginationOptions {
       cardIssuerId,
       cardIssuerName,
       cardTypeId,
+      isOwnedById,
     } = query;
 
     return new CardPaginationOptionsDto(+page, +perPage, {
@@ -30,6 +32,7 @@ export class CardPaginationOptionsDto extends PaginationOptions {
       cardIssuerId: Number(cardIssuerId),
       cardIssuerName,
       cardTypeId: Number(cardTypeId),
+      isOwnedById: +isOwnedById,
     });
   }
 }
