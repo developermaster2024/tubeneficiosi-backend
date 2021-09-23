@@ -101,7 +101,8 @@ export class OrdersService {
       .leftJoinAndSelect('orderStatusHistory.prevOrderStatus', 'prevOrderStatus')
       .innerJoinAndSelect('orderStatusHistory.newOrderStatus', 'newOrderStatus')
       .leftJoinAndSelect('order.orderRejectionReason', 'orderRejectionReason')
-      .leftJoinAndSelect('order.productRatings', 'productRating');
+      .leftJoinAndSelect('order.productRatings', 'productRating')
+      .leftJoinAndSelect('order.storeRating', 'storeRating');
 
     if (user.role === Role.CLIENT) {
       queryBuilder.andWhere('order.userId = :userId', { userId });
@@ -340,6 +341,7 @@ export class OrdersService {
       .leftJoinAndSelect('order.orderRejectionReason', 'orderRejectionReason')
       .leftJoinAndSelect('order.productRatings', 'productRating')
       .leftJoinAndSelect('order.deliveryNote', 'deliveryNote')
+      .leftJoinAndSelect('order.storeRating', 'storeRating')
       .where('order.id = :orderId', { orderId: id });
 
     if (user.role === Role.CLIENT) {
@@ -396,6 +398,7 @@ export class OrdersService {
       .innerJoinAndSelect('orderStatusHistory.newOrderStatus', 'newOrderStatus')
       .leftJoinAndSelect('order.orderRejectionReason', 'orderRejectionReason')
       .leftJoinAndSelect('order.productRatings', 'productRating')
+      .leftJoinAndSelect('order.storeRating', 'storeRating')
       .where('order.id = :id', { id });
 
     const order = await queryBuilder.getOne();

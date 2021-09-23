@@ -12,6 +12,7 @@ import { ReadPaymentMethodDto } from "src/payment-methods/dto/read-payment-metho
 import { ProductRating } from "src/product-ratings/entities/product-rating.entity";
 import { ReadStoreDto } from "src/stores/dto/read-store.dto";
 import { User } from "src/users/entities/user.entity";
+import { Order } from "../entities/order.entity";
 import { ReadOrderStatusHistoryDto } from "./read-order-status-history.dto";
 
 @Exclude()
@@ -76,4 +77,8 @@ export class ReadOrderDto {
   @Expose()
   @Type(() => ReadDeliveryNoteDto)
   readonly deliveryNote: ReadDeliveryNoteDto;
+
+  @Expose()
+  @Transform(({obj}: {obj: Order}) => !!obj.storeRating)
+  readonly storeHasBeenRated: boolean;
 }
