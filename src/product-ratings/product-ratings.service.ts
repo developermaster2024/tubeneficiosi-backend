@@ -16,8 +16,7 @@ export class ProductRatingsService {
   constructor(
     @InjectRepository(ProductRating) private readonly productRatingsRepository: Repository<ProductRating>,
     @InjectRepository(Order) private readonly ordersReposiory: Repository<Order>,
-    @InjectRepository(Product) private readonly productsRepository: Repository<Product>,
-    @InjectRepository(Store) private readonly storesRepository: Repository<Store>
+    @InjectRepository(Product) private readonly productsRepository: Repository<Product>
   ) {}
 
   async rateProduct({productId, userId, orderId, ...rateProductDto}: RateProductDto): Promise<ProductRating> {
@@ -62,29 +61,6 @@ export class ProductRatingsService {
         )`
       })
       .where('id = :productId', { productId })
-      .execute();
-
-    const product = await this.productsRepository.createQueryBuilder('product')
-      .select([
-        'product.id',
-        'product.storeId',
-      ])
-      .where('product.id = :productId', { productId })
-      .getOne();
-
-    if (!product) throw new ProductNotFoundException();
-
-    const { rating } = await this.productRatingsRepository.createQueryBuilder('productRating')
-      .select('ROUND(AVG(value))', 'rating')
-      .innerJoin('productRating.product', 'product')
-      .innerJoin('product.store', 'store')
-      .where('store.id = :storeId', { storeId: product.storeId })
-      .getRawOne();
-
-    await this.storesRepository.createQueryBuilder('store')
-      .update(Store)
-      .set({ rating })
-      .where('stores.id = :storeId', { storeId: product.storeId })
       .execute();
 
     return savedRating;
