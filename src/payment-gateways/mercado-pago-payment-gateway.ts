@@ -40,9 +40,9 @@ export class MercadoPagoPaymentGateway {
         installments: 1,
       },
       back_urls: {
-        success: `${frontEndUrl}/success`,
-        failure: `${frontEndUrl}/failure`,
-        pending: `${frontEndUrl}/pending`,
+        success: `${frontEndUrl}/orders?mercadopago-status=success`,
+        failure: `${frontEndUrl}/orders?mercadopago-status=failure`,
+        pending: `${frontEndUrl}/orders?mercadopago-status=pending`,
       },
       auto_return: 'all',
       shipments: {
