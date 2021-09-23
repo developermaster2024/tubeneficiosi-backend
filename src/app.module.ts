@@ -50,6 +50,7 @@ import { FavoriteStoresModule } from './favorite-stores/favorite-stores.module';
 import { ProductRatingsModule } from './product-ratings/product-ratings.module';
 import { PaymentGatewaysModule } from './payment-gateways/payment-gateways.module';
 import { StoreRatingsModule } from './store-ratings/store-ratings.module';
+import { ClientCardsModule } from './client-cards/client-cards.module';
 
 @Module({
   imports: [
@@ -106,6 +107,7 @@ import { StoreRatingsModule } from './store-ratings/store-ratings.module';
     ProductRatingsModule,
     PaymentGatewaysModule,
     StoreRatingsModule,
+    ClientCardsModule,
   ],
 })
 export class AppModule {}
