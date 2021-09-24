@@ -50,6 +50,13 @@ export class MainBannerAd {
   price: number;
 
   @Column({
+    name: 'percentage',
+    type: 'int',
+    default: 0,
+  })
+  percentage: number;
+
+  @Column({
     name: 'store_id',
     type: 'int',
     select: false,

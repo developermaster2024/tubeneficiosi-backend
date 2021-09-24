@@ -34,4 +34,7 @@ export class ReadMainBannerAdDto {
 
   @Expose()
   readonly isActive: boolean;
+
+  @Expose()
+  readonly percentage: number;
 }

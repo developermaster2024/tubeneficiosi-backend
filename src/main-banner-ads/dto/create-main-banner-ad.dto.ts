@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { IsDate, IsNumber, IsUrl, Min, Validate } from "class-validator";
+import { IsDate, IsInt, IsNumber, IsUrl, Max, Min } from "class-validator";
 import { Store } from "src/stores/entities/store.entity";
 import { DateAfterField } from "src/validation/date-after-field.constrain";
 import { Exists } from "src/validation/exists.constrain";
@@ -41,4 +41,11 @@ export class CreateMainBannerAdDto {
   @Expose()
   @Exists(Store)
   readonly storeId: number;
+
+  @Expose()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  readonly percentage: number;
 }
