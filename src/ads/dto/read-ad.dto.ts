@@ -45,4 +45,7 @@ export class ReadAdDto {
 
   @Expose()
   readonly isActive: boolean;
+
+  @Expose()
+  readonly percentage: number;
 }

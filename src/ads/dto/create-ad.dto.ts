@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { IsDate, IsNumber, IsUrl, MaxLength, Min } from "class-validator";
+import { IsDate, IsInt, IsNumber, IsUrl, Max, MaxLength, Min } from "class-validator";
 import { AdsPosition } from "src/ads-positions/entities/ads-position.entity";
 import { Store } from "src/stores/entities/store.entity";
 import { DateAfterField } from "src/validation/date-after-field.constrain";
@@ -54,4 +54,11 @@ export class CreateAdDto {
   @Expose()
   @Exists(AdsPosition)
   readonly adsPositionId: number;
+
+  @Expose()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  readonly percentage: number;
 }
