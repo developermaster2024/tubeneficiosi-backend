@@ -120,7 +120,9 @@ export class OrdersService {
 
     if (storeName) queryBuilder.andWhere('store.name LIKE :storeName', { storeName: `%${storeName}%` });
 
-    // @TODO: Agregar filtro por totales
+    if (minTotal) queryBuilder.andWhere('order.total >= :minTotal', { minTotal });
+
+    if (maxTotal) queryBuilder.andWhere('order.total <= :maxTotal', { maxTotal });
 
     if (minDate) queryBuilder.andWhere('order.createdAt >= :minDate', { minDate });
 
