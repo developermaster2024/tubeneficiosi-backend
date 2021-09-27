@@ -70,6 +70,22 @@ export class Cart {
   })
   discountId: number;
 
+  @Column({
+    name: 'sub_total',
+    type: 'decimal',
+    precision: 14,
+    scale: 2,
+  })
+  subTotal: number;
+
+  @Column({
+    name: 'sub_total_with_discount',
+    type: 'decimal',
+    precision: 14,
+    scale: 2,
+  })
+  subTotalWithDiscount: number;
+
   @ManyToOne(() => Discount, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'discount_id' })
   discount: Discount;
@@ -91,13 +107,13 @@ export class Cart {
   })
   deletedAt: Date;
 
-  get subTotal(): number {
+  get computedSubTotal(): number {
     return this.cartItems
       .map(item => Number(item.total))
       .reduce(((total, currentValue) => total + currentValue), 0);
   }
 
-  get subTotalWithDiscount(): number {
+  get computedSubTotalWithDiscount(): number {
     const subTotal = this.subTotal;
 
     const percentage = Number(this?.discount?.value) || 0;

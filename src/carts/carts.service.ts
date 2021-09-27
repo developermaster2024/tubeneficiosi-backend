@@ -108,7 +108,7 @@ export class CartsService {
       queryBuilder.andWhere(`cart.expiresOn ${comparator} :today`, { today: new Date() });
     }
 
-    if (isDirectPurchase !== null) queryBuilder.andWhere('cart.isDirectPurchase = :isDirectPurchase', { isDirectPurchase: +isDirectPurchase});
+    if (isDirectPurchase !== null) queryBuilder.andWhere('cart.isDirectPurchase = :isDirectPurchase', { isDirectPurchase: +isDirectPurchase });
 
     const [carts, total] = await queryBuilder.getManyAndCount();
 
@@ -202,6 +202,9 @@ export class CartsService {
       throw new ProductQuantityIsLessThanRequiredQuantityException();
     }
 
+    cart.subTotal = cart.computedSubTotal;
+    cart.subTotalWithDiscount = cart.computedSubTotalWithDiscount;
+
     return await this.cartsRepository.save(cart);
   }
 
@@ -228,6 +231,9 @@ export class CartsService {
       .getOne();
 
     cart.discount = discount ?? null;
+
+    cart.subTotal = cart.computedSubTotal;
+    cart.subTotalWithDiscount = cart.computedSubTotalWithDiscount;
 
     return await this.cartsRepository.save(cart);
   }
@@ -386,7 +392,10 @@ export class CartsService {
       throw new CartNotFoundException();
     }
 
-    return cart;
+    cart.subTotal = cart.computedSubTotal;
+    cart.subTotalWithDiscount = cart.computedSubTotalWithDiscount;
+
+    return await this.cartsRepository.save(cart);
   }
 
   async updateCartItemQuantity({userId, cartId, cartItemId, quantity}: UpdateCartItemQuantityDto): Promise<CartItem> {
@@ -414,7 +423,46 @@ export class CartsService {
       throw new ProductQuantityIsLessThanRequiredQuantityException();
     }
 
-    return await this.cartItemsRepository.save(cartItem);
+    const cart = await this.cartsRepository.createQueryBuilder('cart')
+      .leftJoinAndSelect('cart.cartItems', 'cartItem')
+      .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .leftJoinAndSelect('cart.discount', 'discount')
+      .leftJoinAndSelect('discount.discountType', 'discountType')
+      .innerJoinAndSelect('cart.user', 'user')
+      .leftJoinAndSelect('user.client', 'client')
+      .leftJoinAndSelect('cart.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('store.storeHours', 'storeHour')
+      .leftJoinAndSelect('cart.order', 'order')
+      .leftJoinAndSelect('order.orderStatus', 'orderStatus')
+      .leftJoinAndSelect('order.paymentMethod', 'paymentMethod')
+      .leftJoinAndSelect('order.deliveryMethod', 'deliveryMethod')
+      .leftJoinAndSelect('order.delivery', 'delivery')
+      .leftJoinAndSelect('delivery.profileAddress', 'profileAddress')
+      .leftJoinAndSelect('order.bankTransfers', 'bankTransfer')
+      .leftJoinAndSelect('bankTransfer.bankAccount', 'bankAccount')
+      .leftJoinAndSelect('bankAccount.cardIssuer', 'cardIssuer')
+      .leftJoinAndSelect('order.orderStatusHistory', 'orderStatusHistory')
+      .leftJoinAndSelect('orderStatusHistory.prevOrderStatus', 'prevOrderStatus')
+      .leftJoinAndSelect('orderStatusHistory.newOrderStatus', 'newOrderStatus')
+      .leftJoinAndSelect('order.orderRejectionReason', 'orderRejectionReason')
+      .where('cart.userId = :userId', { userId })
+      .andWhere('cart.id = :cartId', { cartId })
+      .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
+      .getOne();
+
+    if (!cart) {
+      throw new CartNotFoundException();
+    }
+
+    const savedCartItem = await this.cartItemsRepository.save(cartItem);
+
+    cart.subTotal = cart.computedSubTotal;
+    cart.subTotalWithDiscount = cart.computedSubTotalWithDiscount;
+
+    await this.cartsRepository.save(cart);
+
+    return savedCartItem;
   }
 
   async delete({cartId, userId}: {cartId: number, userId: number}): Promise<void> {
