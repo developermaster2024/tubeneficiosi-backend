@@ -142,7 +142,7 @@ export class OrdersService {
     profileAddressId,
     paymentMethodCode,
     bankTransfers = [],
-  }: CreateOrderDto): Promise<{order: Order, url: string}> {
+  }: CreateOrderDto, images: Express.Multer.File[]): Promise<{order: Order, url: string}> {
     const order = Order.create({});
 
     const cart = await this.cartsRepository.createQueryBuilder('cart')
@@ -244,7 +244,10 @@ export class OrdersService {
     }
 
     if (paymentMethodCode === PaymentMethods.BANK_TRANSFER) {
-      order.bankTransfers = bankTransfers.map(bankTransfer => BankTransfer.create(bankTransfer));
+      order.bankTransfers = bankTransfers.map((bankTransfer, i) => BankTransfer.create({
+        ...bankTransfer,
+        imgPath: images[i].path,
+      }));
 
       const bankTransfersTotal = order.bankTransfers.reduce((total, transfer) => Number(total) + Number(transfer.amount), 0);
 

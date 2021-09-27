@@ -26,6 +26,13 @@ export class BankTransfer {
   amount: number;
 
   @Column({
+    name: 'img_path',
+    type: 'varchar',
+    nullable: false,
+  })
+  imgPath: string;
+
+  @Column({
     name: 'bank_account_id',
     type: 'int',
     select: false,

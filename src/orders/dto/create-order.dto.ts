@@ -1,6 +1,5 @@
 import { Exclude, Expose } from "class-transformer";
 import { ArrayMinSize, ValidateIf, ValidateNested } from "class-validator";
-import { Cart } from "src/carts/entities/cart.entity";
 import { DeliveryMethod } from "src/delivery-methods/entities/delivery-method.entity";
 import { PaymentMethod } from "src/payment-methods/entities/payment-method.entity";
 import { PaymentMethods } from "src/payment-methods/enum/payment-methods.enum";
@@ -19,7 +18,6 @@ export class CreateOrderDto {
   @Expose()
   @ValidateIf((obj) => obj.deliveryMethodId)
   @Exists(DeliveryMethod)
-  // @TODO: Validar que este método de envío pertenezca a la tienda
   readonly deliveryMethodId?: number;
 
   @Expose()
