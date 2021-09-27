@@ -166,7 +166,7 @@ export class AuthService {
 
     const fullName = role === Role.CLIENT ? user.client.name : user.store.name;
 
-    await this.mailService.sendForgotPasswordEmail({email, token, fullName});
+    await this.mailService.sendForgotPasswordEmail({email, token, fullName, role});
   }
 
   async resetPassword({email, password, token}: ResetPasswordDto, role: Role): Promise<void> {
