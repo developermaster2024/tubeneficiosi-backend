@@ -96,6 +96,10 @@ export class CartsService {
 
     if (clientName) queryBuilder.andWhere('client.name LIKE :clientName', { clientName: `%${clientName}%` });
 
+    if (minTotal) queryBuilder.andWhere('cart.sub_total_with_discount >= :minTotal', { minTotal });
+
+    if (maxTotal) queryBuilder.andWhere('cart.sub_total_with_discount <= :maxTotal', { maxTotal });
+
     if (minDate) queryBuilder.andWhere('cart.createdAt >= :minDate', { minDate });
 
     if (maxDate) queryBuilder.andWhere('cart.createdAt <= :maxDate', { maxDate });
