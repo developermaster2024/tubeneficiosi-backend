@@ -118,6 +118,14 @@ export class Order {
   @OneToOne(() => StoreRating, (storeRating) => storeRating.order)
   storeRating: StoreRating;
 
+  @Column({
+    name: 'total',
+    type: 'decimal',
+    precision: 14,
+    scale: 2,
+  })
+  total: number;
+
   @CreateDateColumn({
     name: 'created_at',
   })
@@ -135,7 +143,7 @@ export class Order {
   })
   deletedAt: Date;
 
-  get total(): number {
+  get calculatedTotal(): number {
     // @TODO: Guardar total en BD
     const subTotal = this?.cart?.subTotalWithDiscount || 0;
 

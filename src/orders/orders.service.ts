@@ -280,6 +280,7 @@ export class OrdersService {
       .where('id IN (:...ids)', { ids: cart.cartItems.map(item => item.productId) })
       .execute();
 
+    order.total = order.calculatedTotal;
     const savedOrder = await this.ordersRepository.save(order);
 
     let url: string = null;
