@@ -12,8 +12,10 @@ import { Role } from 'src/users/enums/roles.enum';
 import { DeliveryMethodsService } from './delivery-methods.service';
 import { CalculateCostDto } from './dto/calculate-cost.dto';
 import { CreateDeliveryMethodDto } from './dto/create-delivery-method.dto';
+import { DeleteShippingRangeDto } from './dto/delete-shipping.dto';
 import { ReadDeliveryMethodDto } from './dto/read-delivery-method.dto';
 import { UpdateDeliveryMethodDto } from './dto/update-delivery-method.dto';
+import { UpdateShippingRangeDto } from './dto/update-shipping-range.dto';
 import { DeliveryMethodPaginationPipe } from './pipes/delivery-method-pagination.pipe';
 
 @Controller('delivery-methods')
@@ -44,6 +46,22 @@ export class DeliveryMethodsController {
   @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'), new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({id: 'id'}))
   async update(@Body() updateDeliveryMethodDto: UpdateDeliveryMethodDto): Promise<ReadDeliveryMethodDto> {
     return plainToClass(ReadDeliveryMethodDto, await this.deliveryMethodsService.update(updateDeliveryMethodDto));
+  }
+
+  @Put('shipping-ranges/:shippingRangeId')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ shippingRangeId: 'shippingRangeId' }))
+  async updateShippingRange(@Body() updateShippingRangeDto: UpdateShippingRangeDto): Promise<ReadDeliveryMethodDto> {
+    return plainToClass(ReadDeliveryMethodDto, await this.deliveryMethodsService.updateShippingRange(updateShippingRangeDto));
+  }
+
+  @Delete('shipping-ranges/:shippingRangeId')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ shippingRangeId: 'shippingRangeId' }))
+  async deleteShippingRange(@Body() deleteShippingRangeDto: DeleteShippingRangeDto): Promise<ReadDeliveryMethodDto> {
+    return plainToClass(ReadDeliveryMethodDto, await this.deliveryMethodsService.deleteShippingRange(deleteShippingRangeDto));
   }
 
   @Delete(':id')
