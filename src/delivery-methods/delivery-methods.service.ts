@@ -158,7 +158,14 @@ export class DeliveryMethodsService {
   }
 
   async findOne(id: number): Promise<DeliveryMethod> {
-    const deliveryMethod = await this.deliveryMethodsRepository.findOne(id);
+    const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
+      .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
+      .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
+      .leftJoinAndSelect('deliveryZone.deliveryZoneToShippingRanges', 'deliveryZoneToShippingRange')
+      .leftJoinAndSelect('deliveryZoneToShippingRange.shippingRange', 'dztsrShippingRange')
+      .where('deliveryMethod.id = :id', { id })
+      .getOne();
 
     if (!deliveryMethod) {
       throw new DeliveryMethodNotFoundException();
