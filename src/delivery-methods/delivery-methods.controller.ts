@@ -13,6 +13,7 @@ import { DeliveryMethodsService } from './delivery-methods.service';
 import { CalculateCostDto } from './dto/calculate-cost.dto';
 import { CreateDeliveryMethodDto } from './dto/create-delivery-method.dto';
 import { DeleteDeliveryRangeDto } from './dto/delete-delivery-range.dto';
+import { DeleteDeliveryZoneDto } from './dto/delete-delivery-zone.dto';
 import { DeleteShippingRangeDto } from './dto/delete-shipping-range.dto';
 import { ReadDeliveryMethodDto } from './dto/read-delivery-method.dto';
 import { UpdateDeliveryMethodDto } from './dto/update-delivery-method.dto';
@@ -92,12 +93,20 @@ export class DeliveryMethodsController {
     return plainToClass(ReadDeliveryMethodDto, await this.deliveryMethodsService.updateZoneToShippingRange(updateZoneToShippingRangeDto));
   }
 
-  @Put('delivery-zone/:deliveryZoneId')
+  @Put('delivery-zones/:deliveryZoneId')
   @Roles(Role.STORE)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ deliveryZoneId: 'deliveryZoneId' }))
   async updateDeliveryZone(@Body() updateDeliveryZoneDto: UpdateDeliveryZoneDto): Promise<ReadDeliveryMethodDto> {
     return plainToClass(ReadDeliveryMethodDto, await this.deliveryMethodsService.updateDeliveryZone(updateDeliveryZoneDto));
+  }
+
+  @Delete('delivery-zones/:deliveryZoneId')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ deliveryZoneId: 'deliveryZoneId' }))
+  async deleteDeliveryZone(@Body() deleteDeliveryZoneDto: DeleteDeliveryZoneDto): Promise<ReadDeliveryMethodDto> {
+    return plainToClass(ReadDeliveryMethodDto, await this.deliveryMethodsService.deleteDeliveryZone(deleteDeliveryZoneDto));
   }
 
   @Delete(':id')

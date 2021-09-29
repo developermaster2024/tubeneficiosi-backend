@@ -32,10 +32,11 @@ export class DeliveryZone {
     name: 'delivery_method_id',
     type: 'int',
     select: false,
+    nullable: true,
   })
   deliveryMethodId: number;
 
-  @ManyToOne(() => DeliveryMethod, {nullable: false, onDelete: 'CASCADE'})
+  @ManyToOne(() => DeliveryMethod, {nullable: true, onDelete: 'CASCADE'})
   @JoinColumn({name: 'delivery_method_id'})
   deliveryMethod: DeliveryMethod;
 

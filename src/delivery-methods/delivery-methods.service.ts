@@ -33,6 +33,7 @@ import { DeliveryZoneNotFoundException } from './errors/delivery-zone-not-found.
 import { UpdateDeliveryRangeDto } from './dto/update-delivery-range.dto';
 import { DeliveryRangeNotFoundException } from './errors/delivery-range-not-found.exception';
 import { DeleteDeliveryRangeDto } from './dto/delete-delivery-range.dto';
+import { DeleteDeliveryZoneDto } from './dto/delete-delivery-zone.dto';
 
 const shippingRangeIsBetweenRanges = ({weightFrom, weightTo, volumeFrom, volumeTo}: ShippingRange, ranges: ShippingRange[]) => {
   for (const range of ranges) {
@@ -423,6 +424,38 @@ export class DeliveryMethodsService {
       .leftJoinAndSelect('deliveryZone.deliveryZoneToShippingRanges', 'deliveryZoneToShippingRange')
       .leftJoinAndSelect('deliveryZoneToShippingRange.shippingRange', 'dztsrShippingRange')
       .where('deliveryMethod.id = :deliveryMethodId', { deliveryMethodId: deliveryZone.deliveryMethod.id })
+      .getOne();
+
+    if (!deliveryMethod) {
+      throw new DeliveryMethodNotFoundException();
+    }
+
+    return deliveryMethod;
+  }
+
+  async deleteDeliveryZone({userId, deliveryZoneId}: DeleteDeliveryZoneDto): Promise<DeliveryMethod> {
+    const deliveryZone = await this.deliveryZonesRepository.createQueryBuilder('deliveryZone')
+      .innerJoinAndSelect('deliveryZone.deliveryMethod', 'deliveryMethod')
+      .innerJoin('deliveryMethod.store', 'store')
+      .where('deliveryZone.id = :deliveryZoneId', { deliveryZoneId })
+      .andWhere('store.userId = :userId', { userId })
+      .getOne();
+
+    if (!deliveryZone) throw new DeliveryZoneNotFoundException();
+
+    const deliveryMethodId = deliveryZone.deliveryMethod.id;
+
+    deliveryZone.deliveryMethod = null;
+
+    await this.deliveryZonesRepository.save(deliveryZone);
+
+    const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
+      .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
+      .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
+      .leftJoinAndSelect('deliveryZone.deliveryZoneToShippingRanges', 'deliveryZoneToShippingRange')
+      .leftJoinAndSelect('deliveryZoneToShippingRange.shippingRange', 'dztsrShippingRange')
+      .where('deliveryMethod.id = :deliveryMethodId', { deliveryMethodId })
       .getOne();
 
     if (!deliveryMethod) {
