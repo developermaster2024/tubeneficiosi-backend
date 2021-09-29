@@ -28,6 +28,8 @@ import { DeleteShippingRangeDto } from './dto/delete-shipping.dto';
 import { RangeIsBetweenExistingRangesException } from './errors/range-is-between-existing-ranges.exception';
 import { UpdateZoneToShippingRangeDto } from './dto/update-zone-to-shipping-range.dto';
 import { DeliveryZoneToShippingRangeNotFoundException } from './errors/delivery-zone-to-shipping-range-not-found.exception';
+import { UpdateDeliveryZoneDto } from './dto/update-delivery-zone.dto';
+import { DeliveryZoneNotFoundException } from './errors/delivery-zone-not-found.exception';
 
 const rangeIsBetweenRanges = ({weightFrom, weightTo, volumeFrom, volumeTo}: ShippingRange, ranges: ShippingRange[]) => {
   for (const range of ranges) {
@@ -54,6 +56,7 @@ export class DeliveryMethodsService {
     @InjectRepository(Store) private readonly storesRepository: Repository<Store>,
     @InjectRepository(Cart) private readonly cartsRepository: Repository<Cart>,
     @InjectRepository(ShippingRange) private readonly shippingRangesRepository: Repository<ShippingRange>,
+    @InjectRepository(DeliveryZone) private readonly deliveryZonesRepository: Repository<DeliveryZone>,
     private readonly deliveryCostCalculatorResolver: DeliveryCostCalculatorResolver
   ) {}
 
@@ -293,9 +296,9 @@ export class DeliveryMethodsService {
       .andWhere('store.userId = :userId', { userId })
       .getOne();
 
-    Object.assign(zoneToShippingRange, updateZoneToShippingRangeDto);
-
     if (!zoneToShippingRange) throw new DeliveryZoneToShippingRangeNotFoundException();
+
+    Object.assign(zoneToShippingRange, updateZoneToShippingRangeDto);
 
     await this.deliveryZoneToShippingRangesRepository.save(zoneToShippingRange);
 
@@ -306,6 +309,36 @@ export class DeliveryMethodsService {
       .leftJoinAndSelect('deliveryZone.deliveryZoneToShippingRanges', 'deliveryZoneToShippingRange')
       .leftJoinAndSelect('deliveryZoneToShippingRange.shippingRange', 'dztsrShippingRange')
       .where('deliveryMethod.id = :deliveryMethodId', { deliveryMethodId: zoneToShippingRange.deliveryZone.deliveryMethod.id })
+      .getOne();
+
+    if (!deliveryMethod) {
+      throw new DeliveryMethodNotFoundException();
+    }
+
+    return deliveryMethod;
+  }
+
+  async updateDeliveryZone({userId, deliveryZoneId, ...updateDeliveryZoneDto}: UpdateDeliveryZoneDto): Promise<DeliveryMethod> {
+    const deliveryZone = await this.deliveryZonesRepository.createQueryBuilder('deliveryZone')
+      .innerJoinAndSelect('deliveryZone.deliveryMethod', 'deliveryMethod')
+      .innerJoin('deliveryMethod.store', 'store')
+      .where('deliveryZone.id = :deliveryZoneId', { deliveryZoneId })
+      .andWhere('store.userId = :userId', { userId })
+      .getOne();
+
+    if (!deliveryZone) throw new DeliveryZoneNotFoundException();
+
+    Object.assign(deliveryZone, updateDeliveryZoneDto);
+
+    await this.deliveryZonesRepository.save(deliveryZone);
+
+    const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
+      .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
+      .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
+      .leftJoinAndSelect('deliveryZone.deliveryZoneToShippingRanges', 'deliveryZoneToShippingRange')
+      .leftJoinAndSelect('deliveryZoneToShippingRange.shippingRange', 'dztsrShippingRange')
+      .where('deliveryMethod.id = :deliveryMethodId', { deliveryMethodId: deliveryZone.deliveryMethod.id })
       .getOne();
 
     if (!deliveryMethod) {
