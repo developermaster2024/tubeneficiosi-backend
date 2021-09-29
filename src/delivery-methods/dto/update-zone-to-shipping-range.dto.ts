@@ -11,6 +11,7 @@ export class UpdateZoneToShippingRangeDto {
   readonly zoneToShippingRangeId: number;
 
   @Expose()
+  @Type(() => Number)
   @Min(0)
   readonly price: number;
 }
