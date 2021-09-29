@@ -32,6 +32,7 @@ import { UpdateDeliveryZoneDto } from './dto/update-delivery-zone.dto';
 import { DeliveryZoneNotFoundException } from './errors/delivery-zone-not-found.exception';
 import { UpdateDeliveryRangeDto } from './dto/update-delivery-range.dto';
 import { DeliveryRangeNotFoundException } from './errors/delivery-range-not-found.exception';
+import { DeleteDeliveryRangeDto } from './dto/delete-delivery-range.dto';
 
 const shippingRangeIsBetweenRanges = ({weightFrom, weightTo, volumeFrom, volumeTo}: ShippingRange, ranges: ShippingRange[]) => {
   for (const range of ranges) {
@@ -325,6 +326,34 @@ export class DeliveryMethodsService {
     }
 
     await this.deliveryRangesRepository.save(deliveryRange);
+
+    const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
+      .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
+      .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
+      .leftJoinAndSelect('deliveryZone.deliveryZoneToShippingRanges', 'deliveryZoneToShippingRange')
+      .leftJoinAndSelect('deliveryZoneToShippingRange.shippingRange', 'dztsrShippingRange')
+      .where('deliveryMethod.id = :deliveryMethodId', { deliveryMethodId: deliveryRange.deliveryMethod.id })
+      .getOne();
+
+    if (!deliveryMethod) {
+      throw new DeliveryMethodNotFoundException();
+    }
+
+    return deliveryMethod;
+  }
+
+  async deleteDeliveryRange({userId, deliveryRangeId}: DeleteDeliveryRangeDto): Promise<DeliveryMethod> {
+    const deliveryRange = await this.deliveryRangesRepository.createQueryBuilder('deliveryRange')
+      .innerJoinAndSelect('deliveryRange.deliveryMethod', 'deliveryMethod')
+      .innerJoin('deliveryMethod.store', 'store')
+      .where('deliveryRange.id = :deliveryRangeId', { deliveryRangeId })
+      .andWhere('store.userId = :userId', { userId })
+      .getOne();
+
+    if (!deliveryRange) throw new DeliveryRangeNotFoundException();
+
+    await this.deliveryRangesRepository.remove(deliveryRange);
 
     const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
       .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
