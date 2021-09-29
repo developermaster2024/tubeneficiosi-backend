@@ -13,7 +13,7 @@ import { DeliveryMethodsService } from './delivery-methods.service';
 import { CalculateCostDto } from './dto/calculate-cost.dto';
 import { CreateDeliveryMethodDto } from './dto/create-delivery-method.dto';
 import { DeleteDeliveryRangeDto } from './dto/delete-delivery-range.dto';
-import { DeleteShippingRangeDto } from './dto/delete-shipping.dto';
+import { DeleteShippingRangeDto } from './dto/delete-shipping-range.dto';
 import { ReadDeliveryMethodDto } from './dto/read-delivery-method.dto';
 import { UpdateDeliveryMethodDto } from './dto/update-delivery-method.dto';
 import { UpdateDeliveryRangeDto } from './dto/update-delivery-range.dto';

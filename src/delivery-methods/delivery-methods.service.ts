@@ -24,7 +24,7 @@ import { CartNotFoundException } from 'src/carts/errors/cart-not-found.exception
 import { DeliveryCostCalculatorResolver } from './support/delivery-cost-calculator-resolver';
 import { UpdateShippingRangeDto } from './dto/update-shipping-range.dto';
 import { ShippingRangeNotFoundException } from './errors/shipping-range-not-found.exception';
-import { DeleteShippingRangeDto } from './dto/delete-shipping.dto';
+import { DeleteShippingRangeDto } from './dto/delete-shipping-range.dto';
 import { RangeIsBetweenExistingRangesException } from './errors/range-is-between-existing-ranges.exception';
 import { UpdateZoneToShippingRangeDto } from './dto/update-zone-to-shipping-range.dto';
 import { DeliveryZoneToShippingRangeNotFoundException } from './errors/delivery-zone-to-shipping-range-not-found.exception';
