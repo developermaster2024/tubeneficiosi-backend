@@ -11,6 +11,7 @@ export class UpdateDeliveryZoneDto {
   readonly deliveryZoneId: number;
 
   @Expose()
+  @Type(() => Number)
   @Min(0)
   readonly extraPrice: number;
 }
