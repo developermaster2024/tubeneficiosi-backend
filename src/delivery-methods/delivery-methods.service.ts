@@ -320,6 +320,7 @@ export class DeliveryMethodsService {
     await this.shippingRangesRepository.save(shippingRange);
 
     const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .innerJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType')
       .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
       .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
       .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
@@ -348,6 +349,7 @@ export class DeliveryMethodsService {
     await this.shippingRangesRepository.remove(shippingRange);
 
     const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .innerJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType')
       .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
       .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
       .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
@@ -387,6 +389,7 @@ export class DeliveryMethodsService {
     await this.deliveryRangesRepository.save(deliveryRange);
 
     const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .innerJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType')
       .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
       .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
       .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
@@ -415,6 +418,7 @@ export class DeliveryMethodsService {
     await this.deliveryRangesRepository.remove(deliveryRange);
 
     const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .innerJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType')
       .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
       .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
       .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
@@ -446,6 +450,7 @@ export class DeliveryMethodsService {
     await this.deliveryZoneToShippingRangesRepository.save(zoneToShippingRange);
 
     const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .innerJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType')
       .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
       .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
       .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
@@ -477,6 +482,7 @@ export class DeliveryMethodsService {
     await this.deliveryZoneToDeliveryRangesRepository.save(zoneToDeliveryRange);
 
     const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .innerJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType')
       .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
       .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
       .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
@@ -507,6 +513,7 @@ export class DeliveryMethodsService {
     await this.deliveryZonesRepository.save(deliveryZone);
 
     const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .innerJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType')
       .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
       .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
       .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
@@ -539,6 +546,7 @@ export class DeliveryMethodsService {
     await this.deliveryZonesRepository.save(deliveryZone);
 
     const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .innerJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType')
       .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
       .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
       .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
