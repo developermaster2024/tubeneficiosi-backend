@@ -36,6 +36,7 @@ import { DeleteDeliveryRangeDto } from './dto/delete-delivery-range.dto';
 import { DeleteDeliveryZoneDto } from './dto/delete-delivery-zone.dto';
 import { UpdateZoneToDeliveryRangeDto } from './dto/update-zone-to-delivery-range.dto';
 import { DeliveryZoneToDeliveryRangeNotFoundException } from './dto/delivery-zone-to-delivery-range-not-found.exception';
+import { AddShippingRangeDto } from './dto/add-shipping-range.dto';
 
 const shippingRangeIsBetweenRanges = ({weightFrom, weightTo, volumeFrom, volumeTo}: ShippingRange, ranges: ShippingRange[]) => {
   for (const range of ranges) {
@@ -204,7 +205,7 @@ export class DeliveryMethodsService {
 
   async findOne(id: number): Promise<DeliveryMethod> {
     const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
-      .leftJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType')
+      .innerJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType')
       .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
       .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
       .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
@@ -239,6 +240,60 @@ export class DeliveryMethodsService {
     }
 
     return await this.deliveryMethodsRepository.save(deliveryMethod);
+  }
+
+  async addShippingRange({userId, deliveryMethodId, price, ...addShippingRangeDto}: AddShippingRangeDto): Promise<DeliveryMethod> {
+    const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
+      .innerJoin('deliveryMethod.store', 'store')
+      .where('deliveryMethod.id = :deliveryMethodId', { deliveryMethodId })
+      .andWhere('store.userId = :userId', { userId })
+      .getOne();
+
+    if (!deliveryMethod) throw new DeliveryMethodNotFoundException();
+
+    const shippingRanges = await this.shippingRangesRepository.createQueryBuilder('shippingRange')
+      .where('shippingRange.deliveryMethodId = :deliveryMethodId', { deliveryMethodId: deliveryMethod.id })
+      .orderBy('shippingRange.position', 'ASC')
+      .getMany();
+
+    const shippingRange = ShippingRange.create({
+      ...addShippingRangeDto,
+      deliveryMethodId,
+      position: shippingRanges.length > 0
+        ? shippingRanges[shippingRanges.length - 1].position + 1
+        : 0,
+    });
+
+    if (shippingRangeIsBetweenRanges(shippingRange, shippingRanges)) {
+      throw new RangeIsBetweenExistingRangesException();
+    }
+
+    const savedShippingRange = await this.shippingRangesRepository.save(shippingRange);
+
+    const deliveryZoneToShippingRanges = deliveryMethod.deliveryZones.map((deliveryZone) => DeliveryZoneToShippingRange.create({
+      deliveryZone,
+      shippingRange: savedShippingRange,
+      price,
+    }));
+
+    await this.deliveryZoneToShippingRangesRepository.save(deliveryZoneToShippingRanges);
+
+    const deliveryMethodWithNewRange = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .innerJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType')
+      .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
+      .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
+      .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
+      .leftJoinAndSelect('deliveryZone.deliveryZoneToShippingRanges', 'deliveryZoneToShippingRange')
+      .leftJoinAndSelect('deliveryZoneToShippingRange.shippingRange', 'dztsrShippingRange')
+      .where('deliveryMethod.id = :deliveryMethodId', { deliveryMethodId: deliveryMethod.id })
+      .getOne();
+
+    if (!deliveryMethodWithNewRange) {
+      throw new DeliveryMethodNotFoundException();
+    }
+
+    return deliveryMethodWithNewRange;
   }
 
   async updateShippingRange({userId, shippingRangeId, ...updateShippingRange}: UpdateShippingRangeDto): Promise<DeliveryMethod> {
