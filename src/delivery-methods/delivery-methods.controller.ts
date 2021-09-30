@@ -20,6 +20,7 @@ import { UpdateDeliveryMethodDto } from './dto/update-delivery-method.dto';
 import { UpdateDeliveryRangeDto } from './dto/update-delivery-range.dto';
 import { UpdateDeliveryZoneDto } from './dto/update-delivery-zone.dto';
 import { UpdateShippingRangeDto } from './dto/update-shipping-range.dto';
+import { UpdateZoneToDeliveryRangeDto } from './dto/update-zone-to-delivery-range.dto';
 import { UpdateZoneToShippingRangeDto } from './dto/update-zone-to-shipping-range.dto';
 import { DeliveryMethodPaginationPipe } from './pipes/delivery-method-pagination.pipe';
 
@@ -91,6 +92,14 @@ export class DeliveryMethodsController {
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ zoneToShippingRangeId: 'zoneToShippingRangeId' }))
   async updateZoneToShippingRange(@Body() updateZoneToShippingRangeDto: UpdateZoneToShippingRangeDto): Promise<ReadDeliveryMethodDto> {
     return plainToClass(ReadDeliveryMethodDto, await this.deliveryMethodsService.updateZoneToShippingRange(updateZoneToShippingRangeDto));
+  }
+
+  @Put('zone-to-delivery-ranges/:zoneToDeliveryRangeId')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ zoneToDeliveryRangeId: 'zoneToDeliveryRangeId' }))
+  async updateZoneToDeliveryRange(@Body() updateZoneToDeliveryRangeDto: UpdateZoneToDeliveryRangeDto): Promise<ReadDeliveryMethodDto> {
+    return plainToClass(ReadDeliveryMethodDto, await this.deliveryMethodsService.updateZoneToDeliveryRange(updateZoneToDeliveryRangeDto));
   }
 
   @Put('delivery-zones/:deliveryZoneId')
