@@ -204,6 +204,7 @@ export class DeliveryMethodsService {
 
   async findOne(id: number): Promise<DeliveryMethod> {
     const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .leftJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType')
       .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
       .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
       .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
