@@ -11,6 +11,7 @@ import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
 import { DeliveryMethodsService } from './delivery-methods.service';
 import { AddDeliveryRangeDto } from './dto/add-delivery-range.dto';
+import { AddDeliveryZoneDto } from './dto/add-delivery-zone.dto';
 import { AddShippingRangeDto } from './dto/add-shipping-range.dto';
 import { CalculateCostDto } from './dto/calculate-cost.dto';
 import { CreateDeliveryMethodDto } from './dto/create-delivery-method.dto';
@@ -118,6 +119,14 @@ export class DeliveryMethodsController {
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ zoneToDeliveryRangeId: 'zoneToDeliveryRangeId' }))
   async updateZoneToDeliveryRange(@Body() updateZoneToDeliveryRangeDto: UpdateZoneToDeliveryRangeDto): Promise<ReadDeliveryMethodDto> {
     return plainToClass(ReadDeliveryMethodDto, await this.deliveryMethodsService.updateZoneToDeliveryRange(updateZoneToDeliveryRangeDto));
+  }
+
+  @Post(':deliveryMethodId/delivery-zones')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ deliveryMethodId: 'deliveryMethodId' }))
+  async addDeliveryZone(@Body() addDeliveryZoneDto: AddDeliveryZoneDto): Promise<ReadDeliveryMethodDto> {
+    return plainToClass(ReadDeliveryMethodDto, await this.deliveryMethodsService.addDeliveryZone(addDeliveryZoneDto));
   }
 
   @Put('delivery-zones/:deliveryZoneId')

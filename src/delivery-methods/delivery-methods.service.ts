@@ -5,7 +5,7 @@ import { Location } from 'src/locations/entities/location.entity';
 import { Store } from 'src/stores/entities/store.entity';
 import { StoreNotFoundException } from 'src/stores/erros/store-not-found.exception';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CalculateCostDto } from './dto/calculate-cost.dto';
 import { CreateDeliveryMethodDto } from './dto/create-delivery-method.dto';
 import { CreateDeliveryZoneToRangeDto } from './dto/create-delivery-zone-to-range.dto';
@@ -38,6 +38,7 @@ import { UpdateZoneToDeliveryRangeDto } from './dto/update-zone-to-delivery-rang
 import { DeliveryZoneToDeliveryRangeNotFoundException } from './dto/delivery-zone-to-delivery-range-not-found.exception';
 import { AddShippingRangeDto } from './dto/add-shipping-range.dto';
 import { AddDeliveryRangeDto } from './dto/add-delivery-range.dto';
+import { AddDeliveryZoneDto } from './dto/add-delivery-zone.dto';
 
 const shippingRangeIsBetweenRanges = ({weightFrom, weightTo, volumeFrom, volumeTo}: ShippingRange, ranges: ShippingRange[]) => {
   for (const range of ranges) {
@@ -549,6 +550,65 @@ export class DeliveryMethodsService {
     }
 
     return deliveryMethod;
+  }
+
+  async addDeliveryZone({userId, deliveryMethodId, locationIds, ...addDeliveryZoneDto}: AddDeliveryZoneDto): Promise<DeliveryMethod> {
+    const deliveryMethod = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .innerJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType')
+      .innerJoin('deliveryMethod.store', 'store')
+      .where('deliveryMethod.id = :deliveryMethodId', { deliveryMethodId })
+      .andWhere('store.userId = :userId', { userId })
+      .getOne();
+
+    if (!deliveryMethod) throw new DeliveryMethodNotFoundException();
+
+    const deliveryZone = await this.deliveryZonesRepository.save(DeliveryZone.create({
+      ...addDeliveryZoneDto,
+      deliveryMethod,
+      locations: await this.locationsRepository.find({ id: In(locationIds) }),
+    }));
+
+    if (deliveryMethod.deliveryMethodType.code === DeliveryMethodTypes.SHIPPING) {
+      const shippingRanges = await this.shippingRangesRepository.createQueryBuilder('shippingRange')
+        .where('shippingRange.deliveryMethodId = :deliveryMethodId', { deliveryMethodId })
+        .getMany();
+
+      const deliveryZonesToShippingRanges = shippingRanges.map((shippingRange) => DeliveryZoneToShippingRange.create({
+        deliveryZone,
+        shippingRange,
+        price: 0,
+      }));
+
+      await this.deliveryZoneToShippingRangesRepository.save(deliveryZonesToShippingRanges);
+    } else {
+      const deliveryRanges = await this.deliveryRangesRepository.createQueryBuilder('deliveryRange')
+        .where('deliveryRange.deliveryMethodId = :deliveryMethodId', { deliveryMethodId })
+        .getMany();
+
+      const deliveryZoneToDeliveryRanges = deliveryRanges.map((deliveryRange) => DeliveryZoneToDeliveryRange.create({
+        deliveryZone,
+        deliveryRange,
+        price: 0,
+      }));
+
+      await this.deliveryZoneToDeliveryRangesRepository.save(deliveryZoneToDeliveryRanges);
+    }
+
+    const deliveryMethodWithZone = await this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
+      .innerJoinAndSelect('deliveryMethod.deliveryMethodType', 'deliveryMethodType')
+      .leftJoinAndSelect('deliveryMethod.deliveryZones', 'deliveryZone')
+      .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
+      .leftJoinAndSelect('deliveryZoneToDeliveryRange.deliveryRange', 'dztdrDeliveryRange')
+      .leftJoinAndSelect('deliveryZone.deliveryZoneToShippingRanges', 'deliveryZoneToShippingRange')
+      .leftJoinAndSelect('deliveryZoneToShippingRange.shippingRange', 'dztsrShippingRange')
+      .where('deliveryMethod.id = :deliveryMethodId', { deliveryMethodId })
+      .getOne();
+
+    if (!deliveryMethodWithZone) {
+      throw new DeliveryMethodNotFoundException();
+    }
+
+    return deliveryMethodWithZone;
   }
 
   async updateDeliveryZone({userId, deliveryZoneId, ...updateDeliveryZoneDto}: UpdateDeliveryZoneDto): Promise<DeliveryMethod> {
