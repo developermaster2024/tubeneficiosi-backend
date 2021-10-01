@@ -12,22 +12,26 @@ import { LocationNotFoundException } from './errors/location-not-found.exception
 export class LocationsService {
   constructor(@InjectRepository(Location) private readonly locationsRepository: Repository<Location>) {}
 
-  async paginate({offset, perPage, filters}: LocationPaginationOptionsDto): Promise<PaginationResult<Location>> {
-    const where: FindConditions<Location> = {};
+  async paginate({offset, perPage, filters: {
+    id,
+    name,
+    parentId,
+    excludeIds,
+  }}: LocationPaginationOptionsDto): Promise<PaginationResult<Location>> {
+    const queryBuilder = this.locationsRepository.createQueryBuilder('location')
+      .take(perPage)
+      .skip(offset)
+      .innerJoinAndSelect('location.parentLocation', 'parentLocation');
 
-    // @ts-ignore
-    if (filters.id) where.id = +filters.id;
+    if (id) queryBuilder.andWhere('location.id = :id', { id });
 
-    if (filters.name) where.name = Like(`%${filters.name}%`);
+    if (name) queryBuilder.andWhere('location.name LIKE :name', { name: `%${name}%` });
 
-    if (filters.parentId) where.parentId = +filters.parentId;
+    if (parentId) queryBuilder.andWhere('location.parentId = :parentId', { parentId });
 
-    const [locations, total] = await this.locationsRepository.findAndCount({
-      take: perPage,
-      skip: offset,
-      where,
-      relations: ['parentLocation']
-    });
+    if (excludeIds.length > 0) queryBuilder.andWhere('location.id NOT IN (:...excludeIds)', { excludeIds });
+
+    const [locations, total] = await queryBuilder.getManyAndCount();
 
     return new PaginationResult(locations, total, perPage);
   }

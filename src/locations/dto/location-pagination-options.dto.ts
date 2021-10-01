@@ -1,9 +1,10 @@
 import { PaginationOptions } from "src/support/pagination/pagination-options";
 
 type LocationFilters = {
-  id: string;
+  id: number;
   name: string;
   parentId: string;
+  excludeIds: number[];
 };
 
 export class LocationPaginationOptionsDto extends PaginationOptions {
@@ -17,8 +18,15 @@ export class LocationPaginationOptionsDto extends PaginationOptions {
       perPage = 10,
       id,
       name,
-      parentId
+      parentId,
+      excludeIds = '',
     } = query;
-    return new LocationPaginationOptionsDto(+page, +perPage, {id, name, parentId});
+
+    return new LocationPaginationOptionsDto(+page, +perPage, {
+      id: +id,
+      name,
+      parentId,
+      excludeIds: excludeIds.split(',').filter(id => id).map(id => Number(id)),
+    });
   }
 }
