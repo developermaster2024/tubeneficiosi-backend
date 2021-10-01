@@ -10,6 +10,7 @@ import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
 import { DeliveryMethodsService } from './delivery-methods.service';
+import { AddDeliveryRangeDto } from './dto/add-delivery-range.dto';
 import { AddShippingRangeDto } from './dto/add-shipping-range.dto';
 import { CalculateCostDto } from './dto/calculate-cost.dto';
 import { CreateDeliveryMethodDto } from './dto/create-delivery-method.dto';
@@ -77,6 +78,14 @@ export class DeliveryMethodsController {
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ shippingRangeId: 'shippingRangeId' }))
   async deleteShippingRange(@Body() deleteShippingRangeDto: DeleteShippingRangeDto): Promise<ReadDeliveryMethodDto> {
     return plainToClass(ReadDeliveryMethodDto, await this.deliveryMethodsService.deleteShippingRange(deleteShippingRangeDto));
+  }
+
+  @Post(':deliveryMethodId/delivery-ranges')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ deliveryMethodId: 'deliveryMethodId' }))
+  async addDeliveryRange(@Body() addDeliveryRangeDto: AddDeliveryRangeDto): Promise<ReadDeliveryMethodDto> {
+    return plainToClass(ReadDeliveryMethodDto, await this.deliveryMethodsService.addDeliveryRange(addDeliveryRangeDto));
   }
 
   @Put('delivery-ranges/:deliveryRangeId')
