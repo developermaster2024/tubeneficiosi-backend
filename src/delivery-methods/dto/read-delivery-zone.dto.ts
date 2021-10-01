@@ -1,4 +1,5 @@
 import { Exclude, Expose, Type } from "class-transformer";
+import { ReadLocationDto } from "src/locations/dto/read-location.dto";
 import { ReadDeliveryZoneToDeliveryRangeDto } from "./read-delivery-zone-to-delivery-range.dto";
 import { ReadDeliveryZoneToShippingRangeDto } from "./read-delivery-zone-to-shipping-range.dto";
 
@@ -21,4 +22,8 @@ export class ReadDeliveryZoneDto {
   @Expose()
   @Type(() => ReadDeliveryZoneToShippingRangeDto)
   readonly deliveryZoneToShippingRanges: ReadDeliveryZoneToShippingRangeDto[];
+
+  @Expose()
+  @Type(() => ReadLocationDto)
+  readonly locations: ReadLocationDto;
 }
