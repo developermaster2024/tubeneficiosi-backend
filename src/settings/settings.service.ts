@@ -118,24 +118,18 @@ export class SettingsService {
     return await this.settingsRepository.save(setting);
   }
 
-  async updateFooterSection({id, widgets, ...updateFooterSectionDto}: UpdateFooterSectionDto, files: Express.Multer.File[]): Promise<Setting> {
+  async updateFooterSection({id, ...updateFooterSectionDto}: UpdateFooterSectionDto): Promise<Setting> {
     let setting = await this.settingsRepository.findOne({name: SettingEnum.FOOTER});
 
     setting = setting ?? Setting.create({name: SettingEnum.FOOTER});
-
-    const mappedWidgets = widgets.map((widget, i) => widget.type === 'image'
-      ? {...widget, image: files?.splice(0, 1)?.[0]?.path, position: i, }
-      : {...widget, position: i, }
-    );
 
     const sectionName = getFooterSectionName(id);
 
     setting.value = {
       ...setting.value,
       [sectionName]: {
-        id,
+        ...setting.value[sectionName],
         ...updateFooterSectionDto,
-        widgets: mappedWidgets,
       },
     };
 

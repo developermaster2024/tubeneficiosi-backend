@@ -119,12 +119,9 @@ export class SettingsController {
   @Put('footer-sections/:id([1-4])')
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @UseInterceptors(FilesInterceptor('images'), new ParamsToBodyInterceptor({id: 'id'}))
-  async updateFooterSection(
-    @Body() updateFooterSectionDto: UpdateFooterSectionDto,
-    @UploadedFiles() files: Express.Multer.File[]
-  ): Promise<ReadFooterDto> {
-    return plainToClass(ReadFooterDto, await this.settingsService.updateFooterSection(updateFooterSectionDto, files));
+  @UseInterceptors(new ParamsToBodyInterceptor({id: 'id'}))
+  async updateFooterSection(@Body() updateFooterSectionDto: UpdateFooterSectionDto): Promise<ReadFooterDto> {
+    return plainToClass(ReadFooterDto, await this.settingsService.updateFooterSection(updateFooterSectionDto));
   }
 
   @Put('footer-sections/:id([1-4])/toggle-active-state')

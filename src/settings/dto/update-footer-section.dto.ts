@@ -1,6 +1,5 @@
-import { Exclude, Expose, Type } from "class-transformer";
-import { IsArray, MaxLength, ValidateNested } from "class-validator";
-import { UpdateWidgetDto } from "./update-widget.dto";
+import { Exclude, Expose } from "class-transformer";
+import { MaxLength } from "class-validator";
 
 @Exclude()
 export class UpdateFooterSectionDto {
@@ -10,10 +9,4 @@ export class UpdateFooterSectionDto {
   @Expose()
   @MaxLength(50)
   readonly name: string;
-
-  @Expose()
-  @IsArray()
-  @ValidateNested({each: true})
-  @Type(() => UpdateWidgetDto)
-  readonly widgets: UpdateWidgetDto[];
 }
