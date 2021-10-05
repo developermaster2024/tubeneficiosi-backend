@@ -146,7 +146,8 @@ export class SettingsController {
   async deleteFooterWidget(
     @Param('id') id: string,
     @Param('widgetPosition') widgetPosition: string
-  ): Promise<ReadFooterDto> {
-    return plainToClass(ReadFooterDto, await this.settingsService.deleteFooterWidget(id, widgetPosition));
+  ): Promise<any> {
+    const footer = plainToClass(ReadFooterDto, await this.settingsService.deleteFooterWidget(id, widgetPosition));
+    return footer[getFooterSectionName(id)];
   }
 }
