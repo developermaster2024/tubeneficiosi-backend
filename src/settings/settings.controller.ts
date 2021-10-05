@@ -120,8 +120,9 @@ export class SettingsController {
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new ParamsToBodyInterceptor({id: 'id'}))
-  async updateFooterSection(@Body() updateFooterSectionDto: UpdateFooterSectionDto): Promise<ReadFooterDto> {
-    return plainToClass(ReadFooterDto, await this.settingsService.updateFooterSection(updateFooterSectionDto));
+  async updateFooterSection(@Body() updateFooterSectionDto: UpdateFooterSectionDto): Promise<any> {
+    const footer = plainToClass(ReadFooterDto, await this.settingsService.updateFooterSection(updateFooterSectionDto));
+    return footer[getFooterSectionName(updateFooterSectionDto.id)];
   }
 
   @Put('footer-sections/:id([1-4])/toggle-active-state')
