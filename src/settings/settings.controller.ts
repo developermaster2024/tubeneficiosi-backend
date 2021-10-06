@@ -136,8 +136,9 @@ export class SettingsController {
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'), new ParamsToBodyInterceptor({id: 'sectionId'}))
-  async createFooterWidget(@Body() createFooterWidgetDto: CreateFooterWidgetDto): Promise<ReadFooterDto> {
-    return plainToClass(ReadFooterDto, await this.settingsService.createFooterWidget(createFooterWidgetDto));
+  async createFooterWidget(@Body() createFooterWidgetDto: CreateFooterWidgetDto): Promise<any> {
+    const footer = plainToClass(ReadFooterDto, await this.settingsService.createFooterWidget(createFooterWidgetDto));
+    return footer[getFooterSectionName(createFooterWidgetDto.sectionId)];
   }
 
   @Delete('footer-sections/:id([1-4])/widgets/:widgetPosition')
