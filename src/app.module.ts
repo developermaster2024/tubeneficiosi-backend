@@ -51,6 +51,7 @@ import { ProductRatingsModule } from './product-ratings/product-ratings.module';
 import { PaymentGatewaysModule } from './payment-gateways/payment-gateways.module';
 import { StoreRatingsModule } from './store-ratings/store-ratings.module';
 import { ClientCardsModule } from './client-cards/client-cards.module';
+import { StoreFeaturesModule } from './store-features/store-features.module';
 
 @Module({
   imports: [
@@ -108,6 +109,7 @@ import { ClientCardsModule } from './client-cards/client-cards.module';
     PaymentGatewaysModule,
     StoreRatingsModule,
     ClientCardsModule,
+    StoreFeaturesModule,
   ],
 })
 export class AppModule {}
