@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { StoreFeature } from 'src/store-features/entities/store-feature.entity';
 import { StoreImages } from 'src/stores-profile/dto/store-images';
 import { HashingService } from 'src/support/hashing.service';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/roles.enum';
-import { Brackets, Repository } from 'typeorm';
+import { Brackets, In, Repository } from 'typeorm';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { StorePaginationOptionsDto } from './dto/store-pagination-options.dto';
 import { UpdateStorePasswordDto } from './dto/update-store-password.dto';
@@ -18,6 +19,7 @@ import { StoreNotFoundException } from './erros/store-not-found.exception';
 export class StoresService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    @InjectRepository(StoreFeature) private readonly storeFeaturesRepository: Repository<StoreFeature>,
     private readonly hashingService: HashingService
   ) {}
 
@@ -215,6 +217,7 @@ export class StoresService {
       address,
       latitude,
       longitude,
+      storeFeatureIds,
       ...updateStoreProfileData
     }: UpdateStoreDto,
     images: StoreImages
@@ -249,6 +252,10 @@ export class StoresService {
     if (images.frontImage) {
       user.store.storeProfile.frontImage = images.frontImage;
     }
+
+    user.store.storeFeatures = await this.storeFeaturesRepository.find({
+      where: { id: In(storeFeatureIds) },
+    });
 
     return await this.usersRepository.save(user);
   }

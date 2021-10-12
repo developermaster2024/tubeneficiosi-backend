@@ -1,13 +1,13 @@
 import { OmitType } from "@nestjs/mapped-types";
-import { Exclude, Expose, Type } from "class-transformer";
-import { IsEmail, IsNumber, IsPhoneNumber, IsString, IsUrl, Max, MaxLength, Min, MinLength } from "class-validator";
+import { Exclude, Expose, Transform, Type } from "class-transformer";
+import { IsArray, IsEmail, IsNumber, IsPhoneNumber, IsString, Max, MaxLength, Min } from "class-validator";
 import { RegisterStoreDto } from "src/auth/dto/register-store.dto";
 import { User } from "src/users/entities/user.entity";
 import { IsUnique } from "src/validation/is-unique.constrain";
 import { Not } from "typeorm";
 
 @Exclude()
-export class UpdateStoreProfileDto extends OmitType(RegisterStoreDto, ['password', 'email', 'latitude', 'longitude', 'storeCategoryId']) {
+export class UpdateStoreProfileDto extends OmitType(RegisterStoreDto, ['password', 'email', 'slug', 'latitude', 'longitude', 'storeCategoryId']) {
   @Expose()
   readonly userId: number;
 
@@ -57,4 +57,9 @@ export class UpdateStoreProfileDto extends OmitType(RegisterStoreDto, ['password
   @Min(-180)
   @Max(180)
   readonly longitude: number;
+
+  @Expose()
+  @Transform(({value}) => value || [])
+  @IsArray()
+  readonly storeFeatureIds: number[];
 }

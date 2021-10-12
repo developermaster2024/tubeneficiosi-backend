@@ -2,11 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdatePasswordDto } from 'src/profile/dto/update-password.dto';
 import { PasswordDoesNotMatchException } from 'src/profile/exceptions/password-does-not-match.exception';
+import { StoreFeature } from 'src/store-features/entities/store-feature.entity';
 import { StoreProfile } from 'src/stores/entities/store-profile.entity';
 import { HashingService } from 'src/support/hashing.service';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/roles.enum';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { StoreImages } from './dto/store-images';
 import { UpdateStoreProfileDto } from './dto/update-store-profile.dto';
 import { StoreProfileNotFoundException } from './errors/store-profile-not-found.exception';
@@ -15,6 +16,7 @@ import { StoreProfileNotFoundException } from './errors/store-profile-not-found.
 export class StoresProfileService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    @InjectRepository(StoreFeature) private readonly storeFeaturesRepository: Repository<StoreFeature>,
     private readonly hashingService: HashingService
   ) {}
 
@@ -39,6 +41,7 @@ export class StoresProfileService {
     address,
     latitude,
     longitude,
+    storeFeatureIds,
     ...updateStoreProfile
   }: UpdateStoreProfileDto, images: StoreImages): Promise<User> {
     const user = await this.usersRepository.findOne({
@@ -71,6 +74,10 @@ export class StoresProfileService {
     if (images.frontImage) {
       user.store.storeProfile.frontImage = images.frontImage;
     }
+
+    user.store.storeFeatures = await this.storeFeaturesRepository.find({
+      where: { id: In(storeFeatureIds) },
+    });
 
     return await this.usersRepository.save(user);
   }

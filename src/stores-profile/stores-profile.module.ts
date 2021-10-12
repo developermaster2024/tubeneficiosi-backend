@@ -7,10 +7,11 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { filenameGenerator } from 'src/support/file-uploads';
 import { SupportModule } from 'src/support/support.module';
+import { StoreFeature } from 'src/store-features/entities/store-feature.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, StoreFeature]),
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads/stores',

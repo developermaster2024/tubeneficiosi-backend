@@ -1,6 +1,6 @@
 import { OmitType } from "@nestjs/mapped-types";
-import { Exclude, Expose } from "class-transformer";
-import { IsEmail, IsString, MaxLength, MinLength } from "class-validator";
+import { Exclude, Expose, Transform } from "class-transformer";
+import { IsArray, IsEmail, IsString, MaxLength, MinLength } from "class-validator";
 import { User } from "src/users/entities/user.entity";
 import { IsUnique } from "src/validation/is-unique.constrain";
 import { Not } from "typeorm";
@@ -37,4 +37,9 @@ export class UpdateStoreDto extends OmitType(CreateStoreDto, ['email', 'name', '
     where: {name: value, id: Not(dto.id)},
   }))
   readonly name: string;
+
+  @Expose()
+  @Transform(({value}) => value || [])
+  @IsArray()
+  readonly storeFeatureIds: number[];
 }

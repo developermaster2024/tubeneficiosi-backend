@@ -2,9 +2,10 @@ import { Discount } from "src/discounts/entities/discount.entity";
 import { StoreToUser } from "src/favorite-stores/entities/store-to-user.entity";
 import { Product } from "src/products/entities/product.entity";
 import { StoreCategory } from "src/store-categories/entities/store-category.entity";
+import { StoreFeature } from "src/store-features/entities/store-feature.entity";
 import { StoreHour } from "src/store-hours/entities/store-hour.entity";
 import { User } from "src/users/entities/user.entity";
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { StoreProfile } from "./store-profile.entity";
 
 @Entity({
@@ -119,6 +120,14 @@ export class Store {
   storeToUsers: StoreToUser[];
 
   storeToUser: StoreToUser;
+
+  @ManyToMany(() => StoreFeature, { cascade: ['insert', 'update'] })
+  @JoinTable({
+    name: 'store_to_store_feature',
+    joinColumn: { name: 'store_id' },
+    inverseJoinColumn: { name: 'store_feature_id' }
+  })
+  storeFeatures: StoreFeature[];
 
   get isOpen(): boolean {
     return this.storeHours?.some(storeHour => storeHour.isActive);
