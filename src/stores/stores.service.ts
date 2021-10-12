@@ -34,6 +34,7 @@ export class StoresService {
     cardIssuerIds,
     cardIds,
     isFavoriteFor,
+    storeFeatureIds,
   }}: StorePaginationOptionsDto, userId: number): Promise<PaginationResult<User>> {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.userStatus', 'userStatus')
@@ -47,6 +48,7 @@ export class StoresService {
         'latestActiveDiscount',
         'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
       , { today: new Date() })
+      .leftJoinAndSelect('store.storeFeatures', 'storeFeature')
       .leftJoin('store.discounts', 'discount', 'discount.from <= :today AND discount.until >= :today', { today: new Date() })
       .leftJoin('discount.cardIssuers', 'cardIssuerFromDiscount')
       .leftJoin('discount.cards', 'card', '')
@@ -90,6 +92,8 @@ export class StoresService {
     if (isFavoriteFor) {
       queryBuilder.innerJoin('store.storeToUsers', 'storeToUser', 'storeToUser.userId = :isFavoriteFor', { isFavoriteFor });
     }
+
+    if (storeFeatureIds.length > 0) queryBuilder.andWhere('storeFeature.id In (:...storeFeatureIds)', { storeFeatureIds });
 
     queryBuilder.leftJoinAndMapOne(
       'store.storeToUser',
@@ -167,6 +171,7 @@ export class StoresService {
         'latestActiveDiscount',
         'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
       , { today: new Date() })
+      .leftJoinAndSelect('store.storeFeatures', 'storeFeature')
       .where('store.id = :id', { id })
       .getOne();
 
@@ -197,6 +202,7 @@ export class StoresService {
         'storeToUserAlone.userId = :userId',
         { userId }
       )
+      .leftJoinAndSelect('store.storeFeatures', 'storeFeature')
       .where('store.slug = :slug', { slug })
       .getOne();
 
