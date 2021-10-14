@@ -21,10 +21,15 @@ export class StoresProfileService {
   ) {}
 
   async findOne(id: number): Promise<User> {
-    const user = await this.usersRepository.findOne({
-      where: {id, role: Role.STORE},
-      relations: ['store']
-    });
+    const user = await this.usersRepository.createQueryBuilder('user')
+      .innerJoinAndSelect('user.userStatus', 'userStatus')
+      .innerJoinAndSelect('user.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('store.storeCategory', 'storeCategory')
+      .leftJoinAndSelect('store.storeFeatures', 'storeFeature')
+      .where('user.id = :id', { id })
+      .andWhere('user.role = :role', { role: Role.STORE })
+      .getOne();
 
     if (!user) {
       throw new StoreProfileNotFoundException();
