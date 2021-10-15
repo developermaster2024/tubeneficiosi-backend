@@ -54,6 +54,7 @@ export class ProductsService {
     cardIds,
     isFavoriteFor,
     minRating,
+    storeFeatureIds,
   }, tagsToSortBy}: ProductPaginationOptionsDto, userId: number): Promise<PaginationResult<Product>> {
     const queryBuilder = this.productsRepository.createQueryBuilder('product')
       .take(perPage)
@@ -74,6 +75,7 @@ export class ProductsService {
         'latestActiveDiscount',
         'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
       , { today: new Date() })
+      .leftJoinAndSelect('store.storeFeatures', 'storeFeature')
       .leftJoin('product.tags', 'tag')
       .leftJoin('store.discounts', 'discount', 'discount.from <= :today AND discount.until >= :today', { today: new Date() })
       .leftJoin('discount.cardIssuers', 'cardIssuerFromDiscount')
@@ -133,6 +135,8 @@ export class ProductsService {
     if (isFavoriteFor) {
       queryBuilder.innerJoin('product.favoriteProducts', 'favoriteProduct', 'favoriteProduct.userId = :isFavoriteFor', { isFavoriteFor });
     }
+
+    if (storeFeatureIds.length > 0) queryBuilder.andWhere('storeFeature.id IN (:...storeFeatureIds)', { storeFeatureIds });
 
     queryBuilder.leftJoinAndMapOne(
       'product.favoriteProduct',
