@@ -18,6 +18,12 @@ export class Place {
   name: string;
 
   @Column({
+    name: 'img_path',
+    type: 'varchar',
+  })
+  imgPath: string;
+
+  @Column({
     name: 'store_id',
     type: 'int',
     select: false,

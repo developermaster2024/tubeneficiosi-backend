@@ -1,5 +1,6 @@
 import { Exclude, Expose, Type } from "class-transformer";
 import { ArrayMinSize, IsArray, IsNotEmpty, MaxLength, ValidateNested } from "class-validator";
+import { IsMimeType } from "src/validation/mime-type.constrain";
 import { CreateZoneDto } from "./create-zone.dto";
 
 @Exclude()
@@ -11,6 +12,10 @@ export class CreatePlaceDto {
   @IsNotEmpty()
   @MaxLength(255)
   readonly name: string;
+
+  @Expose()
+  @IsMimeType(['image/png', 'image/jpeg'])
+  readonly image: Express.Multer.File;
 
   @Expose()
   @Type(() => CreateZoneDto)

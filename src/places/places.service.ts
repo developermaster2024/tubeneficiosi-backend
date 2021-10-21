@@ -43,7 +43,7 @@ export class PlacesService {
     return new PaginationResult(places, total, perPage);
   }
 
-  async create({userId, zones, ...createPlaceDto}: CreatePlaceDto): Promise<Place> {
+  async create({userId, zones, image, ...createPlaceDto}: CreatePlaceDto): Promise<Place> {
     const store = await this.storesRepository.createQueryBuilder('store')
       .where('store.userId = :userId', { userId })
       .getOne();
@@ -56,6 +56,7 @@ export class PlacesService {
 
     const place = Place.create({
       ...createPlaceDto,
+      imgPath: image.path,
       store,
       zones: zoneEntities,
     });

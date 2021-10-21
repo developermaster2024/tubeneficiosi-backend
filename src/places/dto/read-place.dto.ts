@@ -10,6 +10,9 @@ export class ReadPlaceDto {
   readonly name: string;
 
   @Expose()
+  readonly imgPath: string;
+
+  @Expose()
   @Type(() => ReadZoneDto)
   readonly zones: ReadZoneDto[];
 }
