@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
 
-export class RoomNotFoundException extends HttpException {
+export class PlaceNotFoundException extends HttpException {
   constructor() {
     super({
-      message: 'Sala no encontrada',
+      message: 'Lugar no encontrada',
     }, HttpStatus.NOT_FOUND);
   }
 }

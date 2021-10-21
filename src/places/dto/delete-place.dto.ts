@@ -1,13 +1,10 @@
 import { Exclude, Expose } from "class-transformer";
 
 @Exclude()
-export class ReadSeatGroupDto {
+export class DeletePlaceDto {
   @Expose()
   readonly id: number;
 
   @Expose()
-  readonly name: string;
-
-  @Expose()
-  readonly capacity: number;
+  readonly userId: number;
 }

@@ -52,7 +52,7 @@ import { PaymentGatewaysModule } from './payment-gateways/payment-gateways.modul
 import { StoreRatingsModule } from './store-ratings/store-ratings.module';
 import { ClientCardsModule } from './client-cards/client-cards.module';
 import { StoreFeaturesModule } from './store-features/store-features.module';
-import { RoomsModule } from './rooms/rooms.module';
+import { PlacesModule } from './places/places.module';
 
 @Module({
   imports: [
@@ -111,7 +111,7 @@ import { RoomsModule } from './rooms/rooms.module';
     StoreRatingsModule,
     ClientCardsModule,
     StoreFeaturesModule,
-    RoomsModule,
+    PlacesModule,
   ],
 })
 export class AppModule {}

@@ -1,10 +1,10 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Room } from "./room.entity";
+import { Place } from "./place.entity";
 
 @Entity({
-  name: 'seat_groups',
+  name: 'zones',
 })
-export class SeatGroup {
+export class Zone {
   @PrimaryGeneratedColumn({
     name: 'id',
   })
@@ -23,17 +23,17 @@ export class SeatGroup {
   capacity: number;
 
   @Column({
-    name: 'room_id',
+    name: 'place_id',
     type: 'int',
     select: false,
   })
-  roomId: number;
+  placeId: number;
 
-  @ManyToOne(() => Room, { nullable: false, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'room_id' })
-  room: Room;
+  @ManyToOne(() => Place, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'place_id' })
+  place: Place;
 
-  static create(data: Partial<SeatGroup>): SeatGroup {
-    return Object.assign(new SeatGroup(), data);
+  static create(data: Partial<Zone>): Zone {
+    return Object.assign(new Zone(), data);
   }
 }

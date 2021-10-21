@@ -1,9 +1,9 @@
 import { Exclude, Expose, Type } from "class-transformer";
 import { ArrayMinSize, IsArray, IsNotEmpty, MaxLength, ValidateNested } from "class-validator";
-import { CreateSeatGroupDto } from "./create-seat-group.dto";
+import { CreateZoneDto } from "./create-zone.dto";
 
 @Exclude()
-export class CreateRoomDto {
+export class CreatePlaceDto {
   @Expose()
   readonly userId: number;
 
@@ -13,9 +13,9 @@ export class CreateRoomDto {
   readonly name: string;
 
   @Expose()
-  @Type(() => CreateSeatGroupDto)
+  @Type(() => CreateZoneDto)
   @ValidateNested({ each: true })
   @IsArray()
   @ArrayMinSize(1)
-  readonly seatGroups: CreateSeatGroupDto[];
+  readonly zones: CreateZoneDto[];
 }

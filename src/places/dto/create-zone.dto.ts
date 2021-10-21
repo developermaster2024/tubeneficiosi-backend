@@ -2,7 +2,7 @@ import { Exclude, Expose, Type } from "class-transformer";
 import { IsNotEmpty, MaxLength, Min } from "class-validator";
 
 @Exclude()
-export class CreateSeatGroupDto {
+export class CreateZoneDto {
   @Expose()
   @IsNotEmpty()
   @MaxLength(255)

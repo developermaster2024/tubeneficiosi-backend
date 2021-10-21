@@ -1,11 +1,11 @@
 import { Store } from "src/stores/entities/store.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { SeatGroup } from "./seat-group.entity";
+import { Zone } from "./zone.entity";
 
 @Entity({
-  name: 'rooms',
+  name: 'places',
 })
-export class Room {
+export class Place {
   @PrimaryGeneratedColumn({
     name: 'id',
   })
@@ -28,8 +28,8 @@ export class Room {
   @JoinColumn({ name: 'store_id' })
   store: Store;
 
-  @OneToMany(() => SeatGroup, (seatGroup) => seatGroup.room, { cascade: ['insert', 'update'] })
-  seatGroups: SeatGroup[];
+  @OneToMany(() => Zone, (zone) => zone.place, { cascade: ['insert', 'update'] })
+  zones: Zone[];
 
   @CreateDateColumn({
     name: 'created_at',
@@ -49,7 +49,7 @@ export class Room {
   })
   deletedAt: Date;
 
-  static create(data: Partial<Room>): Room {
-    return Object.assign(new Room(), data);
+  static create(data: Partial<Place>): Place {
+    return Object.assign(new Place(), data);
   }
 }
