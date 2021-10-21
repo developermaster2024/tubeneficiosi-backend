@@ -92,7 +92,7 @@ export class Store {
   })
   storeCategoryId: number;
 
-  @ManyToOne(() => StoreCategory)
+  @ManyToOne(() => StoreCategory, { eager: true })
   @JoinColumn({name: 'store_category_id'})
   storeCategory: StoreCategory;
 
