@@ -13,6 +13,9 @@ export class ReadPlaceDto {
   readonly imgPath: string;
 
   @Expose()
+  readonly capacity: number;
+
+  @Expose()
   @Type(() => ReadZoneDto)
   readonly zones: ReadZoneDto[];
 }

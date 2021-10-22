@@ -55,6 +55,10 @@ export class Place {
   })
   deletedAt: Date;
 
+  get capacity(): number {
+    return !this.zones ? 0 : this.zones.reduce((total, zone) => total + zone.capacity, 0);
+  }
+
   static create(data: Partial<Place>): Place {
     return Object.assign(new Place(), data);
   }
