@@ -5,12 +5,13 @@ import { diskStorage } from 'multer';
 import { Store } from 'src/stores/entities/store.entity';
 import { filenameGenerator } from 'src/support/file-uploads';
 import { Place } from './entities/place.entity';
+import { Zone } from './entities/zone.entity';
 import { PlacesController } from './places.controller';
 import { PlacesService } from './places.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Place, Store]),
+    TypeOrmModule.forFeature([Place, Store, Zone]),
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads/places',

@@ -8,14 +8,17 @@ import { CreatePlaceDto } from './dto/create-place.dto';
 import { DeletePlaceDto } from './dto/delete-place.dto';
 import { PlacePaginationOptionsDto } from './dto/place-pagination-options.dto';
 import { UpdatePlaceDto } from './dto/update-place.dto';
+import { UpdateZoneDto } from './dto/update-zone.dto';
 import { Place } from './entities/place.entity';
 import { Zone } from './entities/zone.entity';
 import { PlaceNotFoundException } from './errors/place-not-found.exception';
+import { ZoneNotFoundException } from './errors/zone-not-found.exception';
 
 @Injectable()
 export class PlacesService {
   constructor(
     @InjectRepository(Place) private readonly placesRepository: Repository<Place>,
+    @InjectRepository(Zone) private readonly zonesRepository: Repository<Zone>,
     @InjectRepository(Store) private readonly storesRepository: Repository<Store>
   ) {}
 
@@ -91,6 +94,30 @@ export class PlacesService {
     }
 
     return await this.placesRepository.save(place);
+  }
+
+  async updateZone({zoneId, userId, ...updateZoneDto}: UpdateZoneDto): Promise<Place> {
+    const zone = await this.zonesRepository.createQueryBuilder('zone')
+      .innerJoinAndSelect('zone.place', 'place')
+      .innerJoin('place.store', 'store')
+      .where('zone.id = :zoneId', { zoneId })
+      .andWhere('store.userId = :userId', { userId })
+      .getOne();
+
+    if (!zone) throw new ZoneNotFoundException();
+
+    Object.assign(zone, updateZoneDto);
+
+    await this.zonesRepository.save(zone);
+
+    const place = await this.placesRepository.createQueryBuilder('place')
+      .leftJoinAndSelect('place.zones', 'zone')
+      .where('place.id = :id', { id: zone.place.id })
+      .getOne();
+
+    if (!place) throw new PlaceNotFoundException();
+
+    return place;
   }
 
   async delete({id, userId}: DeletePlaceDto): Promise<void> {

@@ -13,6 +13,7 @@ import { CreatePlaceDto } from './dto/create-place.dto';
 import { DeletePlaceDto } from './dto/delete-place.dto';
 import { ReadPlaceDto } from './dto/read-place.dto';
 import { UpdatePlaceDto } from './dto/update-place.dto';
+import { UpdateZoneDto } from './dto/update-zone.dto';
 import { PlacePaginationPipe } from './pipes/place-pagination.pipe';
 import { PlacesService } from './places.service';
 
@@ -44,6 +45,14 @@ export class PlacesController {
   @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'), new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ id: 'id' }))
   async update(@Body() updatePlaceDto: UpdatePlaceDto): Promise<ReadPlaceDto> {
     return plainToClass(ReadPlaceDto, await this.placesService.update(updatePlaceDto));
+  }
+
+  @Put(':placeId/zones/:zoneId')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ placeId: 'placeId', zoneId: 'zoneId' }))
+  async updateZone(@Body() updateZoneDto: UpdateZoneDto): Promise<ReadPlaceDto> {
+    return plainToClass(ReadPlaceDto, await this.placesService.updateZone(updateZoneDto));
   }
 
   @Delete(':id')
