@@ -9,6 +9,7 @@ import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-b
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
+import { AddZoneDto } from './dto/add-zone.dto';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { DeletePlaceDto } from './dto/delete-place.dto';
 import { ReadPlaceDto } from './dto/read-place.dto';
@@ -45,6 +46,14 @@ export class PlacesController {
   @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'), new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ id: 'id' }))
   async update(@Body() updatePlaceDto: UpdatePlaceDto): Promise<ReadPlaceDto> {
     return plainToClass(ReadPlaceDto, await this.placesService.update(updatePlaceDto));
+  }
+
+  @Post(':placeId/zones')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ placeId: 'placeId' }))
+  async addZone(@Body() addZoneDto: AddZoneDto): Promise<ReadPlaceDto> {
+    return plainToClass(ReadPlaceDto, await this.placesService.addZone(addZoneDto));
   }
 
   @Put(':placeId/zones/:zoneId')

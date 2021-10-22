@@ -4,6 +4,7 @@ import { Store } from 'src/stores/entities/store.entity';
 import { StoreNotFoundException } from 'src/stores/erros/store-not-found.exception';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Repository } from 'typeorm';
+import { AddZoneDto } from './dto/add-zone.dto';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { DeletePlaceDto } from './dto/delete-place.dto';
 import { PlacePaginationOptionsDto } from './dto/place-pagination-options.dto';
@@ -96,6 +97,37 @@ export class PlacesService {
     return await this.placesRepository.save(place);
   }
 
+  async delete({id, userId}: DeletePlaceDto): Promise<void> {
+    const place = await this.placesRepository.createQueryBuilder('place')
+      .innerJoin('place.store', 'store')
+      .where('place.id = :id', { id })
+      .andWhere('store.userId = :userId', { userId })
+      .getOne();
+
+    if (!place) throw new PlaceNotFoundException();
+
+    await this.placesRepository.softRemove(place);
+  }
+
+  async addZone({placeId, userId, ...addZoneDto}: AddZoneDto): Promise<Place> {
+    const place = await this.placesRepository.createQueryBuilder('place')
+      .leftJoinAndSelect('place.zones', 'zone')
+      .innerJoin('place.store', 'store')
+      .where('store.userId = :userId', { userId })
+      .getOne();
+
+    if (!place) throw new PlaceNotFoundException();
+
+    const zone = Zone.create({
+      ...addZoneDto,
+      place,
+    });
+
+    await this.zonesRepository.save(zone);
+
+    return place;
+  }
+
   async updateZone({zoneId, userId, ...updateZoneDto}: UpdateZoneDto): Promise<Place> {
     const zone = await this.zonesRepository.createQueryBuilder('zone')
       .innerJoinAndSelect('zone.place', 'place')
@@ -118,17 +150,5 @@ export class PlacesService {
     if (!place) throw new PlaceNotFoundException();
 
     return place;
-  }
-
-  async delete({id, userId}: DeletePlaceDto): Promise<void> {
-    const place = await this.placesRepository.createQueryBuilder('place')
-      .innerJoin('place.store', 'store')
-      .where('place.id = :id', { id })
-      .andWhere('store.userId = :userId', { userId })
-      .getOne();
-
-    if (!place) throw new PlaceNotFoundException();
-
-    await this.placesRepository.softRemove(place);
   }
 }
