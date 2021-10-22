@@ -12,6 +12,7 @@ import { Role } from 'src/users/enums/roles.enum';
 import { AddZoneDto } from './dto/add-zone.dto';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { DeletePlaceDto } from './dto/delete-place.dto';
+import { DeleteZoneDto } from './dto/delete-zone.dto';
 import { ReadPlaceDto } from './dto/read-place.dto';
 import { UpdatePlaceDto } from './dto/update-place.dto';
 import { UpdateZoneDto } from './dto/update-zone.dto';
@@ -62,6 +63,14 @@ export class PlacesController {
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ placeId: 'placeId', zoneId: 'zoneId' }))
   async updateZone(@Body() updateZoneDto: UpdateZoneDto): Promise<ReadPlaceDto> {
     return plainToClass(ReadPlaceDto, await this.placesService.updateZone(updateZoneDto));
+  }
+
+  @Delete(':placeId/zones/:zoneId')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ placeId: 'placeId', zoneId: 'zoneId' }))
+  async deleteZone(@Body() deleteZoneDto: DeleteZoneDto): Promise<ReadPlaceDto> {
+    return plainToClass(ReadPlaceDto, await this.placesService.deleteZone(deleteZoneDto));
   }
 
   @Delete(':id')

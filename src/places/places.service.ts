@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { AddZoneDto } from './dto/add-zone.dto';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { DeletePlaceDto } from './dto/delete-place.dto';
+import { DeleteZoneDto } from './dto/delete-zone.dto';
 import { PlacePaginationOptionsDto } from './dto/place-pagination-options.dto';
 import { UpdatePlaceDto } from './dto/update-place.dto';
 import { UpdateZoneDto } from './dto/update-zone.dto';
@@ -125,7 +126,12 @@ export class PlacesService {
 
     await this.zonesRepository.save(zone);
 
-    return place;
+    const updatedPlace = await this.placesRepository.createQueryBuilder('place')
+      .leftJoinAndSelect('place.zones', 'zone')
+      .where('place.id = :id', { id: place.id })
+      .getOne();
+
+    return updatedPlace;
   }
 
   async updateZone({zoneId, userId, ...updateZoneDto}: UpdateZoneDto): Promise<Place> {
@@ -150,5 +156,33 @@ export class PlacesService {
     if (!place) throw new PlaceNotFoundException();
 
     return place;
+  }
+
+  async deleteZone({zoneId, userId}: DeleteZoneDto): Promise<Place> {
+    const place = await this.placesRepository.createQueryBuilder('place')
+      .leftJoinAndSelect('place.zones', 'zone')
+      .innerJoin('place.store', 'store')
+      .where('store.userId = :userId', { userId })
+      .getOne();
+
+    if (!place) throw new PlaceNotFoundException();
+
+    const zone = await this.zonesRepository.createQueryBuilder('zone')
+      .innerJoin('zone.place', 'place')
+      .innerJoin('place.store', 'store')
+      .where('zone.id = :zoneId', { zoneId })
+      .andWhere('store.userId = :userId', { userId })
+      .getOne();
+
+    if (!zone) throw new ZoneNotFoundException();
+
+    await this.zonesRepository.remove(zone);
+
+    const updatedPlace = await this.placesRepository.createQueryBuilder('place')
+      .leftJoinAndSelect('place.zones', 'zone')
+      .where('place.id = :id', { id: place.id })
+      .getOne();
+
+    return updatedPlace;
   }
 }
