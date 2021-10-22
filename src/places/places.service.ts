@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { DeletePlaceDto } from './dto/delete-place.dto';
 import { PlacePaginationOptionsDto } from './dto/place-pagination-options.dto';
+import { UpdatePlaceDto } from './dto/update-place.dto';
 import { Place } from './entities/place.entity';
 import { Zone } from './entities/zone.entity';
 import { PlaceNotFoundException } from './errors/place-not-found.exception';
@@ -73,6 +74,23 @@ export class PlacesService {
     if (!place) throw new PlaceNotFoundException();
 
     return place;
+  }
+
+  async update({id, userId, image, ...updatePlaceDto}: UpdatePlaceDto): Promise<Place> {
+    const place = await this.placesRepository.createQueryBuilder('place')
+      .leftJoinAndSelect('place.zones', 'zone')
+      .where('place.id = :id', { id })
+      .getOne();
+
+    if (!place) throw new PlaceNotFoundException();
+
+    Object.assign(place, updatePlaceDto);
+
+    if (image) {
+      place.imgPath = image.path;
+    }
+
+    return await this.placesRepository.save(place);
   }
 
   async delete({id, userId}: DeletePlaceDto): Promise<void> {

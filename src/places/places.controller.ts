@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
 import { Roles } from 'src/auth/decorators/roles.decorator';
@@ -12,6 +12,7 @@ import { Role } from 'src/users/enums/roles.enum';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { DeletePlaceDto } from './dto/delete-place.dto';
 import { ReadPlaceDto } from './dto/read-place.dto';
+import { UpdatePlaceDto } from './dto/update-place.dto';
 import { PlacePaginationPipe } from './pipes/place-pagination.pipe';
 import { PlacesService } from './places.service';
 
@@ -35,6 +36,14 @@ export class PlacesController {
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ReadPlaceDto> {
     return plainToClass(ReadPlaceDto, await this.placesService.findOne(+id));
+  }
+
+  @Put(':id')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'), new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ id: 'id' }))
+  async update(@Body() updatePlaceDto: UpdatePlaceDto): Promise<ReadPlaceDto> {
+    return plainToClass(ReadPlaceDto, await this.placesService.update(updatePlaceDto));
   }
 
   @Delete(':id')
