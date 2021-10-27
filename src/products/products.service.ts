@@ -15,6 +15,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { DeleteProductImageDto } from './dto/delete-product-image.dto';
 import { ProductPaginationOptionsDto } from './dto/product-pagination-options.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductDetails } from './entities/product-details.entity';
 import { ProductDimension } from './entities/product-dimension.entity';
 import { ProductFeatureForGroup } from './entities/product-feature-for-group.entity';
 import { ProductFeatureGroup } from './entities/product-feature-group.entity';
@@ -59,9 +60,10 @@ export class ProductsService {
     const queryBuilder = this.productsRepository.createQueryBuilder('product')
       .take(perPage)
       .skip(offset)
-      .leftJoinAndSelect('product.brand', 'brand')
       .leftJoinAndSelect('product.categories', 'category')
       .leftJoinAndSelect('product.productImages', 'productImage')
+      .leftJoinAndSelect('product.productDetails', 'productDetails')
+      .leftJoinAndSelect('productDetails.brand', 'brand')
       .leftJoinAndSelect('product.productFeatures', 'productFeature')
       .leftJoinAndSelect('product.productFeatureGroups', 'productFeatureGroup')
       .leftJoinAndSelect('productFeatureGroup.productFeatureForGroups', 'productFeatureForGroup')
@@ -98,15 +100,15 @@ export class ProductsService {
 
     if (name) queryBuilder.andWhere('product.name LIKE :name', { name: `%${name}%` });
 
-    if (reference) queryBuilder.andWhere('product.reference LIKE :reference', { reference: `%${reference}%` });
+    if (reference) queryBuilder.andWhere('productDetails.reference LIKE :reference', { reference: `%${reference}%` });
 
-    if (minPrice) queryBuilder.andWhere('product.price >= :minPrice', { minPrice });
+    if (minPrice) queryBuilder.andWhere('productDetails.price >= :minPrice', { minPrice });
 
-    if (maxPrice) queryBuilder.andWhere('product.price <= :maxPrice', { maxPrice });
+    if (maxPrice) queryBuilder.andWhere('productDetails.price <= :maxPrice', { maxPrice });
 
-    if (minQuantity) queryBuilder.andWhere('product.quantity >= :minQuantity', { minQuantity });
+    if (minQuantity) queryBuilder.andWhere('productDetails.quantity >= :minQuantity', { minQuantity });
 
-    if (maxQuantity) queryBuilder.andWhere('product.quantity <= :maxQuantity', { maxQuantity });
+    if (maxQuantity) queryBuilder.andWhere('productDetails.quantity <= :maxQuantity', { maxQuantity });
 
     if (storeId) queryBuilder.andWhere('product.storeId = :storeId', { storeId });
 
@@ -163,6 +165,10 @@ export class ProductsService {
     featureGroups,
     deliveryMethodTypeCodes,
     brandId,
+    reference,
+    shortDescription,
+    quantity,
+    price,
     ...createProductDto
   }: CreateProductDto, images: Express.Multer.File[]): Promise<Product> {
     const store = await this.findUserStore(userId);
@@ -176,9 +182,16 @@ export class ProductsService {
       productFeatureForGroups: features.map(feature => ProductFeatureForGroup.create(feature)),
     })) : [];
 
+    const productDetails = ProductDetails.create({
+      brandId: brandId ? brandId : null,
+      reference,
+      shortDescription,
+      quantity,
+      price,
+    });
+
     const product = Product.create({
       ...createProductDto,
-      brandId: brandId ? brandId : null,
       tags,
       categories,
       productImages: images.map((imageFile, i) => ProductImage.create({
@@ -186,8 +199,9 @@ export class ProductsService {
         isPortrait: i === 0,
         position: i,
       })),
-      productFeatures,
       store,
+      productDetails,
+      productFeatures,
       productFeatureGroups,
       productDimensions: ProductDimension.create({
         width: createProductDto.width,
@@ -203,9 +217,10 @@ export class ProductsService {
 
   async findOneById(id: number): Promise<Product> {
     const product = await this.productsRepository.createQueryBuilder('product')
-      .leftJoinAndSelect('product.brand', 'brand')
       .leftJoinAndSelect('product.categories', 'category')
       .leftJoinAndSelect('product.productImages', 'productImage')
+      .leftJoinAndSelect('product.productDetails', 'productDetails')
+      .leftJoinAndSelect('productDetails.brand', 'brand')
       .leftJoinAndSelect('product.productFeatures', 'productFeature')
       .leftJoinAndSelect('product.productFeatureGroups', 'productFeatureGroup')
       .leftJoinAndSelect('productFeatureGroup.productFeatureForGroups', 'productFeatureForGroup')
@@ -232,9 +247,10 @@ export class ProductsService {
 
   async findOneBySlug(slug: string, userId: number): Promise<Product> {
     const product = await this.productsRepository.createQueryBuilder('product')
-      .leftJoinAndSelect('product.brand', 'brand')
       .leftJoinAndSelect('product.categories', 'category')
       .leftJoinAndSelect('product.productImages', 'productImage')
+      .leftJoinAndSelect('product.productDetails', 'productDetails')
+      .leftJoinAndSelect('productDetails.brand', 'brand')
       .leftJoinAndSelect('product.productFeatures', 'productFeature')
       .leftJoinAndSelect('product.productFeatureGroups', 'productFeatureGroup')
       .leftJoinAndSelect('productFeatureGroup.productFeatureForGroups', 'productFeatureForGroup')
@@ -279,6 +295,10 @@ export class ProductsService {
     height,
     length,
     weight,
+    reference,
+    shortDescription,
+    quantity,
+    price,
     ...updateProductDto
   }: UpdateProductDto): Promise<Product> {
     const store = await this.findUserStore(userId);
@@ -315,11 +335,19 @@ export class ProductsService {
       productFeatureForGroups: features.map(feature => ProductFeatureForGroup.create(feature)),
     })) : [];
 
+    const productDetails = ProductDetails.create({
+      brandId: brandId ? brandId : null,
+      reference,
+      shortDescription,
+      quantity,
+      price,
+    });
+
     const updatedData: Record<string, any> = {
       ...updateProductDto,
-      brandId: brandId ? brandId : null,
       tags,
       categories,
+      productDetails,
       productFeatures,
       productFeatureGroups,
       productDimensions: ProductDimension.create({

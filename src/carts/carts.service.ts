@@ -133,7 +133,7 @@ export class CartsService {
 
     const product = await this.productsRepository.findOne({
       where: { id: productId, storeId },
-      relations: ['productImages'],
+      relations: ['productImages', 'productDetails'],
     });
 
     if (!product) {
@@ -188,7 +188,7 @@ export class CartsService {
         productId,
         productName: product.name,
         productImage: product.productImages[0].path,
-        productPrice: product.finalPrice,
+        productPrice: product.productDetails.finalPrice,
         productSlug: product.slug,
         quantity,
         cartItemFeatures: [
@@ -202,7 +202,7 @@ export class CartsService {
       itemQuantity = quantity;
     }
 
-    if (itemQuantity > product.quantity) {
+    if (itemQuantity > product.productDetails.quantity) {
       throw new ProductQuantityIsLessThanRequiredQuantityException();
     }
 
@@ -423,7 +423,7 @@ export class CartsService {
 
     cartItem.quantity = quantity;
 
-    if (cartItem.quantity > product.quantity) {
+    if (cartItem.quantity > product.productDetails.quantity) {
       throw new ProductQuantityIsLessThanRequiredQuantityException();
     }
 

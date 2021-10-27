@@ -1,4 +1,3 @@
-import { Brand } from "src/brands/entities/brand.entity";
 import { Category } from "src/categories/entities/category.entity";
 import { DeliveryMethodType } from "src/delivery-method-types/entities/delivery-method-type.entity";
 import { FavoriteProduct } from "src/favorite-products/entities/favorite-product.entity";
@@ -6,6 +5,7 @@ import { ProductFeature } from "src/product-features/entities/product-feature.en
 import { Store } from "src/stores/entities/store.entity";
 import { Tag } from "src/tags/entities/tag.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { ProductDetails } from "./product-details.entity";
 import { ProductDimension } from "./product-dimension.entity";
 import { ProductFeatureGroup } from "./product-feature-group.entity";
 import { ProductImage } from "./product-image.entity";
@@ -33,51 +33,11 @@ export class Product {
   slug: string;
 
   @Column({
-    name: 'reference',
-    type: 'varchar',
-    nullable: true,
-  })
-  reference: string;
-
-  @Column({
-    name: 'short_description',
-    type: 'varchar',
-    nullable: true,
-  })
-  shortDescription: string;
-
-  @Column({
     name: 'description',
     type: 'text',
     nullable: true,
   })
   description: string;
-
-  @Column({
-    name: 'quantity',
-    type: 'int',
-    default: 0,
-  })
-  quantity: number;
-
-  @Column({
-    name: 'price',
-    type: 'decimal',
-    precision: 14,
-    scale: 2,
-  })
-  price: number;
-
-  @Column({
-    name: 'brand_id',
-    type: 'int',
-    nullable: true,
-  })
-  brandId: number;
-
-  @ManyToOne(() => Brand, {nullable: true})
-  @JoinColumn({name: 'brand_id'})
-  brand: Brand;
 
   @Column({
     name: 'store_id',
@@ -89,14 +49,6 @@ export class Product {
   @ManyToOne(() => Store, {nullable: false})
   @JoinColumn({name: 'store_id'})
   store: Store;
-
-  @ManyToMany(() => DeliveryMethodType, {cascade: true, onDelete: 'CASCADE'})
-  @JoinTable({
-    name: 'product_to_delivery_method_type',
-    joinColumn: {name: 'product_id'},
-    inverseJoinColumn: {name: 'delivery_method_type_id'},
-  })
-  deliveryMethodTypes: DeliveryMethodType[];
 
   @ManyToMany(() => Tag, {
     cascade: ['insert', 'update'],
@@ -120,11 +72,19 @@ export class Product {
   })
   categories: Category[];
 
-  @OneToMany(() => ProductFeature, productFeature => productFeature.product, {cascade: ['insert', 'update']})
-  productFeatures: ProductFeature[];
-
   @OneToMany(() => ProductImage, productImage => productImage.product, {cascade: ['insert', 'update']})
   productImages: ProductImage[];
+
+  @OneToMany(() => FavoriteProduct, (favoriteProduct) => favoriteProduct.product)
+  favoriteProducts: FavoriteProduct[];
+
+  favoriteProduct: FavoriteProduct;
+
+  @OneToOne(() => ProductDetails, productDetails => productDetails.product, { cascade: ['insert', 'update'] })
+  productDetails: ProductDetails;
+
+  @OneToMany(() => ProductFeature, productFeature => productFeature.product, {cascade: ['insert', 'update']})
+  productFeatures: ProductFeature[];
 
   @OneToMany(() => ProductFeatureGroup, productFeatureGroup => productFeatureGroup.product, {cascade: ['insert', 'update']})
   productFeatureGroups: ProductFeatureGroup[];
@@ -132,10 +92,13 @@ export class Product {
   @OneToOne(() => ProductDimension, productDimension => productDimension.product, {cascade: ['insert', 'update']})
   productDimensions: ProductDimension;
 
-  @OneToMany(() => FavoriteProduct, (favoriteProduct) => favoriteProduct.product)
-  favoriteProducts: FavoriteProduct[];
-
-  favoriteProduct: FavoriteProduct;
+  @ManyToMany(() => DeliveryMethodType, {cascade: true, onDelete: 'CASCADE'})
+  @JoinTable({
+    name: 'product_to_delivery_method_type',
+    joinColumn: {name: 'product_id'},
+    inverseJoinColumn: {name: 'delivery_method_type_id'},
+  })
+  deliveryMethodTypes: DeliveryMethodType[];
 
   @CreateDateColumn({
     name: 'created_at',
@@ -154,10 +117,6 @@ export class Product {
     select: false
   })
   deletedAt: Date;
-
-  get finalPrice(): number {
-    return this.price;
-  }
 
   get isFavorite(): boolean {
     return !!this.favoriteProduct;

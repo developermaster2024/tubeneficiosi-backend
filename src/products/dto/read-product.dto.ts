@@ -9,6 +9,7 @@ import { User } from "src/users/entities/user.entity";
 import { ProductDimension } from "../entities/product-dimension.entity";
 import { ProductFeatureGroup } from "../entities/product-feature-group.entity";
 import { ProductImage } from "../entities/product-image.entity";
+import { ReadProductDetailsDto } from "./read-product-details.dto";
 
 @Exclude()
 export class ReadProductDto {
@@ -40,10 +41,6 @@ export class ReadProductDto {
   readonly finalPrice: number;
 
   @Expose()
-  @Type(() => ReadBrandDto)
-  readonly brand: ReadBrandDto;
-
-  @Expose()
   readonly productFeatures: ProductFeature[];
 
   @Expose()
@@ -51,6 +48,10 @@ export class ReadProductDto {
 
   @Expose()
   readonly productDimensions: ProductDimension;
+
+  @Expose()
+  @Type(() => ReadProductDetailsDto)
+  readonly productDetails: ReadProductDetailsDto;
 
   @Expose()
   @Transform(({value}) => !value ? value : value.sort((a, b) => a.position - b.position))

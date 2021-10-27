@@ -10,7 +10,7 @@ import { Delivery } from 'src/deliveries/entities/delivery.entity';
 import { DeliveryZone } from 'src/delivery-methods/entities/delivery-zone.entity';
 import { OrderStatuses } from 'src/order-statuses/enums/order-statuses.enum';
 import { PaymentMethods } from 'src/payment-methods/enum/payment-methods.enum';
-import { LessThan, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Order } from './entities/order.entity';
 import { OrderNotFoundException } from './errors/order-not-found.exception';
@@ -42,6 +42,7 @@ import { StoreIsClosedException } from './errors/store-is-closed.exception';
 import { OrdersCountDto } from './dto/orders-count.dto';
 import { DeliveryMethodNotAllowedByProductException } from './errors/delivery-method-not-allowed-by-product.exception';
 import { MercadoPagoPaymentGateway } from 'src/payment-gateways/mercado-pago-payment-gateway';
+import { ProductDetails } from 'src/products/entities/product-details.entity';
 
 @Injectable()
 export class OrdersService {
@@ -51,6 +52,7 @@ export class OrdersService {
     @InjectRepository(DeliveryZone) private readonly deliveryZoneRepository: Repository<DeliveryZone>,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     @InjectRepository(Product) private readonly productsRepository: Repository<Product>,
+    @InjectRepository(ProductDetails) private readonly productDetailsRepository: Repository<ProductDetails>,
     @InjectRepository(DeliveryMethod) private readonly deliveryMethodsRepository: Repository<DeliveryMethod>,
     @InjectRepository(OrderStatus) private readonly orderStatusesRepository: Repository<OrderStatus>,
     @InjectRepository(Notification) private readonly notificationsRepository: Repository<Notification>,
@@ -174,10 +176,10 @@ export class OrdersService {
     }
 
     for (let cartItem of cart.cartItems) {
-      const product = await this.productsRepository.findOne({
-        id: cartItem.productId,
-        quantity: LessThan(cartItem.quantity),
-      });
+      const product = await this.productsRepository.createQueryBuilder('product')
+        .innerJoin('product.productDetails', 'productDetails')
+        .where('productDetails.quantity < :quantity', { quantity: cartItem.quantity })
+        .getOne();
 
       if (product) {
         throw new ProductQuantityIsLessThanRequiredQuantityException(cartItem);
@@ -263,23 +265,23 @@ export class OrdersService {
     cart.isProcessed = true;
     await this.cartsRepository.save(cart);
 
-    await this.productsRepository.createQueryBuilder('product')
-      .update(Product)
+    await this.productDetailsRepository.createQueryBuilder('productDetails')
+      .update(ProductDetails)
       .set({
         quantity: () => `
-          products.quantity - (SELECT
+          product_details.quantity - (SELECT
             cart_items.quantity
           FROM
             cart_items
           WHERE
-            cart_items.product_id = products.id AND
+            cart_items.product_id = product_details.product_id AND
             cart_items.cart_id = ${cart.id}
           LIMIT
             1
           )
         `
       })
-      .where('id IN (:...ids)', { ids: cart.cartItems.map(item => item.productId) })
+      .where('productId IN (:...productIds)', { productIds: cart.cartItems.map(item => item.productId) })
       .execute();
 
     order.total = order.calculatedTotal;

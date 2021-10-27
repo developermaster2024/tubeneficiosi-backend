@@ -10,6 +10,7 @@ import { Notification } from 'src/notifications/entities/notification.entity';
 import { NotificationsModule } from 'src/notifications/notifications.module';
 import { OrderStatus } from 'src/order-statuses/entities/order-status.entity';
 import { PaymentGatewaysModule } from 'src/payment-gateways/payment-gateways.module';
+import { ProductDetails } from 'src/products/entities/product-details.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { filenameGenerator } from 'src/support/file-uploads';
 import { User } from 'src/users/entities/user.entity';
@@ -19,7 +20,7 @@ import { OrdersService } from './orders.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Order, Cart, DeliveryZone, User, Product, DeliveryMethod, OrderStatus, Notification]),
+    TypeOrmModule.forFeature([Order, Cart, DeliveryZone, User, Product, ProductDetails, DeliveryMethod, OrderStatus, Notification]),
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads/orders',
