@@ -53,6 +53,7 @@ import { StoreRatingsModule } from './store-ratings/store-ratings.module';
 import { ClientCardsModule } from './client-cards/client-cards.module';
 import { StoreFeaturesModule } from './store-features/store-features.module';
 import { PlacesModule } from './places/places.module';
+import { ShowsModule } from './shows/shows.module';
 
 @Module({
   imports: [
@@ -112,6 +113,7 @@ import { PlacesModule } from './places/places.module';
     ClientCardsModule,
     StoreFeaturesModule,
     PlacesModule,
+    ShowsModule,
   ],
 })
 export class AppModule {}

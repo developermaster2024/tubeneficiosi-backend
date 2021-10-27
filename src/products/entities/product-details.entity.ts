@@ -1,12 +1,12 @@
 import { Brand } from "src/brands/entities/brand.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
 import { Product } from "./product.entity";
 
 @Entity({
   name: 'product_details',
 })
 export class ProductDetails {
-  @OneToOne(() => Product, product => product.productDimensions, {primary: true, onDelete: 'CASCADE'})
+  @OneToOne(() => Product, product => product.productDetails, {primary: true, onDelete: 'CASCADE'})
   @JoinColumn({name: 'product_id'})
   product: Product;
 

@@ -2,6 +2,7 @@ import { Category } from "src/categories/entities/category.entity";
 import { DeliveryMethodType } from "src/delivery-method-types/entities/delivery-method-type.entity";
 import { FavoriteProduct } from "src/favorite-products/entities/favorite-product.entity";
 import { ProductFeature } from "src/product-features/entities/product-feature.entity";
+import { ShowDetails } from "src/shows/entities/show-details.entity";
 import { Store } from "src/stores/entities/store.entity";
 import { Tag } from "src/tags/entities/tag.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
@@ -82,6 +83,9 @@ export class Product {
 
   @OneToOne(() => ProductDetails, productDetails => productDetails.product, { cascade: ['insert', 'update'] })
   productDetails: ProductDetails;
+
+  @OneToOne(() => ShowDetails, showDetails => showDetails.product, { cascade: ['insert', 'update'] })
+  showDetails: ShowDetails;
 
   @OneToMany(() => ProductFeature, productFeature => productFeature.product, {cascade: ['insert', 'update']})
   productFeatures: ProductFeature[];
