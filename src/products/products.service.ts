@@ -71,6 +71,7 @@ export class ProductsService {
       .leftJoinAndSelect('product.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .leftJoinAndSelect('store.storeHours', 'storeHour')
+      .leftJoinAndSelect('store.storeCategory', 'storeCategory')
       .leftJoinAndMapOne(
         'store.latestActiveDiscount',
         'store.discounts',
