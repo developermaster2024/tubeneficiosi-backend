@@ -73,7 +73,29 @@ export class StoresService {
         'store.cheapestProduct',
         'store.products',
         'product',
-        'product.price = (SELECT MIN(product2.price) FROM products AS product2 WHERE product2.store_id = store.id AND product2.deleted_at IS NULL)'
+        `(
+          SELECT
+            product_details.price
+          FROM
+            product_details
+          INNER JOIN
+            products products2 ON products2.id = product_details.product_id AND products2.deleted_at IS NULL
+          WHERE
+            product_details.product_id = product.id
+          LIMIT
+            1
+        ) = (
+          SELECT
+            MIN(product_details2.price)
+          FROM
+            product_details product_details2
+          INNER JOIN
+            products products3 ON products3.id = product_details2.product_id AND products3.deleted_at IS NULL
+          WHERE
+            products3.store_id = store.id
+          LIMIT
+            1
+        )`
       );
     }
 
