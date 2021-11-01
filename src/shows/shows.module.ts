@@ -7,12 +7,13 @@ import { Product } from 'src/products/entities/product.entity';
 import { Store } from 'src/stores/entities/store.entity';
 import { filenameGenerator } from 'src/support/file-uploads';
 import { Tag } from 'src/tags/entities/tag.entity';
+import { Show } from './entities/show.entity';
 import { ShowsController } from './shows.controller';
 import { ShowsService } from './shows.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Product, Store, Tag, Category]),
+    TypeOrmModule.forFeature([Product, Store, Show, Tag, Category]),
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads/products',

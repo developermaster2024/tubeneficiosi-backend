@@ -8,8 +8,10 @@ import { JwtUserToBodyInterceptor } from 'src/support/interceptors/jwt-user-to-b
 import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body.interceptor';
 import { SlugifierInterceptor } from 'src/support/interceptors/slugifier.interceptor';
 import { Role } from 'src/users/enums/roles.enum';
+import { AddShowDto } from './dto/add-show.dto';
 import { CreateShowDto } from './dto/create-show.dto';
 import { DeleteShowDto } from './dto/delete-show.dto';
+import { ReadProductShowDto } from './dto/read-product-show.dto';
 import { ReadShowDto } from './dto/read-show.dto';
 import { UpdateShowDto } from './dto/update-show.dto';
 import { ShowsService } from './shows.service';
@@ -25,21 +27,21 @@ export class ShowsController {
   async create(
     @Body() createShowDto: CreateShowDto,
     @UploadedFiles() images: Express.Multer.File[]
-  ): Promise<ReadShowDto> {
-    return plainToClass(ReadShowDto, await this.showsService.create(createShowDto, images));
+  ): Promise<ReadProductShowDto> {
+    return plainToClass(ReadProductShowDto, await this.showsService.create(createShowDto, images));
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ReadShowDto> {
-    return plainToClass(ReadShowDto, await this.showsService.findOne(+id));
+  async findOne(@Param('id') id: string): Promise<ReadProductShowDto> {
+    return plainToClass(ReadProductShowDto, await this.showsService.findOne(+id));
   }
 
   @Put(':id')
   @Roles(Role.STORE)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({id: 'id'}))
-  async update(@Body() updateShowDto: UpdateShowDto): Promise<ReadShowDto> {
-    return plainToClass(ReadShowDto, await this.showsService.update(updateShowDto));
+  async update(@Body() updateShowDto: UpdateShowDto): Promise<ReadProductShowDto> {
+    return plainToClass(ReadProductShowDto, await this.showsService.update(updateShowDto));
   }
 
   @Delete(':id')
@@ -48,5 +50,13 @@ export class ShowsController {
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ id: 'id' }))
   async delete(@Body() deleteShowDto: DeleteShowDto): Promise<void> {
     await this.showsService.delete(deleteShowDto);
+  }
+
+  @Post(':id/shows')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ id: 'productId' }))
+  async addShow(@Body() addShowDto: AddShowDto): Promise<ReadShowDto> {
+    return plainToClass(ReadShowDto, await this.showsService.addShow(addShowDto));
   }
 }
