@@ -20,6 +20,12 @@ export class ShowToZone {
   price: number;
 
   @Column({
+    name: 'available_seats',
+    type: 'int',
+  })
+  availableSeats: number;
+
+  @Column({
     name: 'show_id',
     type: 'int',
     select: false,
