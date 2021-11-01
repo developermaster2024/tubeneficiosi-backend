@@ -9,11 +9,11 @@ import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body
 import { SlugifierInterceptor } from 'src/support/interceptors/slugifier.interceptor';
 import { Role } from 'src/users/enums/roles.enum';
 import { AddShowDto } from './dto/add-show.dto';
-import { CreateShowDto } from './dto/create-show.dto';
-import { DeleteShowDto } from './dto/delete-show.dto';
+import { CreateProductShowDto } from './dto/create-product-show.dto';
+import { DeleteProductShowDto } from './dto/delete-product-show.dto';
 import { ReadProductShowDto } from './dto/read-product-show.dto';
 import { ReadShowDto } from './dto/read-show.dto';
-import { UpdateShowDto } from './dto/update-show.dto';
+import { UpdateProductShowDto } from './dto/update-product-show.dto';
 import { ShowsService } from './shows.service';
 
 @Controller('shows')
@@ -25,7 +25,7 @@ export class ShowsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(FilesInterceptor('images'), new JwtUserToBodyInterceptor(), new SlugifierInterceptor({name: 'slug'}))
   async create(
-    @Body() createShowDto: CreateShowDto,
+    @Body() createShowDto: CreateProductShowDto,
     @UploadedFiles() images: Express.Multer.File[]
   ): Promise<ReadProductShowDto> {
     return plainToClass(ReadProductShowDto, await this.showsService.create(createShowDto, images));
@@ -40,7 +40,7 @@ export class ShowsController {
   @Roles(Role.STORE)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({id: 'id'}))
-  async update(@Body() updateShowDto: UpdateShowDto): Promise<ReadProductShowDto> {
+  async update(@Body() updateShowDto: UpdateProductShowDto): Promise<ReadProductShowDto> {
     return plainToClass(ReadProductShowDto, await this.showsService.update(updateShowDto));
   }
 
@@ -48,7 +48,7 @@ export class ShowsController {
   @Roles(Role.STORE)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ id: 'id' }))
-  async delete(@Body() deleteShowDto: DeleteShowDto): Promise<void> {
+  async delete(@Body() deleteShowDto: DeleteProductShowDto): Promise<void> {
     await this.showsService.delete(deleteShowDto);
   }
 

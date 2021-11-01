@@ -1,7 +1,7 @@
 import { Exclude, Expose, Type } from "class-transformer";
 
 @Exclude()
-export class DeleteShowDto {
+export class DeleteProductShowDto {
   @Expose()
   readonly userId: number;
 

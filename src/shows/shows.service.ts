@@ -12,9 +12,9 @@ import { StoreNotFoundException } from 'src/stores/erros/store-not-found.excepti
 import { Tag } from 'src/tags/entities/tag.entity';
 import { In, Repository } from 'typeorm';
 import { AddShowDto } from './dto/add-show.dto';
-import { CreateShowDto } from './dto/create-show.dto';
-import { DeleteShowDto } from './dto/delete-show.dto';
-import { UpdateShowDto } from './dto/update-show.dto';
+import { CreateProductShowDto } from './dto/create-product-show.dto';
+import { DeleteProductShowDto } from './dto/delete-product-show.dto';
+import { UpdateProductShowDto } from './dto/update-product-show.dto';
 import { ShowDetails } from './entities/show-details.entity';
 import { ShowToZone } from './entities/show-to-zone.entity';
 import { Show } from './entities/show.entity';
@@ -32,7 +32,7 @@ export class ShowsService {
     @InjectRepository(Category) private readonly categoriesRepository: Repository<Category>
   ) {}
 
-  async create({userId, trailer, tagIds, categoryIds, ...createShowDto}: CreateShowDto, images: Express.Multer.File[]): Promise<Product> {
+  async create({userId, trailer, tagIds, categoryIds, ...createShowDto}: CreateProductShowDto, images: Express.Multer.File[]): Promise<Product> {
     const store = await this.storesRepository.createQueryBuilder('store')
       .leftJoin('store.storeCategory', 'storeCategory')
       .where('store.userId = :userId', { userId })
@@ -85,7 +85,7 @@ export class ShowsService {
     return product;
   }
 
-  async update({id, userId, trailer, tagIds, categoryIds, ...updateShowDto}: UpdateShowDto): Promise<Product> {
+  async update({id, userId, trailer, tagIds, categoryIds, ...updateShowDto}: UpdateProductShowDto): Promise<Product> {
     const product = await this.productsRepository.createQueryBuilder('product')
       .leftJoinAndSelect('product.showDetails', 'showDetails')
       .leftJoinAndSelect('product.store', 'store')
@@ -115,7 +115,7 @@ export class ShowsService {
     return await this.productsRepository.save(product);
   }
 
-  async delete({id, userId}: DeleteShowDto): Promise<void> {
+  async delete({id, userId}: DeleteProductShowDto): Promise<void> {
     const product = await this.productsRepository.createQueryBuilder('product')
       .innerJoin('product.store', 'store')
       .where('product.id = :id', { id })

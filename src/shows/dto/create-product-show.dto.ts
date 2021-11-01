@@ -2,7 +2,7 @@ import { Exclude, Expose } from "class-transformer";
 import { ArrayMinSize, IsArray, MaxLength, ValidateIf } from "class-validator";
 
 @Exclude()
-export class CreateShowDto {
+export class CreateProductShowDto {
   @Expose()
   readonly userId: number;
 
