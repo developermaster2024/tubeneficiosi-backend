@@ -74,7 +74,7 @@ export class ShowsController {
   @Roles(Role.STORE)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ id: 'productId', showId: 'showId' }))
-  async deleteShow(@Body() deleteShowDto: DeleteShowDto): Promise<void> {
-    await this.showsService.deleteShow(deleteShowDto);
+  async deleteShow(@Body() deleteShowDto: DeleteShowDto): Promise<ReadProductShowDto> {
+    return plainToClass(ReadProductShowDto, await this.showsService.deleteShow(deleteShowDto));
   }
 }

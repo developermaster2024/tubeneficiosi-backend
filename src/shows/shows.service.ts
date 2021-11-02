@@ -195,7 +195,7 @@ export class ShowsService {
     return await this.showsRepository.save(show);
   }
 
-  async deleteShow({productId, userId, showId}: DeleteShowDto): Promise<void> {
+  async deleteShow({productId, userId, showId}: DeleteShowDto): Promise<Product> {
     const show = await this.showsRepository.createQueryBuilder('show')
       .innerJoin('show.product', 'product')
       .innerJoin('product.store', 'store')
@@ -207,5 +207,9 @@ export class ShowsService {
     if (!show) throw new ShowNotFoundException();
 
     await this.showsRepository.remove(show);
+
+    const product = await this.findOne(productId);
+
+    return product;
   }
 }
