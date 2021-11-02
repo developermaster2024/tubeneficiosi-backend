@@ -69,6 +69,8 @@ export class ShowsService {
       .leftJoinAndSelect('product.store', 'store')
       .leftJoinAndSelect('product.shows', 'show')
       .leftJoinAndSelect('show.showToZones', 'showToZone')
+      .leftJoinAndSelect('showToZone.zone', 'zone')
+      .leftJoinAndSelect('show.place', 'place')
       .leftJoin('store.storeCategory', 'storeCategory')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .leftJoinAndSelect('store.storeHours', 'storeHour')
