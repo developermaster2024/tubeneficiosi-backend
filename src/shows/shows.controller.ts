@@ -14,6 +14,7 @@ import { DeleteProductShowDto } from './dto/delete-product-show.dto';
 import { ReadProductShowDto } from './dto/read-product-show.dto';
 import { ReadShowDto } from './dto/read-show.dto';
 import { UpdateProductShowDto } from './dto/update-product-show.dto';
+import { UpdateShowDto } from './dto/update-show.dto';
 import { ShowsService } from './shows.service';
 
 @Controller('shows')
@@ -58,5 +59,13 @@ export class ShowsController {
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ id: 'productId' }))
   async addShow(@Body() addShowDto: AddShowDto): Promise<ReadShowDto> {
     return plainToClass(ReadShowDto, await this.showsService.addShow(addShowDto));
+  }
+
+  @Put(':id/shows/:showId')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ id: 'productId', showId: 'showId' }))
+  async updateShow(@Body() udpateShowDto: UpdateShowDto): Promise<ReadShowDto> {
+    return plainToClass(ReadShowDto, await this.showsService.updateShow(udpateShowDto));
   }
 }

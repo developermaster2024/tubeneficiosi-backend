@@ -15,9 +15,11 @@ import { AddShowDto } from './dto/add-show.dto';
 import { CreateProductShowDto } from './dto/create-product-show.dto';
 import { DeleteProductShowDto } from './dto/delete-product-show.dto';
 import { UpdateProductShowDto } from './dto/update-product-show.dto';
+import { UpdateShowDto } from './dto/update-show.dto';
 import { ShowDetails } from './entities/show-details.entity';
 import { ShowToZone } from './entities/show-to-zone.entity';
 import { Show } from './entities/show.entity';
+import { ShowNotFoundException } from './errors/show-not-found.exception';
 
 const DEFAULT_SHOW_TO_ZONE_PRICE = 0;
 
@@ -160,6 +162,33 @@ export class ShowsService {
         availableSeats: zone.capacity,
         zone,
       }))
+    });
+
+    return await this.showsRepository.save(show);
+  }
+
+  async updateShow({showId, productId, userId, showToZones, ...updateShowDto}: UpdateShowDto): Promise<Show> {
+    const show = await this.showsRepository.createQueryBuilder('show')
+      .innerJoin('show.product', 'product')
+      .innerJoin('product.store', 'store')
+      .innerJoinAndSelect('show.showToZones', 'showToZone')
+      .where('show.id = :showId', { showId })
+      .andWhere('product.id = :productId', { productId })
+      .andWhere('store.userId = :userId', { userId })
+      .getOne();
+
+    if (!show) throw new ShowNotFoundException();
+
+    Object.assign(show, updateShowDto);
+
+    show.showToZones = show.showToZones.map(showToZone => {
+      const foundShowToZone = showToZones.find(stz => stz.id === showToZone.id);
+
+      return {
+        ...showToZone,
+        price: foundShowToZone?.price ?? showToZone.price,
+        availableSeats: foundShowToZone?.availableSeats ?? showToZone.availableSeats,
+      }
     });
 
     return await this.showsRepository.save(show);
