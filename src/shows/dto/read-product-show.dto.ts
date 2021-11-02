@@ -5,6 +5,7 @@ import { ReadStoreDto } from "src/stores/dto/read-store.dto";
 import { ReadTagDto } from "src/tags/dto/read-tag.dto";
 import { User } from "src/users/entities/user.entity";
 import { ReadShowDetailsDto } from "./read-show-details.dto";
+import { ReadShowDto } from "./read-show.dto";
 
 @Exclude()
 export class ReadProductShowDto {
@@ -45,4 +46,8 @@ export class ReadProductShowDto {
   @Expose()
   @Type(() => ReadShowDetailsDto)
   readonly showDetails: ReadShowDetailsDto;
+
+  @Expose()
+  @Type(() => ReadShowDto)
+  readonly shows: ReadShowDto[];
 }

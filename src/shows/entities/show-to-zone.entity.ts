@@ -39,7 +39,6 @@ export class ShowToZone {
   @Column({
     name: 'zone_id',
     type: 'int',
-    select: false,
   })
   zoneId: number;
 

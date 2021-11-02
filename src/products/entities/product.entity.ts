@@ -3,6 +3,7 @@ import { DeliveryMethodType } from "src/delivery-method-types/entities/delivery-
 import { FavoriteProduct } from "src/favorite-products/entities/favorite-product.entity";
 import { ProductFeature } from "src/product-features/entities/product-feature.entity";
 import { ShowDetails } from "src/shows/entities/show-details.entity";
+import { Show } from "src/shows/entities/show.entity";
 import { Store } from "src/stores/entities/store.entity";
 import { Tag } from "src/tags/entities/tag.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
@@ -103,6 +104,9 @@ export class Product {
     inverseJoinColumn: {name: 'delivery_method_type_id'},
   })
   deliveryMethodTypes: DeliveryMethodType[];
+
+  @OneToMany(() => Show, show => show.product)
+  shows: Show[];
 
   @CreateDateColumn({
     name: 'created_at',
