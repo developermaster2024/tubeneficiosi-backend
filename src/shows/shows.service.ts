@@ -14,6 +14,7 @@ import { In, Repository } from 'typeorm';
 import { AddShowDto } from './dto/add-show.dto';
 import { CreateProductShowDto } from './dto/create-product-show.dto';
 import { DeleteProductShowDto } from './dto/delete-product-show.dto';
+import { DeleteShowDto } from './dto/delete-show.dto';
 import { UpdateProductShowDto } from './dto/update-product-show.dto';
 import { UpdateShowDto } from './dto/update-show.dto';
 import { ShowDetails } from './entities/show-details.entity';
@@ -192,5 +193,19 @@ export class ShowsService {
     });
 
     return await this.showsRepository.save(show);
+  }
+
+  async deleteShow({productId, userId, showId}: DeleteShowDto): Promise<void> {
+    const show = await this.showsRepository.createQueryBuilder('show')
+      .innerJoin('show.product', 'product')
+      .innerJoin('product.store', 'store')
+      .where('show.id = :showId', { showId })
+      .andWhere('product.id = :productId', { productId })
+      .andWhere('store.userId = :userId', { userId })
+      .getOne();
+
+    if (!show) throw new ShowNotFoundException();
+
+    await this.showsRepository.remove(show);
   }
 }

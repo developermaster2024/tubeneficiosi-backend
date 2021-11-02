@@ -11,6 +11,7 @@ import { Role } from 'src/users/enums/roles.enum';
 import { AddShowDto } from './dto/add-show.dto';
 import { CreateProductShowDto } from './dto/create-product-show.dto';
 import { DeleteProductShowDto } from './dto/delete-product-show.dto';
+import { DeleteShowDto } from './dto/delete-show.dto';
 import { ReadProductShowDto } from './dto/read-product-show.dto';
 import { ReadShowDto } from './dto/read-show.dto';
 import { UpdateProductShowDto } from './dto/update-product-show.dto';
@@ -67,5 +68,13 @@ export class ShowsController {
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ id: 'productId', showId: 'showId' }))
   async updateShow(@Body() udpateShowDto: UpdateShowDto): Promise<ReadShowDto> {
     return plainToClass(ReadShowDto, await this.showsService.updateShow(udpateShowDto));
+  }
+
+  @Delete(':id/shows/:showId')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ id: 'productId', showId: 'showId' }))
+  async deleteShow(@Body() deleteShowDto: DeleteShowDto): Promise<void> {
+    await this.showsService.deleteShow(deleteShowDto);
   }
 }
