@@ -1,7 +1,7 @@
-import { Exclude, Expose, Transform } from "class-transformer";
+import { Exclude, Expose, Transform, Type } from "class-transformer";
 import { format } from "date-fns";
 import { ReadPlaceDto } from "src/places/dto/read-place.dto";
-import { ShowToZone } from "../entities/show-to-zone.entity";
+import { ReadShowToZoneDto } from "./read-show-to-zone.dto";
 
 @Exclude()
 export class ReadShowDto {
@@ -16,6 +16,7 @@ export class ReadShowDto {
   readonly place: ReadPlaceDto;
 
   @Expose()
-  readonly showToZones: ShowToZone[];
+  @Type(() => ReadShowToZoneDto)
+  readonly showToZones: ReadShowToZoneDto[];
 }
 
