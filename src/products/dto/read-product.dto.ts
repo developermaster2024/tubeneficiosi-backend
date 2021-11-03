@@ -3,6 +3,8 @@ import { ReadBrandDto } from "src/brands/dto/read-brand.dto";
 import { ReadCategoryDto } from "src/categories/dto/read-category.dto";
 import { DeliveryMethodType } from "src/delivery-method-types/entities/delivery-method-type.entity";
 import { ProductFeature } from "src/product-features/entities/product-feature.entity";
+import { ReadShowDetailsDto } from "src/shows/dto/read-show-details.dto";
+import { ReadShowDto } from "src/shows/dto/read-show.dto";
 import { ReadStoreDto } from "src/stores/dto/read-store.dto";
 import { ReadTagDto } from "src/tags/dto/read-tag.dto";
 import { User } from "src/users/entities/user.entity";
@@ -23,19 +25,7 @@ export class ReadProductDto {
   readonly slug: string;
 
   @Expose()
-  readonly reference: string;
-
-  @Expose()
-  readonly shortDescription: string;
-
-  @Expose()
   readonly description: string;
-
-  @Expose()
-  readonly quantity: number;
-
-  @Expose()
-  readonly price: number;
 
   @Expose()
   readonly finalPrice: number;
@@ -52,6 +42,14 @@ export class ReadProductDto {
   @Expose()
   @Type(() => ReadProductDetailsDto)
   readonly productDetails: ReadProductDetailsDto;
+
+  @Expose()
+  @Type(() => ReadShowDetailsDto)
+  readonly showDetails: ReadShowDetailsDto;
+
+  @Expose()
+  @Type(() => ReadShowDto)
+  readonly shows: ReadShowDto[];
 
   @Expose()
   @Transform(({value}) => !value ? value : value.sort((a, b) => a.position - b.position))
