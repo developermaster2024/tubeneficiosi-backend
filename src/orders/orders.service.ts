@@ -281,7 +281,7 @@ export class OrdersService {
           )
         `
       })
-      .where('productId IN (:...productIds)', { productIds: cart.cartItems.map(item => item.productId) })
+      .where('product_id IN (:...productIds)', { productIds: cart.cartItems.map(item => item.productId) })
       .execute();
 
     order.total = order.calculatedTotal;
