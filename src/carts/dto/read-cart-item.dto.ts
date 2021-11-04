@@ -1,6 +1,7 @@
 import { Exclude, Expose, Type } from "class-transformer";
 import { ReadProductDto } from "src/products/dto/read-product.dto";
 import { CartItemFeature } from "../entities/cart-item-feature.entity";
+import { ReadCartItemShowDetailsDto } from "./read-cart-item-show-details.dto";
 
 @Exclude()
 export class ReadCartItemDto {
@@ -30,4 +31,8 @@ export class ReadCartItemDto {
 
   @Expose()
   readonly cartItemFeatures: CartItemFeature[];
+
+  @Expose()
+  @Type(() => ReadCartItemShowDetailsDto)
+  readonly cartItemShowDetails: ReadCartItemShowDetailsDto;
 }
