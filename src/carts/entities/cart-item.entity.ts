@@ -1,6 +1,7 @@
 import { Product } from "src/products/entities/product.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { CartItemFeature } from "./cart-item-feature.entity";
+import { CartItemShowDetails } from "./cart-item-show-details.entity";
 import { Cart } from "./cart.entity";
 
 @Entity({
@@ -66,6 +67,9 @@ export class CartItem {
 
   @OneToMany(() => CartItemFeature, cartItemFeature => cartItemFeature.cartItem, { cascade: ['insert', 'update'] })
   cartItemFeatures: CartItemFeature[];
+
+  @OneToOne(() => CartItemShowDetails, cartItemShowDetails => cartItemShowDetails.cartItem, { cascade: ['insert', 'update'] })
+  cartItemShowDetails: CartItemShowDetails;
 
   get total(): number {
     return (Number(this.productPrice) + this.featuresTotal) * this.quantity;

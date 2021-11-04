@@ -9,6 +9,7 @@ import { PaginationResult } from 'src/support/pagination/pagination-result';
 import queryStringToBoolean from 'src/support/query-string-to-boolean';
 import { Role } from 'src/users/enums/roles.enum';
 import { CartsService } from './carts.service';
+import { AddShowToCartDto } from './dto/add-show-to-cart.dto';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { DeleteCartitemDto } from './dto/delete-cart-item.dto';
 import { ReadCartDto } from './dto/read-cart.dto';
@@ -38,6 +39,14 @@ export class CartsController {
   @UseInterceptors(new JwtUserToBodyInterceptor())
   async addToCart(@Body() addToCartDto: AddToCartDto): Promise<ReadCartDto> {
     return plainToClass(ReadCartDto, await this.cartsRepository.addToCart(addToCartDto));
+  }
+
+  @Post('add-show-to-cart')
+  @Roles(Role.CLIENT)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async addShowToCart(@Body() addShowToCartDto: AddShowToCartDto): Promise<ReadCartDto> {
+    return plainToClass(ReadCartDto, await this.cartsRepository.addShowToCart(addShowToCartDto));
   }
 
   @Put(':id/update-discount')

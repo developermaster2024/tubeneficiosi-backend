@@ -6,22 +6,28 @@ import { ProductFeature } from 'src/product-features/entities/product-feature.en
 import { ProductFeatureForGroup } from 'src/products/entities/product-feature-for-group.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { ProductNotFoundException } from 'src/products/errors/product-not-found.exception';
+import { ShowToZone } from 'src/shows/entities/show-to-zone.entity';
+import { ShowNotFoundException } from 'src/shows/errors/show-not-found.exception';
+import { ShowToZoneNotFoundException } from 'src/shows/errors/show-to-zone-not-found.exception';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/roles.enum';
 import { UserNotFoundException } from 'src/users/errors/user-not-found.exception';
-import { In, Repository } from 'typeorm';
+import { Connection, In, Repository } from 'typeorm';
+import { AddShowToCartDto } from './dto/add-show-to-cart.dto';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { CartPaginationOptionsDto } from './dto/cart-pagination-options.dto';
 import { DeleteCartitemDto } from './dto/delete-cart-item.dto';
 import { UpdateCartDiscountDto } from './dto/update-cart-discount.dto';
 import { UpdateCartItemQuantityDto } from './dto/update-cart-item-quantity.dto';
 import { CartItemFeature } from './entities/cart-item-feature.entity';
+import { CartItemShowDetails } from './entities/cart-item-show-details.entity';
 import { CartItem } from './entities/cart-item.entity';
 import { Cart } from './entities/cart.entity';
 import { CartItemNotFoundException } from './errors/cart-item-not-found.exception';
 import { CartNotFoundException } from './errors/cart-not-found.exception';
 import { ProductQuantityIsLessThanRequiredQuantityException } from './errors/product-quantity-is-less-than-required-quantity.exception';
+import { QuantityIsGreaterThanAvailableSeatsException } from './errors/quantity-is-greater-than-available-seats.exception';
 
 type FindOneQueryParams = {
   isExpired: boolean|null,
@@ -31,13 +37,15 @@ type FindOneQueryParams = {
 @Injectable()
 export class CartsService {
   constructor(
+    private readonly connection: Connection,
     @InjectRepository(Cart) private readonly cartsRepository: Repository<Cart>,
     @InjectRepository(CartItem) private readonly cartItemsRepository: Repository<CartItem>,
     @InjectRepository(Product) private readonly productsRepository: Repository<Product>,
     @InjectRepository(ProductFeature) private readonly productFeaturesRepository: Repository<ProductFeature>,
     @InjectRepository(ProductFeatureForGroup) private readonly productFeatureForGroupsRepository: Repository<ProductFeatureForGroup>,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
-    @InjectRepository(Discount) private readonly discountsRepository: Repository<Discount>
+    @InjectRepository(Discount) private readonly discountsRepository: Repository<Discount>,
+    @InjectRepository(ShowToZone) private readonly showToZonesRepository: Repository<ShowToZone>
   ) {}
 
   async paginate({offset, perPage, filters: {
@@ -210,6 +218,66 @@ export class CartsService {
     cart.subTotalWithDiscount = cart.computedSubTotalWithDiscount;
 
     return await this.cartsRepository.save(cart);
+  }
+
+  async addShowToCart({
+    productId,
+    userId,
+    showId,
+    zoneId,
+    quantity,
+  }: AddShowToCartDto): Promise<Cart> {
+    const product = await this.productsRepository.createQueryBuilder('product')
+      .innerJoinAndSelect('product.productImages', 'productImage')
+      .innerJoinAndSelect('product.store', 'store')
+      .innerJoinAndSelect('product.shows', 'show', 'show.id = :showId', { showId })
+      .innerJoinAndSelect('show.showToZones', 'showToZone', 'showToZone.zoneId = :zoneId', { zoneId })
+      .where('product.id = :productId', { productId })
+      .getOne();
+
+    if (!product) throw new ProductNotFoundException();
+
+    const show = product.shows.find(show => show.id === Number(showId));
+
+    if (!show) throw new ShowNotFoundException();
+
+    const showToZone = show.showToZones.find(stz => stz.zoneId === Number(zoneId));
+
+    if (!showToZone) throw new ShowToZoneNotFoundException();
+
+    if (quantity > showToZone.availableSeats) {
+      throw new QuantityIsGreaterThanAvailableSeatsException();
+    }
+
+    showToZone.availableSeats = showToZone.availableSeats - quantity;
+
+    let cart = Cart.create({
+      userId,
+      store: product.store,
+      isProcessed: false,
+      isDirectPurchase: true,
+      cartItems: [CartItem.create({
+        product,
+        productName: product.name,
+        productImage: product.productImages[0].path,
+        productPrice: showToZone.price,
+        productSlug: product.slug,
+        quantity,
+        cartItemShowDetails: CartItemShowDetails.create({ showId, zoneId }),
+      })],
+      expiresOn: add(new Date(), { hours: 1 }),
+    });
+
+    cart.subTotal = cart.computedSubTotal;
+    cart.subTotalWithDiscount = cart.computedSubTotalWithDiscount;
+
+    await this.connection.transaction(async () => {
+      cart = await this.cartsRepository.save(cart);
+
+      this.showToZonesRepository.save(showToZone);
+    });
+
+    return cart;
   }
 
   async updateCartDiscount({id, userId, storeId, discountId}: UpdateCartDiscountDto): Promise<Cart> {
