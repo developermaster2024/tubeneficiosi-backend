@@ -259,6 +259,7 @@ export class ProductsService {
       .leftJoinAndSelect('product.shows', 'show', 'show.date >= :today', { today: new Date() })
       .leftJoinAndSelect('show.showToZones', 'showToZone')
       .leftJoinAndSelect('showToZone.zone', 'zone')
+      .leftJoinAndSelect('show.place', 'place')
       .leftJoinAndSelect('product.productDetails', 'productDetails')
       .leftJoinAndSelect('productDetails.brand', 'brand')
       .leftJoinAndSelect('product.productFeatures', 'productFeature')
