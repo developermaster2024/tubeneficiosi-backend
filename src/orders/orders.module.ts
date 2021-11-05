@@ -12,6 +12,7 @@ import { OrderStatus } from 'src/order-statuses/entities/order-status.entity';
 import { PaymentGatewaysModule } from 'src/payment-gateways/payment-gateways.module';
 import { ProductDetails } from 'src/products/entities/product-details.entity';
 import { Product } from 'src/products/entities/product.entity';
+import { ShowToZone } from 'src/shows/entities/show-to-zone.entity';
 import { filenameGenerator } from 'src/support/file-uploads';
 import { User } from 'src/users/entities/user.entity';
 import { Order } from './entities/order.entity';
@@ -20,7 +21,7 @@ import { OrdersService } from './orders.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Order, Cart, DeliveryZone, User, Product, ProductDetails, DeliveryMethod, OrderStatus, Notification]),
+    TypeOrmModule.forFeature([Order, Cart, DeliveryZone, User, Product, ProductDetails, DeliveryMethod, OrderStatus, Notification, ShowToZone]),
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads/orders',

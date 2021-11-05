@@ -43,6 +43,8 @@ import { OrdersCountDto } from './dto/orders-count.dto';
 import { DeliveryMethodNotAllowedByProductException } from './errors/delivery-method-not-allowed-by-product.exception';
 import { MercadoPagoPaymentGateway } from 'src/payment-gateways/mercado-pago-payment-gateway';
 import { ProductDetails } from 'src/products/entities/product-details.entity';
+import { QuantityIsGreaterThanAvailableSeatsException } from 'src/carts/errors/quantity-is-greater-than-available-seats.exception';
+import { ShowToZone } from 'src/shows/entities/show-to-zone.entity';
 
 @Injectable()
 export class OrdersService {
@@ -56,6 +58,7 @@ export class OrdersService {
     @InjectRepository(DeliveryMethod) private readonly deliveryMethodsRepository: Repository<DeliveryMethod>,
     @InjectRepository(OrderStatus) private readonly orderStatusesRepository: Repository<OrderStatus>,
     @InjectRepository(Notification) private readonly notificationsRepository: Repository<Notification>,
+    @InjectRepository(ShowToZone) private readonly showToZonesRepository: Repository<ShowToZone>,
     private readonly deliveryCostCalculatorResolver: DeliveryCostCalculatorResolver,
     private readonly notificationsGateway: NotificationsGateway,
     private readonly mercadoPagoPaymentGateway: MercadoPagoPaymentGateway
@@ -157,6 +160,8 @@ export class OrdersService {
       .leftJoinAndSelect('store.storeHours', 'storeHour')
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
+      .leftJoinAndSelect('cartItem.cartItemShowDetails', 'cartItemShowDetails')
+      .leftJoinAndSelect('cartItemShowDetails.showToZone', 'showToZone')
       .leftJoinAndSelect('cart.discount', 'discount')
       .leftJoinAndSelect('cartItem.product', 'product')
       .leftJoinAndSelect('product.productDimensions', 'productDimensions')
@@ -184,6 +189,14 @@ export class OrdersService {
       if (product) {
         throw new ProductQuantityIsLessThanRequiredQuantityException(cartItem);
       }
+
+      if (!cartItem.cartItemShowDetails) {
+        continue;
+      }
+
+      const quantityIsGreaterThanAvailableSeats = cartItem.quantity > cartItem.cartItemShowDetails.showToZone.availableSeats;
+
+      if (quantityIsGreaterThanAvailableSeats) throw new QuantityIsGreaterThanAvailableSeatsException();
     }
 
     const lastOrder = await this.ordersRepository.findOne({ order: { id: 'DESC' } });
@@ -283,6 +296,14 @@ export class OrdersService {
       })
       .where('product_id IN (:...productIds)', { productIds: cart.cartItems.map(item => item.productId) })
       .execute();
+
+    const showToZones = cart.cartItems.map(cartItem => Object.assign(cartItem.cartItemShowDetails.showToZone, {
+      availableSeats: cartItem.cartItemShowDetails.showToZone.availableSeats - cartItem.quantity
+    })).filter(stz => stz);
+
+    if (showToZones.length > 0) {
+      this.showToZonesRepository.save(showToZones);
+    }
 
     order.total = order.calculatedTotal;
     const savedOrder = await this.ordersRepository.save(order);

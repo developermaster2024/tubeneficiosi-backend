@@ -252,8 +252,6 @@ export class CartsService {
       throw new QuantityIsGreaterThanAvailableSeatsException();
     }
 
-    showToZone.availableSeats = showToZone.availableSeats - quantity;
-
     let cart = Cart.create({
       userId,
       store: product.store,
@@ -266,7 +264,7 @@ export class CartsService {
         productPrice: showToZone.price,
         productSlug: product.slug,
         quantity,
-        cartItemShowDetails: CartItemShowDetails.create({ showId, zoneId }),
+        cartItemShowDetails: CartItemShowDetails.create({ showId, zoneId, showToZone }),
       })],
       expiresOn: add(new Date(), { hours: 1 }),
     });
@@ -276,8 +274,6 @@ export class CartsService {
 
     await this.connection.transaction(async () => {
       cart = await this.cartsRepository.save(cart);
-
-      this.showToZonesRepository.save(showToZone);
     });
 
     return cart;
