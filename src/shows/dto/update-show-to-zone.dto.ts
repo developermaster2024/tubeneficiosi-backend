@@ -15,6 +15,7 @@ export class UpdateShowToZoneDto {
   readonly price: number;
 
   @Expose()
+  @Type(() => Number)
   @Min(0)
   readonly availableSeats: number;
 }
