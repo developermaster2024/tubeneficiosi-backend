@@ -26,9 +26,11 @@ export class ReadCartDto {
   readonly store: ReadStoreDto;
 
   @Expose()
+  @Type(() => Number)
   readonly subTotal: number;
 
   @Expose()
+  @Type(() => Number)
   readonly subTotalWithDiscount: number;
 
   @Expose()
