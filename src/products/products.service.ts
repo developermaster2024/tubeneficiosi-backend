@@ -56,6 +56,7 @@ export class ProductsService {
     isFavoriteFor,
     minRating,
     storeFeatureIds,
+    showDate,
   }, tagsToSortBy}: ProductPaginationOptionsDto, userId: number): Promise<PaginationResult<Product>> {
     const queryBuilder = this.productsRepository.createQueryBuilder('product')
       .take(perPage)
@@ -157,6 +158,8 @@ export class ProductsService {
     if (minRating) {
       queryBuilder.andWhere(`product.rating >= :minRating`, { minRating });
     }
+
+    if (showDate) queryBuilder.andWhere('DATE_FORMAT(show.date, "%Y-%m-%d") = :showDate', { showDate });
 
     const [products, total] = await queryBuilder.getManyAndCount();
 
