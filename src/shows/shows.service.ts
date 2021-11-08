@@ -9,12 +9,14 @@ import { ProductNotFoundException } from 'src/products/errors/product-not-found.
 import { StoreCategoriesWithSchedules } from 'src/store-categories/enum/store-category.enum';
 import { Store } from 'src/stores/entities/store.entity';
 import { StoreNotFoundException } from 'src/stores/erros/store-not-found.exception';
+import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Tag } from 'src/tags/entities/tag.entity';
 import { In, Repository } from 'typeorm';
 import { AddShowDto } from './dto/add-show.dto';
 import { CreateProductShowDto } from './dto/create-product-show.dto';
 import { DeleteProductShowDto } from './dto/delete-product-show.dto';
 import { DeleteShowDto } from './dto/delete-show.dto';
+import { ShowPaginationOptionsDto } from './dto/show-pagination-options.dto';
 import { UpdateProductShowDto } from './dto/update-product-show.dto';
 import { UpdateShowDto } from './dto/update-show.dto';
 import { ShowDetails } from './entities/show-details.entity';
@@ -132,6 +134,38 @@ export class ShowsService {
     if (!product) throw new ProductNotFoundException();
 
     await this.productsRepository.softRemove(product);
+  }
+
+  async paginateShows({perPage, offset, filters: {
+    id,
+    date,
+    productId,
+    isActive,
+  }}: ShowPaginationOptionsDto): Promise<PaginationResult<Show>> {
+    const queryBuilder = this.showsRepository.createQueryBuilder('show')
+      .take(perPage)
+      .skip(offset)
+      .leftJoinAndSelect('show.showToZones', 'showToZone')
+      .leftJoinAndSelect('showToZone.zone', 'zone')
+      .leftJoinAndSelect('show.place', 'place');
+
+    if (id) queryBuilder.andWhere('show.id = :id', { id });
+
+    if (productId) queryBuilder.andWhere('show.productId = :productId', { productId });
+
+    if (isActive !== null) {
+      const condition = isActive
+        ? 'show.date >= :today'
+        : 'show.date < :today';
+
+      queryBuilder.andWhere(condition, { today: new Date() });
+    }
+
+    if (date) queryBuilder.andWhere('DATE_FORMAT(show.date, "%Y-%m-%d") = :date', { date });
+
+    const [shows, total] = await queryBuilder.getManyAndCount();
+
+    return new PaginationResult(shows, total, perPage);
   }
 
   async addShow({productId, userId, placeId, ...addShowDto}: AddShowDto): Promise<Show> {
