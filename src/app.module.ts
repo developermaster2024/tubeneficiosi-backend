@@ -54,6 +54,7 @@ import { ClientCardsModule } from './client-cards/client-cards.module';
 import { StoreFeaturesModule } from './store-features/store-features.module';
 import { PlacesModule } from './places/places.module';
 import { ShowsModule } from './shows/shows.module';
+import { NewsModule } from './news/news.module';
 
 @Module({
   imports: [
@@ -114,6 +115,7 @@ import { ShowsModule } from './shows/shows.module';
     StoreFeaturesModule,
     PlacesModule,
     ShowsModule,
+    NewsModule,
   ],
 })
 export class AppModule {}
