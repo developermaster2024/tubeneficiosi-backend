@@ -114,7 +114,8 @@ export class PlacesService {
     const place = await this.placesRepository.createQueryBuilder('place')
       .leftJoinAndSelect('place.zones', 'zone')
       .innerJoin('place.store', 'store')
-      .where('store.userId = :userId', { userId })
+      .where('place.id = :placeId', { placeId })
+      .andWhere('store.userId = :userId', { userId })
       .getOne();
 
     if (!place) throw new PlaceNotFoundException();
