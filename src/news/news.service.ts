@@ -24,6 +24,8 @@ export class NewsService {
     storeId,
   }}: NewsPaginationOptionsDto): Promise<PaginationResult<News>> {
     const queryBuilder = this.newsRepository.createQueryBuilder('news')
+      .innerJoinAndSelect('news.store', 'store')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .take(perPage)
       .skip(offset);
 
