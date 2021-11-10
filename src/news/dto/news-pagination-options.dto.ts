@@ -2,6 +2,8 @@ import { PaginationOptions } from "src/support/pagination/pagination-options";
 
 type NewsFilters = {
   id: number;
+  title: string;
+  storeId: number;
 };
 
 export class NewsPaginationOptionsDto extends PaginationOptions {
@@ -14,9 +16,13 @@ export class NewsPaginationOptionsDto extends PaginationOptions {
       page = 1,
       perPage = 10,
       id,
+      title,
+      storeId,
     } = query;
     return new NewsPaginationOptionsDto(+page, +perPage, {
       id: +id,
+      title,
+      storeId: +storeId,
     });
   }
 }

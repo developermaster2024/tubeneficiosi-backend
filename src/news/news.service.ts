@@ -20,12 +20,18 @@ export class NewsService {
 
   async paginate({perPage, offset, filters: {
     id,
+    title,
+    storeId,
   }}: NewsPaginationOptionsDto): Promise<PaginationResult<News>> {
     const queryBuilder = this.newsRepository.createQueryBuilder('news')
       .take(perPage)
       .skip(offset);
 
     if (id) queryBuilder.andWhere('news.id = :id', { id });
+
+    if (title) queryBuilder.andWhere('news.title LIKE :title', { title: `%${title}%` });
+
+    if (storeId) queryBuilder.andWhere('news.storeId = :storeId', { storeId });
 
     const [news, total] = await queryBuilder.getManyAndCount();
 
