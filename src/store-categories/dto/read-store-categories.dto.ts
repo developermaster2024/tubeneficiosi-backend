@@ -10,4 +10,7 @@ export class ReadStoreCategoryDto {
 
   @Expose()
   readonly imgPath: string;
+
+  @Expose()
+  readonly logo: string;
 }

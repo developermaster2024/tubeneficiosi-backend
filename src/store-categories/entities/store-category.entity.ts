@@ -21,6 +21,12 @@ export class StoreCategory {
   })
   imgPath: string;
 
+  @Column({
+    name: 'logo',
+    type: 'varchar',
+  })
+  logo: string;
+
   @CreateDateColumn({
     name: 'created_at',
     select: false,
