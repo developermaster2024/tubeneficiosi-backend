@@ -1,4 +1,4 @@
-const MAX_PER_PAGE = 200;
+const MAX_PER_PAGE = 300;
 
 export class PaginationOptions {
   constructor(public page: number, protected _perPage: number) {}
