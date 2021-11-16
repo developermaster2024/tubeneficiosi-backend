@@ -55,6 +55,7 @@ import { StoreFeaturesModule } from './store-features/store-features.module';
 import { PlacesModule } from './places/places.module';
 import { ShowsModule } from './shows/shows.module';
 import { NewsModule } from './news/news.module';
+import { CountriesModule } from './countries/countries.module';
 
 @Module({
   imports: [
@@ -116,6 +117,7 @@ import { NewsModule } from './news/news.module';
     PlacesModule,
     ShowsModule,
     NewsModule,
+    CountriesModule,
   ],
 })
 export class AppModule {}
