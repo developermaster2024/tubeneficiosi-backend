@@ -297,9 +297,9 @@ export class OrdersService {
       .where('product_id IN (:...productIds)', { productIds: cart.cartItems.map(item => item.productId) })
       .execute();
 
-    const showToZones = cart.cartItems.map(cartItem => Object.assign(cartItem.cartItemShowDetails.showToZone, {
+    const showToZones = cart.cartItems.map(cartItem => cartItem.cartItemShowDetails ? Object.assign(cartItem.cartItemShowDetails.showToZone, {
       availableSeats: cartItem.cartItemShowDetails.showToZone.availableSeats - cartItem.quantity
-    })).filter(stz => stz);
+    }) : null).filter(stz => stz);
 
     if (showToZones.length > 0) {
       this.showToZonesRepository.save(showToZones);
