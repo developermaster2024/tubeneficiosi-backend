@@ -39,7 +39,7 @@ export class StoresService {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.userStatus', 'userStatus')
       .innerJoinAndSelect('user.store', 'store')
-      .innerJoinAndSelect('store.storeProfile', 'storeProfile')
+      .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .innerJoinAndSelect('store.storeCategory', 'storeCategory')
       .leftJoinAndSelect('store.storeHours', 'storeHour')
       .leftJoinAndMapOne(
