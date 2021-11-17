@@ -244,7 +244,7 @@ export class OrdersService {
       cart.cartItems.forEach(({product}) => {
         const productAllowsDeliveryMethodType = product.deliveryMethodTypes.map(dmt => dmt.code).includes(deliveryMethod.deliveryMethodTypeCode);
 
-        if (productAllowsDeliveryMethodType) {
+        if (!productAllowsDeliveryMethodType) {
           throw new DeliveryMethodNotAllowedByProductException(product);
         }
       });
