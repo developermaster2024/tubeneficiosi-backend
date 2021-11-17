@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { add } from 'date-fns';
+import { add, startOfWeek } from 'date-fns';
 import { Discount } from 'src/discounts/entities/discount.entity';
 import { ProductFeature } from 'src/product-features/entities/product-feature.entity';
 import { ProductFeatureForGroup } from 'src/products/entities/product-feature-for-group.entity';
@@ -17,6 +17,7 @@ import { Connection, In, Repository } from 'typeorm';
 import { AddShowToCartDto } from './dto/add-show-to-cart.dto';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { CartPaginationOptionsDto } from './dto/cart-pagination-options.dto';
+import { CartsSummaryDto } from './dto/carts-summary.dto';
 import { DeleteCartitemDto } from './dto/delete-cart-item.dto';
 import { UpdateCartDiscountDto } from './dto/update-cart-discount.dto';
 import { UpdateCartItemQuantityDto } from './dto/update-cart-item-quantity.dto';
@@ -554,5 +555,39 @@ export class CartsService {
     }
 
     await this.cartsRepository.remove(cart);
+  }
+
+  async cartsSummary(userId: number): Promise<CartsSummaryDto> {
+    const user = await this.usersRepository.findOne(userId);
+
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    const cartsSummaryQueryBuilder = this.cartsRepository.createQueryBuilder('cart')
+      .innerJoin('cart.store', 'store')
+      .select('AVG(cart.subTotal)', 'totalAverage')
+      .addSelect('AVG(cart.subTotalWithDiscount)', 'totalAverageWithDiscount');
+
+    const cartsCountThisWeekQueryBuilder = this.cartsRepository.createQueryBuilder('cart')
+      .innerJoin('cart.store', 'store')
+      .select('COUNT(cart.id)', 'numberOfCartsThisWeek')
+      .where('cart.createdAt >= :startOfWeek AND cart.createdAt <= :now', {
+        startOfWeek: startOfWeek(new Date(), { weekStartsOn: 1 }),
+        now: new Date(),
+      });
+
+    if (user.role === Role.CLIENT) {
+      cartsSummaryQueryBuilder.andWhere('cart.userId = :userId', { userId });
+      cartsCountThisWeekQueryBuilder.andWhere('cart.userId = :userId', { userId });
+    } else if (user.role === Role.STORE) {
+      cartsSummaryQueryBuilder.andWhere('store.userId = :userId', { userId });
+      cartsCountThisWeekQueryBuilder.andWhere('store.userId = :userId', { userId });
+    }
+
+    const cartsSummary = await cartsSummaryQueryBuilder.getRawOne<{totalAverage: number, totalAverageWithDiscount: number}>();
+    const cartsCountThisWeek = await cartsCountThisWeekQueryBuilder.getRawOne<{numberOfCartsThisWeek: number}>();
+
+    return {...cartsSummary, ...cartsCountThisWeek};
   }
 }
