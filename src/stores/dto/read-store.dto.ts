@@ -4,6 +4,7 @@ import { ReadDiscountDto } from "src/discounts/dto/read-discount.dto";
 import { ReadProductDto } from "src/products/dto/read-product.dto";
 import { ReadStoreCategoryDto } from "src/store-categories/dto/read-store-categories.dto";
 import { ReadStoreFeatureDto } from "src/store-features/dto/read-store-feature.dto";
+import { ReadStoreHourDto } from "src/store-hours/dto/read-store-hour.dto";
 import { ReadStoreProfileDto } from "src/stores-profile/dto/read-store-profile.dto";
 import { ReadUserDto } from "src/users/dto/read-user.dto";
 import { User } from "src/users/entities/user.entity";
@@ -99,4 +100,14 @@ export class ReadStoreDto extends OmitType(ReadUserDto, ['role']) {
     return plainToClass(ReadStoreFeatureDto, storeFeatures);
   })
   readonly storeFeatures: ReadStoreFeatureDto;
+
+  @Expose()
+  @Transform(({obj: {store: {storeHours}}}: {obj: User}) => {
+    if (!storeHours || storeHours instanceof ReadStoreHourDto) {
+      return storeHours;
+    }
+
+    return plainToClass(ReadStoreHourDto, storeHours);
+  })
+  readonly storeHours: ReadStoreHourDto;
 }
