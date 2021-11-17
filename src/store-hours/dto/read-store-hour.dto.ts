@@ -31,4 +31,7 @@ export class ReadStoreHourDto {
 
   @Expose()
   readonly isActive: boolean;
+
+  @Expose()
+  readonly dayInSpanish: string;
 }

@@ -80,6 +80,27 @@ export class StoreHour {
     );
   }
 
+  get dayInSpanish(): string {
+    switch(this.day) {
+      case Days.MONDAY:
+        return 'Lunes';
+      case Days.TUESDAY:
+        return 'Martes';
+      case Days.WEDNESDAY:
+        return 'Miércoles';
+      case Days.THURSDAY:
+        return 'Jueves';
+      case Days.FRIDAY:
+        return 'Viernes';
+      case Days.SATURDAY:
+        return 'Sábado';
+      case Days.SUNDAY:
+        return 'Domingo';
+      default:
+        return 'unkown';
+    }
+  }
+
   static create(data: Partial<StoreHour>): StoreHour {
     return Object.assign(new StoreHour(), data);
   }
