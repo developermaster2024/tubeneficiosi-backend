@@ -1,3 +1,4 @@
+import { DeliveryMethod } from "src/delivery-methods/entities/delivery-method.entity";
 import { Discount } from "src/discounts/entities/discount.entity";
 import { StoreToUser } from "src/favorite-stores/entities/store-to-user.entity";
 import { Product } from "src/products/entities/product.entity";
@@ -128,6 +129,9 @@ export class Store {
     inverseJoinColumn: { name: 'store_feature_id' }
   })
   storeFeatures: StoreFeature[];
+
+  @OneToMany(() => DeliveryMethod, deliveryMethod => deliveryMethod.store)
+  deliveryMethods: DeliveryMethod[];
 
   get isOpen(): boolean {
     return this.storeHours?.some(storeHour => storeHour.isActive);

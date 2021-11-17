@@ -13,6 +13,7 @@ type StoreFilters = {
   cardIds: number[];
   isFavoriteFor: number;
   storeFeatureIds: number[];
+  userLatLng: [number, number],
 };
 
 export class StorePaginationOptionsDto extends PaginationOptions {
@@ -36,6 +37,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       cardIds = '',
       isFavoriteFor,
       storeFeatureIds = '',
+      userLatLng = '',
     } = query;
 
     return new StorePaginationOptionsDto(+page, +perPage, {
@@ -51,6 +53,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       cardIds: cardIds.split(',').filter(id => id).map(id => Number(id)),
       isFavoriteFor: +isFavoriteFor,
       storeFeatureIds: storeFeatureIds.split(',').filter(id => id).map(id => Number(id)),
+      userLatLng: userLatLng.split(',').filter(value => value).map(value => Number(value)) as [number, number],
     });
   }
 }

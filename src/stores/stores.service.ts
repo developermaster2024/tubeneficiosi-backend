@@ -35,6 +35,7 @@ export class StoresService {
     cardIds,
     isFavoriteFor,
     storeFeatureIds,
+    userLatLng,
   }}: StorePaginationOptionsDto, userId: number): Promise<PaginationResult<User>> {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.userStatus', 'userStatus')
@@ -116,6 +117,16 @@ export class StoresService {
     }
 
     if (storeFeatureIds.length > 0) queryBuilder.andWhere('storeFeature.id In (:...storeFeatureIds)', { storeFeatureIds });
+
+    if (userLatLng.length > 0) {
+      queryBuilder
+        .innerJoin('store.deliveryMethods', 'deliveryMethod')
+        .innerJoin('deliveryMethod.deliveryZones', 'deliveryZone')
+        .innerJoin('deliveryZone.locations', 'location', `ST_CONTAINS(location.area, POINT(:latitude, :longitude))`, {
+          latitude: userLatLng[0],
+          longitude: userLatLng[1],
+        });
+    }
 
     queryBuilder.leftJoinAndMapOne(
       'store.storeToUser',
