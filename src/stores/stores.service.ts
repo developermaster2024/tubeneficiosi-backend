@@ -36,6 +36,7 @@ export class StoresService {
     isFavoriteFor,
     storeFeatureIds,
     userLatLng,
+    locationIds,
   }}: StorePaginationOptionsDto, userId: number): Promise<PaginationResult<User>> {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.userStatus', 'userStatus')
@@ -54,6 +55,9 @@ export class StoresService {
       .leftJoin('discount.cardIssuers', 'cardIssuerFromDiscount')
       .leftJoin('discount.cards', 'card', '')
       .leftJoin('card.cardIssuer', 'cardIssuerFromCard')
+      .leftJoin('store.deliveryMethods', 'deliveryMethod')
+      .leftJoin('deliveryMethod.deliveryZones', 'deliveryZone')
+      .leftJoin('deliveryZone.locations', 'location')
       .take(perPage)
       .skip(offset);
 
@@ -118,14 +122,15 @@ export class StoresService {
 
     if (storeFeatureIds.length > 0) queryBuilder.andWhere('storeFeature.id In (:...storeFeatureIds)', { storeFeatureIds });
 
-    if (userLatLng.length > 0) {
-      queryBuilder
-        .innerJoin('store.deliveryMethods', 'deliveryMethod')
-        .innerJoin('deliveryMethod.deliveryZones', 'deliveryZone')
-        .innerJoin('deliveryZone.locations', 'location', `ST_CONTAINS(location.area, POINT(:latitude, :longitude))`, {
-          latitude: userLatLng[0],
-          longitude: userLatLng[1],
-        });
+    if (userLatLng.length >= 2) {
+      queryBuilder.andWhere(`ST_CONTAINS(location.area, POINT(:latitude, :longitude))`, {
+        latitude: userLatLng[0],
+        longitude: userLatLng[1],
+      });
+    }
+
+    if (locationIds.length > 0) {
+      queryBuilder.andWhere('location.id IN (:...locationIds)', { locationIds });
     }
 
     queryBuilder.leftJoinAndMapOne(
