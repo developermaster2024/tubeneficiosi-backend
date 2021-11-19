@@ -75,6 +75,8 @@ export class OrdersService {
     maxDate,
     orderStatusCode,
     paymentMethodCode,
+    clientId,
+    storeId,
   }, order}: OrderPaginationOptionsDto, userId: number): Promise<PaginationResult<Order>> {
     const user = await this.usersRepository.findOne(userId);
 
@@ -136,6 +138,10 @@ export class OrdersService {
     if (orderStatusCode) queryBuilder.andWhere('order.orderStatusCode = :orderStatusCode', { orderStatusCode });
 
     if (paymentMethodCode) queryBuilder.andWhere('order.paymentMethodCode = :paymentMethodCode', { paymentMethodCode });
+
+    if (clientId) queryBuilder.andWhere('order.userId = :clientId', { clientId });
+
+    if (storeId) queryBuilder.andWhere('order.storeId = :storeId', { storeId });
 
     const [orders, total] = await queryBuilder.getManyAndCount();
 

@@ -12,6 +12,8 @@ type OrderFilters = {
   maxDate: string;
   orderStatusCode: string;
   paymentMethodCode: string;
+  clientId: number;
+  storeId: number;
 };
 
 export class OrderPaginationOptionsDto extends PaginationOptions {
@@ -39,6 +41,8 @@ export class OrderPaginationOptionsDto extends PaginationOptions {
       orderStatusCode,
       paymentMethodCode,
       sort = '',
+      clientId,
+      storeId,
     } = query;
 
     return new OrderPaginationOptionsDto(+page, +perPage, {
@@ -52,6 +56,8 @@ export class OrderPaginationOptionsDto extends PaginationOptions {
       maxDate: maxDate,
       orderStatusCode,
       paymentMethodCode,
+      clientId: +clientId,
+      storeId: +storeId,
     }, parseSort(sort, ['createdAt']));
   }
 }
