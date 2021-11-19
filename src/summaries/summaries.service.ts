@@ -8,10 +8,12 @@ import { Order } from 'src/orders/entities/order.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { StoreAd } from 'src/store-ads/entities/store-ad.entity';
 import { Store } from 'src/stores/entities/store.entity';
+import { Tag } from 'src/tags/entities/tag.entity';
 import { UserStatuses } from 'src/users/enums/user-statuses.enum';
 import { Repository } from 'typeorm';
 import { ClientsSummaryDto } from './dto/clients-summary.dto';
 import { DashboardSummaryDto } from './dto/dashboard-summary.dto';
+import { TagsSummaryDto } from './dto/tags-summary.dto';
 
 @Injectable()
 export class SummariesService {
@@ -23,7 +25,8 @@ export class SummariesService {
     @InjectRepository(Ad) private readonly adsRepository: Repository<Ad>,
     @InjectRepository(FeaturedAd) private readonly featuredAdsRepository: Repository<FeaturedAd>,
     @InjectRepository(MainBannerAd) private readonly mainBannerAdsRepository: Repository<MainBannerAd>,
-    @InjectRepository(StoreAd) private readonly storeAdsRepository: Repository<StoreAd>
+    @InjectRepository(StoreAd) private readonly storeAdsRepository: Repository<StoreAd>,
+    @InjectRepository(Tag) private readonly tagsRepository: Repository<Tag>
   ) {}
 
   async dashboardSummary(): Promise<DashboardSummaryDto> {
@@ -58,6 +61,27 @@ export class SummariesService {
       clientsCount,
       activeClientsCount,
       bannedClientsCount,
+    };
+  }
+
+  async tagsSummary(): Promise<TagsSummaryDto> {
+    const emptyTagsCount = await this.tagsRepository.createQueryBuilder('tag')
+      .where('NOT EXISTS (SELECT tag_id FROM product_to_tag WHERE tag_id = id)')
+      .getCount();
+
+    const bestTag = await this.tagsRepository.createQueryBuilder('tag')
+      .addSelect('(SELECT COUNT(tag_id) FROM product_to_tag WHERE tag_id = id)', 'products_count')
+      .orderBy('products_count', 'DESC')
+      .getOne();
+
+    const { averageProductsPerTag } = await this.tagsRepository.createQueryBuilder('tag')
+      .select('(AVG((SELECT COUNT(tag_id) FROM product_to_tag WHERE tag_id = id)))', 'averageProductsPerTag')
+      .getRawOne<{ averageProductsPerTag: string }>();
+
+    return {
+      emptyTagsCount,
+      bestTag,
+      averageProductsPerTag: +averageProductsPerTag,
     };
   }
 }

@@ -8,11 +8,12 @@ import { Order } from 'src/orders/entities/order.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { StoreAd } from 'src/store-ads/entities/store-ad.entity';
 import { Store } from 'src/stores/entities/store.entity';
+import { Tag } from 'src/tags/entities/tag.entity';
 import { SummariesController } from './summaries.controller';
 import { SummariesService } from './summaries.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Client, Store, Order, Product, Ad, FeaturedAd, MainBannerAd, StoreAd])],
+  imports: [TypeOrmModule.forFeature([Client, Store, Order, Product, Ad, FeaturedAd, MainBannerAd, StoreAd, Tag])],
   controllers: [SummariesController],
   providers: [SummariesService]
 })
