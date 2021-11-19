@@ -56,6 +56,7 @@ import { PlacesModule } from './places/places.module';
 import { ShowsModule } from './shows/shows.module';
 import { NewsModule } from './news/news.module';
 import { CountriesModule } from './countries/countries.module';
+import { SummariesModule } from './summaries/summaries.module';
 
 @Module({
   imports: [
@@ -118,6 +119,7 @@ import { CountriesModule } from './countries/countries.module';
     ShowsModule,
     NewsModule,
     CountriesModule,
+    SummariesModule,
   ],
 })
 export class AppModule {}
