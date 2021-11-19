@@ -130,7 +130,10 @@ export class StoresService {
     }
 
     if (locationIds.length > 0) {
-      queryBuilder.andWhere('location.id IN (:...locationIds)', { locationIds });
+      queryBuilder.andWhere(new Brackets(qb => {
+        qb.where('location.id IN (:...locationIds)', { locationIds })
+          .orWhere('ST_CONTAINS(location.area, store.location)');
+      }));
     }
 
     queryBuilder.leftJoinAndMapOne(
