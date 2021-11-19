@@ -6,6 +6,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Role } from 'src/users/enums/roles.enum';
 import { ClientsSummaryDto } from './dto/clients-summary.dto';
 import { DashboardSummaryDto } from './dto/dashboard-summary.dto';
+import { DiscountsSummaryDto } from './dto/discounts-summary.dto';
 import { TagsSummaryDto } from './dto/tags-summary.dto';
 import { SummariesService } from './summaries.service';
 
@@ -32,5 +33,12 @@ export class SummariesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   async tagsSummary(): Promise<TagsSummaryDto> {
     return plainToClass(TagsSummaryDto, await this.summariesService.tagsSummary());
+  }
+
+  @Get('discounts')
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  async discountsSummary(): Promise<DiscountsSummaryDto> {
+    return plainToClass(DiscountsSummaryDto, await this.summariesService.discountsSummary());
   }
 }

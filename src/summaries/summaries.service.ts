@@ -2,8 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Ad } from 'src/ads/entities/ad.entity';
 import { Client } from 'src/clients/entities/client.entity';
+import { Discount } from 'src/discounts/entities/discount.entity';
 import { FeaturedAd } from 'src/featured-ads/entities/featured-ad.entity';
 import { MainBannerAd } from 'src/main-banner-ads/entities/main-banner-ad.entity';
+import { OrderStatuses } from 'src/order-statuses/enums/order-statuses.enum';
 import { Order } from 'src/orders/entities/order.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { StoreAd } from 'src/store-ads/entities/store-ad.entity';
@@ -13,7 +15,6 @@ import { UserStatuses } from 'src/users/enums/user-statuses.enum';
 import { Repository } from 'typeorm';
 import { ClientsSummaryDto } from './dto/clients-summary.dto';
 import { DashboardSummaryDto } from './dto/dashboard-summary.dto';
-import { TagsSummaryDto } from './dto/tags-summary.dto';
 
 @Injectable()
 export class SummariesService {
@@ -26,7 +27,8 @@ export class SummariesService {
     @InjectRepository(FeaturedAd) private readonly featuredAdsRepository: Repository<FeaturedAd>,
     @InjectRepository(MainBannerAd) private readonly mainBannerAdsRepository: Repository<MainBannerAd>,
     @InjectRepository(StoreAd) private readonly storeAdsRepository: Repository<StoreAd>,
-    @InjectRepository(Tag) private readonly tagsRepository: Repository<Tag>
+    @InjectRepository(Tag) private readonly tagsRepository: Repository<Tag>,
+    @InjectRepository(Discount) private readonly discountsRepository: Repository<Discount>
   ) {}
 
   async dashboardSummary(): Promise<DashboardSummaryDto> {
@@ -64,7 +66,7 @@ export class SummariesService {
     };
   }
 
-  async tagsSummary(): Promise<TagsSummaryDto> {
+  async tagsSummary(): Promise<{ emptyTagsCount: number; bestTag: Tag; averageProductsPerTag: number; }> {
     const emptyTagsCount = await this.tagsRepository.createQueryBuilder('tag')
       .where('NOT EXISTS (SELECT tag_id FROM product_to_tag WHERE tag_id = id)')
       .getCount();
@@ -82,6 +84,37 @@ export class SummariesService {
       emptyTagsCount,
       bestTag,
       averageProductsPerTag: +averageProductsPerTag,
+    };
+  }
+
+  async discountsSummary(): Promise<{ discountsCount: number; bestDiscount: Discount; storeWithMoreDiscounts: Store; }> {
+    const discountsCount = await this.discountsRepository.createQueryBuilder('discount')
+      .getCount();
+
+    const storeWithMoreDiscounts = await this.storesRepository.createQueryBuilder('store')
+      .innerJoin('store.storeProfile', 'storeProfile')
+      .addSelect('(SELECT COUNT(discounts.id) FROM discounts WHERE discounts.store_id = store.id AND discounts.deleted_at IS NULL)', 'discounts_count')
+      .orderBy('discounts_count', 'DESC')
+      .getOne();
+
+    const bestDiscount = await this.discountsRepository.createQueryBuilder('discount')
+        .addSelect(`(
+          SELECT
+            COUNT(orders.id)
+          FROM
+            orders
+          INNER JOIN
+            carts ON carts.id = orders.cart_id
+          WHERE
+            carts.discount_id = discount.id AND orders.order_status_code = '${OrderStatuses.PRODUCTS_RECEIVED}' AND orders.deleted_at IS NULL
+        )`, 'orders_count')
+        .orderBy('orders_count', 'DESC')
+        .getOne();
+
+    return {
+      discountsCount,
+      bestDiscount,
+      storeWithMoreDiscounts,
     };
   }
 }
