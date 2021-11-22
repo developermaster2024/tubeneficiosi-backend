@@ -135,7 +135,6 @@ export class SummariesService {
       )`, 'orders_count')
       .innerJoin('discount.store', 'store')
       .where('store.userId = :userId', { userId })
-      .having('orders_count > 0')
       .orderBy('orders_count', 'DESC')
       .getOne();
 
