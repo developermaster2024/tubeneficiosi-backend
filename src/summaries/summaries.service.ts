@@ -117,4 +117,38 @@ export class SummariesService {
       storeWithMoreDiscounts,
     };
   }
+
+  async storeDiscountsSummary(userId: number): Promise<{
+    bestDiscount: Discount;
+    ordersCount: number;
+  }> {
+    const bestDiscount = await this.discountsRepository.createQueryBuilder('discount')
+      .addSelect(`(
+        SELECT
+          COUNT(orders.id)
+        FROM
+          orders
+        INNER JOIN
+          carts ON carts.id = orders.cart_id
+        WHERE
+          carts.discount_id = discount.id AND orders.order_status_code = '${OrderStatuses.PRODUCTS_RECEIVED}' AND orders.deleted_at IS NULL
+      )`, 'orders_count')
+      .innerJoin('discount.store', 'store')
+      .where('store.userId = :userId', { userId })
+      .having('orders_count > 0')
+      .orderBy('orders_count', 'DESC')
+      .getOne();
+
+    const ordersCount = await this.ordersRepository.createQueryBuilder('order')
+      .innerJoin('order.store', 'store')
+      .innerJoin('order.cart', 'cart')
+      .where('store.userId = :userId', { userId })
+      .andWhere('cart.discountId = :discountId', { discountId: bestDiscount?.id ?? 0 })
+      .getCount();
+
+    return {
+      bestDiscount: bestDiscount || null,
+      ordersCount,
+    };
+  }
 }
