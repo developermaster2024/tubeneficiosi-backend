@@ -15,6 +15,7 @@ type StoreFilters = {
   storeFeatureIds: number[];
   userLatLng: [number, number],
   locationIds: number[],
+  withinLocationId: number;
 };
 
 export class StorePaginationOptionsDto extends PaginationOptions {
@@ -40,6 +41,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       storeFeatureIds = '',
       userLatLng = '',
       locationIds = '',
+      withinLocationId,
     } = query;
 
     return new StorePaginationOptionsDto(+page, +perPage, {
@@ -57,6 +59,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       storeFeatureIds: storeFeatureIds.split(',').filter(id => id).map(id => Number(id)),
       userLatLng: userLatLng.split(',').filter(value => value).map(value => Number(value)) as [number, number],
       locationIds: locationIds.split(',').filter(id => id).map(id => Number(id)),
+      withinLocationId: +withinLocationId,
     });
   }
 }

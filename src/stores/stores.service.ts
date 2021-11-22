@@ -37,6 +37,7 @@ export class StoresService {
     storeFeatureIds,
     userLatLng,
     locationIds,
+    withinLocationId,
   }}: StorePaginationOptionsDto, userId: number): Promise<PaginationResult<User>> {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.userStatus', 'userStatus')
@@ -130,10 +131,11 @@ export class StoresService {
     }
 
     if (locationIds.length > 0) {
-      queryBuilder.andWhere(new Brackets(qb => {
-        qb.where('location.id IN (:...locationIds)', { locationIds })
-          .orWhere('ST_CONTAINS(location.area, store.location)');
-      }));
+      queryBuilder.where('location.id IN (:...locationIds)', { locationIds });
+    }
+
+    if (withinLocationId) {
+      queryBuilder.andWhere('ST_CONTAINS((SELECT locations.area FROM locations WHERE locations.id = :withinLocationId AND locations.deleted_at IS NULL LIMIT 1), store.location)', { withinLocationId });
     }
 
     queryBuilder.leftJoinAndMapOne(
