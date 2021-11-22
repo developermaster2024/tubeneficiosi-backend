@@ -13,6 +13,6 @@ export class DiscountsSummaryDto {
   readonly bestDiscount: ReadDiscountDto;
 
   @Expose()
-  @Transform(({obj}) => obj.store ? plainToClass(ReadStoreDto, User.create({store: obj.store})) : null)
+  @Transform(({obj}) => obj.storeWithMoreDiscounts ? plainToClass(ReadStoreDto, User.create({store: obj.storeWithMoreDiscounts})) : null)
   readonly storeWithMoreDiscounts: ReadStoreDto;
 }

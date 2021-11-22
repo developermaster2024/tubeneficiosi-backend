@@ -98,18 +98,18 @@ export class SummariesService {
       .getOne();
 
     const bestDiscount = await this.discountsRepository.createQueryBuilder('discount')
-        .addSelect(`(
-          SELECT
-            COUNT(orders.id)
-          FROM
-            orders
-          INNER JOIN
-            carts ON carts.id = orders.cart_id
-          WHERE
-            carts.discount_id = discount.id AND orders.order_status_code = '${OrderStatuses.PRODUCTS_RECEIVED}' AND orders.deleted_at IS NULL
-        )`, 'orders_count')
-        .orderBy('orders_count', 'DESC')
-        .getOne();
+      .addSelect(`(
+        SELECT
+          COUNT(orders.id)
+        FROM
+          orders
+        INNER JOIN
+          carts ON carts.id = orders.cart_id
+        WHERE
+          carts.discount_id = discount.id AND orders.order_status_code = '${OrderStatuses.PRODUCTS_RECEIVED}' AND orders.deleted_at IS NULL
+      )`, 'orders_count')
+      .orderBy('orders_count', 'DESC')
+      .getOne();
 
     return {
       discountsCount,
