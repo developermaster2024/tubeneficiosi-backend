@@ -16,6 +16,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { DeleteProductImageDto } from './dto/delete-product-image.dto';
 import { ReadProductDto } from './dto/read-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { UploadHtmlImageDto } from './dto/upload-html-image.dto';
 import { ProductImage } from './entities/product-image.entity';
 import { ProductPaginationPipe } from './pipes/product-pagination.pipe';
 import { ProductsService } from './products.service';
@@ -96,5 +97,13 @@ export class ProductsController {
   @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({id: 'productId', position: 'position'}))
   async deleteProductImage(@Body() deleteProductImageDto: DeleteProductImageDto): Promise<void> {
     await this.productsService.deleteProductImage(deleteProductImageDto);
+  }
+
+  @Post('upload-html-image')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'))
+  async uploadHtmlImage(@Body() uploadHtmlImageDto: UploadHtmlImageDto): Promise<{url: string}> {
+    return await this.productsService.uploadHtmlImage(uploadHtmlImageDto);
   }
 }

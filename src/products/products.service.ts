@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from 'src/categories/entities/category.entity';
 import { DeliveryMethodType } from 'src/delivery-method-types/entities/delivery-method-type.entity';
@@ -15,6 +16,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { DeleteProductImageDto } from './dto/delete-product-image.dto';
 import { ProductPaginationOptionsDto } from './dto/product-pagination-options.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { UploadHtmlImageDto } from './dto/upload-html-image.dto';
 import { ProductDetails } from './entities/product-details.entity';
 import { ProductDimension } from './entities/product-dimension.entity';
 import { ProductFeatureForGroup } from './entities/product-feature-for-group.entity';
@@ -35,7 +37,8 @@ export class ProductsService {
     @InjectRepository(ProductFeature) private readonly productFeaturesRepository: Repository<ProductFeature>,
     @InjectRepository(ProductFeatureGroup) private readonly productFeatureForGroupsRepository: Repository<ProductFeatureGroup>,
     @InjectRepository(ProductImage) private readonly productImagesRepository: Repository<ProductImage>,
-    @InjectRepository(User) private readonly usersRepository: Repository<User>
+    @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    private readonly configService: ConfigService
   ) {}
 
   async paginate({offset, perPage, filters: {
@@ -453,5 +456,9 @@ export class ProductsService {
     }
 
     await this.productImagesRepository.remove(productImage);
+  }
+
+  async uploadHtmlImage({image}: UploadHtmlImageDto): Promise<{url: string}> {
+    return { url: `${this.configService.get<string>('BACKEND_URL')}/${image.path}` };
   }
 }
