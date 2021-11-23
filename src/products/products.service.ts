@@ -20,6 +20,7 @@ import { ProductDimension } from './entities/product-dimension.entity';
 import { ProductFeatureForGroup } from './entities/product-feature-for-group.entity';
 import { ProductFeatureGroup } from './entities/product-feature-group.entity';
 import { ProductImage } from './entities/product-image.entity';
+import { ProductVideo } from './entities/product-video.entity';
 import { Product } from './entities/product.entity';
 import { ProductImageNotFound } from './errors/product-image-not-found.exception';
 import { ProductNotFoundException } from './errors/product-not-found.exception';
@@ -63,6 +64,7 @@ export class ProductsService {
       .skip(offset)
       .leftJoinAndSelect('product.categories', 'category')
       .leftJoinAndSelect('product.productImages', 'productImage')
+      .leftJoinAndSelect('product.productVideos', 'productVideo')
       .leftJoinAndSelect('product.showDetails', 'showDetails')
       .leftJoinAndSelect('product.shows', 'show', 'show.date >= :today', { today: new Date() })
       .leftJoinAndSelect('show.showToZones', 'showToZone')
@@ -178,6 +180,7 @@ export class ProductsService {
     shortDescription,
     quantity,
     price,
+    videoUrls,
     ...createProductDto
   }: CreateProductDto, images: Express.Multer.File[]): Promise<Product> {
     const store = await this.findUserStore(userId);
@@ -208,6 +211,7 @@ export class ProductsService {
         isPortrait: i === 0,
         position: i,
       })),
+      productVideos: videoUrls.map((videoUrl) => ProductVideo.create({ url: videoUrl })),
       store,
       productDetails,
       productFeatures,
@@ -228,6 +232,7 @@ export class ProductsService {
     const product = await this.productsRepository.createQueryBuilder('product')
       .leftJoinAndSelect('product.categories', 'category')
       .leftJoinAndSelect('product.productImages', 'productImage')
+      .leftJoinAndSelect('product.productVideos', 'productVideo')
       .leftJoinAndSelect('product.productDetails', 'productDetails')
       .leftJoinAndSelect('productDetails.brand', 'brand')
       .leftJoinAndSelect('product.productFeatures', 'productFeature')
@@ -258,6 +263,7 @@ export class ProductsService {
     const product = await this.productsRepository.createQueryBuilder('product')
       .leftJoinAndSelect('product.categories', 'category')
       .leftJoinAndSelect('product.productImages', 'productImage')
+      .leftJoinAndSelect('product.productVideos', 'productVideo')
       .leftJoinAndSelect('product.showDetails', 'showDetails')
       .leftJoinAndSelect('product.productDetails', 'productDetails')
       .leftJoinAndSelect('productDetails.brand', 'brand')

@@ -11,6 +11,7 @@ import { ProductDetails } from "./product-details.entity";
 import { ProductDimension } from "./product-dimension.entity";
 import { ProductFeatureGroup } from "./product-feature-group.entity";
 import { ProductImage } from "./product-image.entity";
+import { ProductVideo } from "./product-video.entity";
 
 @Entity({
   name: 'products'
@@ -76,6 +77,9 @@ export class Product {
 
   @OneToMany(() => ProductImage, productImage => productImage.product, {cascade: ['insert', 'update']})
   productImages: ProductImage[];
+
+  @OneToMany(() => ProductVideo, productVideo => productVideo.product, {cascade: ['insert', 'update']})
+  productVideos: ProductVideo[];
 
   @OneToMany(() => FavoriteProduct, (favoriteProduct) => favoriteProduct.product)
   favoriteProducts: FavoriteProduct[];

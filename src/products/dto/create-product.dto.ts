@@ -1,5 +1,5 @@
-import { Exclude, Expose, Type } from "class-transformer";
-import { ArrayMinSize, IsArray, IsIn, IsNumber, MaxLength, Min, ValidateIf, ValidateNested } from "class-validator";
+import { Exclude, Expose, Transform, Type } from "class-transformer";
+import { ArrayMinSize, IsArray, IsIn, IsNumber, IsUrl, MaxLength, Min, ValidateIf, ValidateNested } from "class-validator";
 import { Brand } from "src/brands/entities/brand.entity";
 import { DeliveryMethodTypes, DeliveryMethodTypesValues } from "src/delivery-method-types/enums/delivery-methods-types.enum";
 import { Exists } from "src/validation/exists.constrain";
@@ -96,4 +96,10 @@ export class CreateProductDto {
   @Expose()
   @IsIn(DeliveryMethodTypesValues, {each: true})
   readonly deliveryMethodTypeCodes: DeliveryMethodTypes[];
+
+  @Expose()
+  @Transform(({value}) => value || [])
+  @IsArray()
+  @IsUrl({}, { each: true })
+  readonly videoUrls: string[];
 }
