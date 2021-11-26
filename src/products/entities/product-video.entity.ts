@@ -11,6 +11,12 @@ export class ProductVideo {
   readonly id: number;
 
   @Column({
+    name: 'name',
+    type: 'varchar',
+  })
+  name: string;
+
+  @Column({
     name: 'url',
     type: 'varchar',
   })

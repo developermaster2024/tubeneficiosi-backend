@@ -1,10 +1,11 @@
 import { Exclude, Expose, Transform, Type } from "class-transformer";
-import { ArrayMinSize, IsArray, IsIn, IsNumber, IsUrl, MaxLength, Min, ValidateIf, ValidateNested } from "class-validator";
+import { ArrayMinSize, IsArray, IsIn, IsNumber, MaxLength, Min, ValidateIf, ValidateNested } from "class-validator";
 import { Brand } from "src/brands/entities/brand.entity";
 import { DeliveryMethodTypes, DeliveryMethodTypesValues } from "src/delivery-method-types/enums/delivery-methods-types.enum";
 import { Exists } from "src/validation/exists.constrain";
 import { CreateProductFeatureGroup } from "./create-product-feature-group.dto";
 import { CreateProductToProductFeatureDto } from "./create-product-to-feature.dto";
+import { CreateProductVideoDto } from "./create-product-video.dto";
 
 @Exclude()
 export class CreateProductDto {
@@ -99,7 +100,8 @@ export class CreateProductDto {
 
   @Expose()
   @Transform(({value}) => value || [])
+  @Type(() => CreateProductVideoDto)
+  @ValidateNested({ each: true })
   @IsArray()
-  @IsUrl({}, { each: true })
-  readonly videoUrls: string[];
+  readonly videos: CreateProductVideoDto[];
 }

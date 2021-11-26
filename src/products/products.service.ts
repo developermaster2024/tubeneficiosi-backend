@@ -183,7 +183,7 @@ export class ProductsService {
     shortDescription,
     quantity,
     price,
-    videoUrls,
+    videos,
     ...createProductDto
   }: CreateProductDto, images: Express.Multer.File[]): Promise<Product> {
     const store = await this.findUserStore(userId);
@@ -214,7 +214,7 @@ export class ProductsService {
         isPortrait: i === 0,
         position: i,
       })),
-      productVideos: videoUrls.map((videoUrl) => ProductVideo.create({ url: videoUrl })),
+      productVideos: videos.map((video) => ProductVideo.create(video)),
       store,
       productDetails,
       productFeatures,
