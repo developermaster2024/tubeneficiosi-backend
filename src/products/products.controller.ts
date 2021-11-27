@@ -11,13 +11,16 @@ import { ParamsToBodyInterceptor } from 'src/support/interceptors/params-to-body
 import { SlugifierInterceptor } from 'src/support/interceptors/slugifier.interceptor';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Role } from 'src/users/enums/roles.enum';
+import { AddProductVideoDto } from './dto/add-product-video.dto';
 import { CreateProductImageDto } from './dto/create-product-image.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { DeleteProductImageDto } from './dto/delete-product-image.dto';
+import { DeleteProductVideoDto } from './dto/delete-product-video.dto';
 import { ReadProductDto } from './dto/read-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { UploadHtmlImageDto } from './dto/upload-html-image.dto';
 import { ProductImage } from './entities/product-image.entity';
+import { ProductVideo } from './entities/product-video.entity';
 import { ProductPaginationPipe } from './pipes/product-pagination.pipe';
 import { ProductsService } from './products.service';
 
@@ -105,5 +108,21 @@ export class ProductsController {
   @UseInterceptors(FileInterceptor('image'), new FileToBodyInterceptor('image'))
   async uploadHtmlImage(@Body() uploadHtmlImageDto: UploadHtmlImageDto): Promise<{url: string}> {
     return await this.productsService.uploadHtmlImage(uploadHtmlImageDto);
+  }
+
+  @Post(':id/videos')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ id: 'productId' }))
+  async addProductVideo(@Body() addProductVideoDto: AddProductVideoDto): Promise<ProductVideo> {
+    return await this.productsService.addProductVideo(addProductVideoDto);
+  }
+
+  @Delete(':id/videos/:videoId')
+  @Roles(Role.STORE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor(), new ParamsToBodyInterceptor({ id: 'productId', videoId: 'videoId' }))
+  async deleteProductVideo(@Body() deleteProductVideoDto: DeleteProductVideoDto): Promise<void> {
+    await this.productsService.deleteProductVideo(deleteProductVideoDto);
   }
 }

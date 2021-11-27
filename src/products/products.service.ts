@@ -11,9 +11,11 @@ import { Tag } from 'src/tags/entities/tag.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/roles.enum';
 import { Brackets, FindConditions, In, Repository } from 'typeorm';
+import { AddProductVideoDto } from './dto/add-product-video.dto';
 import { CreateProductImageDto } from './dto/create-product-image.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { DeleteProductImageDto } from './dto/delete-product-image.dto';
+import { DeleteProductVideoDto } from './dto/delete-product-video.dto';
 import { ProductPaginationOptionsDto } from './dto/product-pagination-options.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { UploadHtmlImageDto } from './dto/upload-html-image.dto';
@@ -26,6 +28,7 @@ import { ProductVideo } from './entities/product-video.entity';
 import { Product } from './entities/product.entity';
 import { ProductImageNotFound } from './errors/product-image-not-found.exception';
 import { ProductNotFoundException } from './errors/product-not-found.exception';
+import { ProductVideoNotFoundException } from './errors/product-video-not-found.exception';
 
 @Injectable()
 export class ProductsService {
@@ -37,6 +40,7 @@ export class ProductsService {
     @InjectRepository(ProductFeature) private readonly productFeaturesRepository: Repository<ProductFeature>,
     @InjectRepository(ProductFeatureGroup) private readonly productFeatureForGroupsRepository: Repository<ProductFeatureGroup>,
     @InjectRepository(ProductImage) private readonly productImagesRepository: Repository<ProductImage>,
+    @InjectRepository(ProductVideo) private readonly productVideosRepository: Repository<ProductVideo>,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     private readonly configService: ConfigService
   ) {}
@@ -460,5 +464,25 @@ export class ProductsService {
 
   async uploadHtmlImage({image}: UploadHtmlImageDto): Promise<{url: string}> {
     return { url: `${this.configService.get<string>('BACKEND_URL')}/${image.path}` };
+  }
+
+  async addProductVideo({userId, ...addProductVideoDto}: AddProductVideoDto): Promise<ProductVideo> {
+    const productVideo = ProductVideo.create(addProductVideoDto);
+
+    return await this.productVideosRepository.save(productVideo);
+  }
+
+  async deleteProductVideo({userId, productId, videoId}: DeleteProductVideoDto): Promise<void> {
+    const productVideo = await this.productVideosRepository.createQueryBuilder('productVideo')
+      .innerJoin('productVideo.product', 'product')
+      .innerJoin('product.store', 'store')
+      .where('productVideo.id = :videoId', { videoId })
+      .andWhere('product.id = :productId', { productId })
+      .andWhere('store.userId = :userId', { userId })
+      .getOne();
+
+    if (!productVideo) throw new ProductVideoNotFoundException()
+
+    await this.productVideosRepository.remove(productVideo);
   }
 }
