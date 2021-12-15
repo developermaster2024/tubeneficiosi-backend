@@ -1,4 +1,4 @@
-import { Exclude, Expose } from "class-transformer";
+import { Exclude, Expose, Type } from "class-transformer";
 
 @Exclude()
 export class ReadProfileAddressDto {
@@ -15,9 +15,11 @@ export class ReadProfileAddressDto {
   readonly address: string;
 
   @Expose()
+  @Type(() => Number)
   readonly latitude: number;
 
   @Expose()
+  @Type(() => Number)
   readonly longitude: number;
 
 }
