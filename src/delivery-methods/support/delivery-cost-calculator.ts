@@ -29,7 +29,7 @@ export class DeliveryCostCalculator {
 
 
     const zone = await this.deliveryZonesRepository.createQueryBuilder('deliveryZone')
-      .leftJoinAndSelect('deliveryZone.deliveryZoneToShippingRanges', 'deliveryZoneToShippingRange')
+      .leftJoinAndSelect('deliveryZone.deliveryZoneToDeliveryRanges', 'deliveryZoneToDeliveryRange')
       .innerJoin('deliveryZone.locations', 'location', `ST_CONTAINS(location.area, (
         SELECT
           POINT(address.latitude, address.longitude)
