@@ -26,6 +26,7 @@ export class StoreAdsService {
       .leftJoinAndSelect('storeAd.store', 'store')
       .leftJoinAndSelect('store.storeProfile', 'storeProfile')
       .leftJoinAndSelect('store.products', 'product')
+      .leftJoinAndSelect('store.storeHours', 'storeHour')
       .leftJoinAndSelect('product.productImages', 'productImage')
       .take(perPage)
       .skip(offset);
