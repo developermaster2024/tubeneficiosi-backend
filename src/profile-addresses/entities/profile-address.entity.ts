@@ -46,6 +46,14 @@ export class ProfileAddress {
   })
   longitude: number;
 
+  @Column({
+    name: 'user_id',
+    type: 'int',
+    select: false,
+    nullable: false,
+  })
+  userId: number;
+
   @ManyToOne(() => User, {nullable: false, onDelete: 'CASCADE'})
   @JoinColumn({
     name: 'user_id',
