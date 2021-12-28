@@ -9,6 +9,7 @@ import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { CreateProfileAddressDto } from './dto/create-profile-address.dto';
 import { ReadProfileAddressDto } from './dto/read-profile-address.dto';
 import { UpdateProfileAddressDto } from './dto/update-profile-address.dto';
+import { ProfileAddressPaginationPipe } from './pipes/profile-address-pagination.pipe';
 import { ProfileAddressesService } from './profile-addresses.service';
 
 @Controller('profile/addresses')
@@ -19,7 +20,7 @@ export class ProfileAddressesController {
   @Get()
   @UseInterceptors(new JwtUserToBodyInterceptor())
   async paginate(
-    @Query(PaginationPipe) options: PaginationOptions,
+    @Query(ProfileAddressPaginationPipe) options: any,
     @Body('userId') userId: number
   ): Promise<PaginationResult<ReadProfileAddressDto>> {
     return (await this.profileAddressesService.paginate(options, userId)).toClass(ReadProfileAddressDto);

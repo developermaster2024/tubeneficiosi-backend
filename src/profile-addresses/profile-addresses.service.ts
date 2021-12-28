@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginationOptions } from 'src/support/pagination/pagination-options';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { Repository } from 'typeorm';
 import { CreateProfileAddressDto } from './dto/create-profile-address.dto';
+import { ProfileAddressPaginationOptionsDto } from './dto/profile-address-pagination-options.dto';
 import { UpdateProfileAddressDto } from './dto/update-profile-address.dto';
 import { ProfileAddress } from './entities/profile-address.entity';
 import { ProfileAddressNotFoundException } from './exceptions/profile-address-not-found.exception';
@@ -12,14 +12,22 @@ import { ProfileAddressNotFoundException } from './exceptions/profile-address-no
 export class ProfileAddressesService {
   constructor(@InjectRepository(ProfileAddress) private readonly profileAddressesRepository: Repository<ProfileAddress>) {}
 
-  async paginate(options: PaginationOptions, userId: number): Promise<PaginationResult<ProfileAddress>> {
-    const [profileAddresses, total] = await this.profileAddressesRepository.findAndCount({
-      take: options.perPage,
-      skip: options.offset,
-      where: {user: userId},
-    });
+  async paginate({perPage, offset, filters: {
+    id,
+    name,
+  }}: ProfileAddressPaginationOptionsDto, userId: number): Promise<PaginationResult<ProfileAddress>> {
+    const queryBuilder = this.profileAddressesRepository.createQueryBuilder('profileAddress')
+      .take(perPage)
+      .skip(offset)
+      .where('profileAddress.userId = :userId', { userId });
 
-    return new PaginationResult(profileAddresses, total, options.perPage);
+    if (id) queryBuilder.andWhere('profileAddress.id = :id', { id });
+
+    if (name) queryBuilder.andWhere('profileAddress.name LIKE :name', { name: `%${name}%` });
+
+    const [profileAddresses, total] = await queryBuilder.getManyAndCount();
+
+    return new PaginationResult(profileAddresses, total, perPage);
   }
 
   async create(createProfileAddressDto: CreateProfileAddressDto): Promise<ProfileAddress> {
