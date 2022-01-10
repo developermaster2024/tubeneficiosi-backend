@@ -30,8 +30,8 @@ export class ProfileAddressesService {
     return new PaginationResult(profileAddresses, total, perPage);
   }
 
-  async create(createProfileAddressDto: CreateProfileAddressDto): Promise<ProfileAddress> {
-    const profileAddress = Object.assign(new ProfileAddress(), createProfileAddressDto);
+  async create({user, ...createProfileAddressDto}: CreateProfileAddressDto): Promise<ProfileAddress> {
+    const profileAddress = Object.assign(new ProfileAddress(), {...createProfileAddressDto, userId: user});
 
     return await this.profileAddressesRepository.save(profileAddress);
   }
