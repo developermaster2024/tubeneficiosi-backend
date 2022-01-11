@@ -84,6 +84,8 @@ export class DeliveryMethod {
   })
   deletedAt: Date;
 
+  deliveryCost: number;
+
   static create(data: Partial<DeliveryMethod>): DeliveryMethod {
     return Object.assign(new DeliveryMethod(), data);
   }

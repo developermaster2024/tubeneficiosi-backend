@@ -89,6 +89,7 @@ export class DeliveryMethodsService {
     name,
     storeId,
     addressId,
+    forCartId,
   }}: DeliveryMethodPaginationOptionsDto): Promise<PaginationResult<DeliveryMethod>> {
     const queryBuilder = this.deliveryMethodsRepository.createQueryBuilder('deliveryMethod')
       .take(perPage)
@@ -118,6 +119,16 @@ export class DeliveryMethodsService {
     }
 
     const [deliveryMethods, total] = await queryBuilder.getManyAndCount();
+
+    if (addressId && forCartId) {
+      for (let deliveryMethod of deliveryMethods) {
+        deliveryMethod.deliveryCost = (await this.calculateCost({
+          deliveryMethodId: deliveryMethod.id,
+          cartId: forCartId,
+          profileAddressId: addressId,
+        })).cost;
+      }
+    }
 
     return new PaginationResult(deliveryMethods, total, perPage);
   }

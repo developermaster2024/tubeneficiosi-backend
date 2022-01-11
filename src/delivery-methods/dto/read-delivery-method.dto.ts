@@ -31,4 +31,7 @@ export class ReadDeliveryMethodDto {
 
   @Expose()
   readonly deliveryRanges: DeliveryRange[];
+
+  @Expose()
+  readonly deliveryCost: number;
 }
