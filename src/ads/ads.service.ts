@@ -90,7 +90,13 @@ export class AdsService {
   }
 
   async update({id, image, ...updateAdDto}: UpdateAdDto): Promise<Ad> {
-    const ad = await this.findOne(+id);
+    const ad = await this.adsRepository.createQueryBuilder('ad')
+      .where('ad.id = :id', { id })
+      .getOne();
+
+    if (!ad) {
+      throw new AdNotFound();
+    }
 
     Object.assign(ad, updateAdDto);
 
