@@ -66,11 +66,13 @@ export class CartsController {
     @Param('storeId') storeId: string,
     @Body('userId') userId: number,
     @Query('isExpired') isExpired: string,
-    @Query('isProcessed') isProcessed: string
+    @Query('isProcessed') isProcessed: string,
+    @Query('isDirectPurchase') isDirectPurchase: string
   ): Promise<ReadCartDto> {
     return plainToClass(ReadCartDto, await this.cartsService.findOneStoreId(userId, +storeId, {
       isExpired: queryStringToBoolean(isExpired),
       isProcessed: queryStringToBoolean(isProcessed),
+      isDirectPurchase: queryStringToBoolean(isDirectPurchase)
     }));
   }
 
@@ -83,6 +85,7 @@ export class CartsController {
     return plainToClass(ReadCartDto, await this.cartsService.findOneById(+id, {
       isExpired: queryStringToBoolean(isExpired),
       isProcessed: queryStringToBoolean(isProcessed),
+      isDirectPurchase: null,
     }));
   }
 

@@ -6,7 +6,6 @@ import { ProductFeature } from 'src/product-features/entities/product-feature.en
 import { ProductFeatureForGroup } from 'src/products/entities/product-feature-for-group.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { ProductNotFoundException } from 'src/products/errors/product-not-found.exception';
-import { ShowToZone } from 'src/shows/entities/show-to-zone.entity';
 import { ShowNotFoundException } from 'src/shows/errors/show-not-found.exception';
 import { ShowToZoneNotFoundException } from 'src/shows/errors/show-to-zone-not-found.exception';
 import { Store } from 'src/stores/entities/store.entity';
@@ -34,6 +33,7 @@ import { QuantityIsGreaterThanAvailableSeatsException } from './errors/quantity-
 type FindOneQueryParams = {
   isExpired: boolean|null,
   isProcessed: boolean|null,
+  isDirectPurchase: boolean|null,
 }
 
 @Injectable()
@@ -313,7 +313,7 @@ export class CartsService {
     return await this.cartsRepository.save(cart);
   }
 
-  async findOneStoreId(userId: number, storeId: number, { isExpired, isProcessed }: FindOneQueryParams ): Promise<Cart> {
+  async findOneStoreId(userId: number, storeId: number, { isExpired, isProcessed, isDirectPurchase }: FindOneQueryParams ): Promise<Cart> {
     const user = await this.usersRepository.findOne(userId);
 
     if (!user) {
@@ -366,6 +366,8 @@ export class CartsService {
     }
 
     if (isProcessed !== null) queryBuilder.andWhere('cart.isProcessed = :isProcessed', { isProcessed: +isProcessed });
+
+    if (isDirectPurchase !== null) queryBuilder.andWhere('cart.isDirectPurchase = :isDirectPurchase', { isDirectPurchase: +isDirectPurchase });
 
     const cart = await queryBuilder.getOne();
 
