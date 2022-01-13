@@ -292,7 +292,6 @@ export class CartsService {
       .andWhere('cart.id = :id', { id })
       .andWhere('cart.storeId = :storeId', { storeId })
       .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
-      .andWhere('cart.isDirectPurchase = :isDirectPurchase', { isDirectPurchase: 0 })
       .andWhere(':today < cart.expiresOn', { today: new Date() })
       .getOne();
 
