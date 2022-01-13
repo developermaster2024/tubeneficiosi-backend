@@ -288,6 +288,8 @@ export class CartsService {
       .leftJoinAndSelect('cart.cartItems', 'cartItem')
       .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
       .leftJoinAndSelect('cart.discount', 'discount')
+      .innerJoinAndSelect('cart.store', 'store')
+      .innerJoinAndSelect('store.storeProfile', 'storeProfile')
       .where('cart.userId = :userId', { userId })
       .andWhere('cart.id = :id', { id })
       .andWhere('cart.storeId = :storeId', { storeId })
