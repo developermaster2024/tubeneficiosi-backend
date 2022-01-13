@@ -9,6 +9,7 @@ import { ProductNotFoundException } from 'src/products/errors/product-not-found.
 import { ShowToZone } from 'src/shows/entities/show-to-zone.entity';
 import { ShowNotFoundException } from 'src/shows/errors/show-not-found.exception';
 import { ShowToZoneNotFoundException } from 'src/shows/errors/show-to-zone-not-found.exception';
+import { Store } from 'src/stores/entities/store.entity';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/roles.enum';
@@ -46,7 +47,7 @@ export class CartsService {
     @InjectRepository(ProductFeatureForGroup) private readonly productFeatureForGroupsRepository: Repository<ProductFeatureForGroup>,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     @InjectRepository(Discount) private readonly discountsRepository: Repository<Discount>,
-    @InjectRepository(ShowToZone) private readonly showToZonesRepository: Repository<ShowToZone>
+    @InjectRepository(Store) private readonly storesRepository: Repository<Store>
   ) {}
 
   async paginate({offset, perPage, filters: {
@@ -159,6 +160,8 @@ export class CartsService {
         .leftJoinAndSelect('cart.cartItems', 'cartItem')
         .leftJoinAndSelect('cartItem.cartItemFeatures', 'cartItemFeature')
         .leftJoinAndSelect('cart.discount', 'discount')
+        .innerJoinAndSelect('cart.store', 'store')
+        .innerJoinAndSelect('store.storeProfile', 'storstoreProfile')
         .where('cart.userId = :userId', { userId })
         .andWhere('cart.storeId = :storeId', { storeId })
         .andWhere('cart.isProcessed = :isProcessed', { isProcessed: 0 })
@@ -170,7 +173,7 @@ export class CartsService {
     if (!cart) {
       cart = Cart.create({
         userId,
-        storeId,
+        store: await this.storesRepository.findOne(storeId),
         isProcessed: false,
         isDirectPurchase,
         cartItems: [],
