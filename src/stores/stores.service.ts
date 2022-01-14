@@ -201,7 +201,7 @@ export class StoresService {
     return await this.usersRepository.save(user);
   }
 
-  async findOneById(id: number): Promise<User> {
+  async findOneById(id: number, userId: number = 0): Promise<User> {
     const user = await this.usersRepository.createQueryBuilder('user')
       .leftJoinAndSelect('user.userStatus', 'userStatus')
       .leftJoinAndSelect('user.store', 'store')
@@ -214,6 +214,13 @@ export class StoresService {
         'latestActiveDiscount',
         'latestActiveDiscount.from <= :today AND latestActiveDiscount.until >= :today'
       , { today: new Date() })
+      .leftJoinAndMapOne(
+        'store.storeToUser',
+        'store.storeToUsers',
+        'storeToUserAlone',
+        'storeToUserAlone.userId = :userId',
+        { userId }
+      )
       .leftJoinAndSelect('store.storeFeatures', 'storeFeature')
       .where('store.id = :id', { id })
       .getOne();

@@ -51,8 +51,14 @@ export class StoresController {
   }
 
   @Get(':id(\\d+)')
-  async findOneById(@Param('id') id: string): Promise<ReadStoreDto> {
-    return plainToClass(ReadStoreDto, await this.storesService.findOneById(+id));
+  @AllowAny()
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async findOneById(
+    @Param('id') id: string,
+    @Body('userId') userId: number
+  ): Promise<ReadStoreDto> {
+    return plainToClass(ReadStoreDto, await this.storesService.findOneById(+id, userId));
   }
 
   @Get(':slug')
