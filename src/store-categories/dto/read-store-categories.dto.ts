@@ -13,4 +13,7 @@ export class ReadStoreCategoryDto {
 
   @Expose()
   readonly logo: string;
+
+  @Expose()
+  readonly mapIcon: string;
 }

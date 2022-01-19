@@ -27,6 +27,12 @@ export class StoreCategory {
   })
   logo: string;
 
+  @Column({
+    name: 'map_icon',
+    type: 'varchar',
+  })
+  mapIcon: string;
+
   @CreateDateColumn({
     name: 'created_at',
     select: false,
