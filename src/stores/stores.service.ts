@@ -38,6 +38,7 @@ export class StoresService {
     userLatLng,
     locationIds,
     withinLocationId,
+    withinWktPolygon,
   }}: StorePaginationOptionsDto, userId: number): Promise<PaginationResult<User>> {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.userStatus', 'userStatus')
@@ -136,6 +137,10 @@ export class StoresService {
 
     if (withinLocationId) {
       queryBuilder.andWhere('ST_CONTAINS((SELECT locations.area FROM locations WHERE locations.id = :withinLocationId AND locations.deleted_at IS NULL LIMIT 1), store.location)', { withinLocationId });
+    }
+
+    if (withinWktPolygon) {
+      queryBuilder.andWhere('ST_WITHIN(store.location, ST_GEOMFROMTEXT(:withinWktPolygon))', { withinWktPolygon: `POLYGON((${withinWktPolygon}))` });
     }
 
     queryBuilder.leftJoinAndMapOne(
