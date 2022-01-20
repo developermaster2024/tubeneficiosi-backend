@@ -39,6 +39,7 @@ export class StoresService {
     locationIds,
     withinLocationId,
     withinWktPolygon,
+    minRating,
   }}: StorePaginationOptionsDto, userId: number): Promise<PaginationResult<User>> {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.userStatus', 'userStatus')
@@ -141,6 +142,10 @@ export class StoresService {
 
     if (withinWktPolygon) {
       queryBuilder.andWhere('ST_WITHIN(store.location, ST_GEOMFROMTEXT(:withinWktPolygon))', { withinWktPolygon: `POLYGON((${withinWktPolygon}))` });
+    }
+
+    if (minRating) {
+      queryBuilder.andWhere(`store.rating >= :minRating`, { minRating });
     }
 
     queryBuilder.leftJoinAndMapOne(

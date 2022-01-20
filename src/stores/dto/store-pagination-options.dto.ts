@@ -17,6 +17,7 @@ type StoreFilters = {
   locationIds: number[],
   withinLocationId: number;
   withinWktPolygon: string;
+  minRating: number;
 };
 
 export class StorePaginationOptionsDto extends PaginationOptions {
@@ -44,6 +45,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       locationIds = '',
       withinLocationId,
       withinWktPolygon,
+      minRating,
     } = query;
 
     return new StorePaginationOptionsDto(+page, +perPage, {
@@ -63,6 +65,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       locationIds: locationIds.split(',').filter(id => id).map(id => Number(id)),
       withinLocationId: +withinLocationId,
       withinWktPolygon,
+      minRating: +minRating,
     });
   }
 }
