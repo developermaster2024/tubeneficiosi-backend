@@ -42,9 +42,9 @@ export class HelpCategoriesController {
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(
-    new ParamsToBodyInterceptor({id: 'id'}),
     FileInterceptor('icon', {dest: 'uploads/help-categories/'}),
-    new FileToBodyInterceptor('icon')
+    new FileToBodyInterceptor('icon'),
+    new ParamsToBodyInterceptor({id: 'id'})
   )
   async update(@Body() updateHelpCategoryDto: UpdateHelpCategoryDto): Promise<ReadHelpCategoryDto> {
     return plainToClass(ReadHelpCategoryDto, await this.helpCategoriesService.update(updateHelpCategoryDto));

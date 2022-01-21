@@ -51,7 +51,11 @@ export class HelpCategoriesService {
   async update({id, icon, name}: UpdateHelpCategoryDto): Promise<HelpCategory> {
     const helpCategory = await this.findOne(id);
 
-    Object.assign(helpCategory, {name, icon: icon.path});
+    Object.assign(helpCategory, {name});
+
+    if (icon) {
+      helpCategory.icon = icon.path;
+    }
 
     return await this.helpCategoriesRepository.save(helpCategory);
   }
