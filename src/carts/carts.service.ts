@@ -596,4 +596,34 @@ export class CartsService {
 
     return {...cartsSummary, ...cartsCountThisWeek};
   }
+
+  async cartsCount(userId: number, { isExpired, isProcessed, isDirectPurchase }: FindOneQueryParams): Promise<{count: number}> {
+    const user = await this.usersRepository.findOne(userId);
+
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    const queryBuilder = this.cartsRepository.createQueryBuilder('cart')
+      .innerJoin('cart.store', 'store')
+      .select('COUNT(cart.id)', 'count');
+
+    if (user.role === Role.CLIENT) {
+      queryBuilder.andWhere('cart.userId = :userId', { userId });
+    } else if (user.role === Role.STORE) {
+      queryBuilder.andWhere('store.userId = :userId', { userId });
+    }
+
+    if (isExpired !== null) {
+      const comparator = isExpired ? '<' : '>';
+
+      queryBuilder.andWhere(`cart.expiresOn ${comparator} :today`, { today: new Date() });
+    }
+
+    if (isProcessed !== null) queryBuilder.andWhere('cart.isProcessed = :isProcessed', { isProcessed: +isProcessed });
+
+    if (isDirectPurchase !== null) queryBuilder.andWhere('cart.isDirectPurchase = :isDirectPurchase', { isDirectPurchase: +isDirectPurchase });
+
+    return await queryBuilder.getRawOne<{count: number}>();
+  }
 }

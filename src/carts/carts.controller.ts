@@ -123,4 +123,21 @@ export class CartsController {
   async cartsSummary(@Body('userId') userId: number): Promise<CartsSummaryDto> {
     return plainToClass(CartsSummaryDto, await this.cartsService.cartsSummary(userId));
   }
+
+  @Get('carts-count')
+  @Roles(Role.ADMIN, Role.STORE, Role.CLIENT)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseInterceptors(new JwtUserToBodyInterceptor())
+  async cartsCount(
+    @Body('userId') userId: number,
+    @Query('isExpired') isExpired: string,
+    @Query('isProcessed') isProcessed: string,
+    @Query('isDirectPurchase') isDirectPurchase: string
+  ): Promise<{count: number}> {
+    return await this.cartsService.cartsCount(userId, {
+      isExpired: queryStringToBoolean(isExpired),
+      isProcessed: queryStringToBoolean(isProcessed),
+      isDirectPurchase: queryStringToBoolean(isDirectPurchase),
+    });
+  }
 }
