@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { OneSignalService } from 'onesignal-api-client-nest';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/users/enums/roles.enum';
@@ -11,6 +12,7 @@ import { Notification } from './entities/notification.entity';
 import { UserToNotification } from './entities/user-to-notification.entity';
 import { NotificationNotFoundException } from './errors/notification-not-found.exception';
 import { NotificationsGateway } from './notifications.gateway';
+import { NotificationByDeviceBuilder } from 'onesignal-api-client-core';
 
 @Injectable()
 export class NotificationsService {
@@ -18,7 +20,8 @@ export class NotificationsService {
     @InjectRepository(Notification) private readonly notificationsRepository: Repository<Notification>,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     @InjectRepository(UserToNotification) private readonly userToNotificationsRepository: Repository<UserToNotification>,
-    private readonly notificationsGateway: NotificationsGateway
+    private readonly notificationsGateway: NotificationsGateway,
+    private readonly oneSignalService: OneSignalService
   ) {}
 
   async paginate({offset, perPage, filters: {
@@ -132,5 +135,17 @@ export class NotificationsService {
       .set({ seen: true })
       .where('userId = :userId', { userId })
       .execute();
+  }
+
+  async notifyUsersById(userIds: number[], notification: Notification) {
+    const input = new NotificationByDeviceBuilder()
+      .setIncludeExternalUserIds(userIds.map(id => String(id)))
+      .notification()
+      .setHeadings({ en: notification.title })
+      .setContents({ en: notification.message })
+      .setAttachments({ data: notification.toDto() })
+      .build();
+
+    await this.oneSignalService.createNotification(input);
   }
 }

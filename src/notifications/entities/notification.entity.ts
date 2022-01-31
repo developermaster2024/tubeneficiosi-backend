@@ -65,8 +65,18 @@ export class Notification {
   userToNotification: UserToNotification;
 
   get distanceInWords(): string {
-    console.log(this.createdAt)
     return formatDistance(this.createdAt, new Date(), { addSuffix: true, locale: es });
+  }
+
+  get title(): string {
+    switch(this.type) {
+      case NotificationTypes.ORDER_CREATED:
+        return '¡Orden creada!';
+      case NotificationTypes.ORDER_STATUS_CHANGE:
+        return '¡Estatus de orden actualizado!';
+      default:
+        return 'Beneficio Si';
+    }
   }
 
   toDto(): ReadNotificationDto {

@@ -45,6 +45,7 @@ import { MercadoPagoPaymentGateway } from 'src/payment-gateways/mercado-pago-pay
 import { ProductDetails } from 'src/products/entities/product-details.entity';
 import { QuantityIsGreaterThanAvailableSeatsException } from 'src/carts/errors/quantity-is-greater-than-available-seats.exception';
 import { ShowToZone } from 'src/shows/entities/show-to-zone.entity';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class OrdersService {
@@ -61,6 +62,7 @@ export class OrdersService {
     @InjectRepository(ShowToZone) private readonly showToZonesRepository: Repository<ShowToZone>,
     private readonly deliveryCostCalculatorResolver: DeliveryCostCalculatorResolver,
     private readonly notificationsGateway: NotificationsGateway,
+    private readonly notificationsService: NotificationsService,
     private readonly mercadoPagoPaymentGateway: MercadoPagoPaymentGateway
   ) {}
 
@@ -334,7 +336,10 @@ export class OrdersService {
       userToNotifications,
     }));
 
-    this.notificationsGateway.notifyUsersById(userToNotifications.map(utn => utn.user?.id ?? userId), notification.toDto());
+    const userIds = userToNotifications.map(utn => utn.user?.id ?? userId);
+
+    this.notificationsGateway.notifyUsersById(userIds, notification.toDto());
+    await this.notificationsService.notifyUsersById(userIds, notification);
 
     return {
       order: savedOrder,
@@ -544,7 +549,10 @@ export class OrdersService {
       userToNotifications,
     }));
 
-    this.notificationsGateway.notifyUsersById(userToNotifications.map(utn => utn.userId), notification.toDto());
+    const userIds = userToNotifications.map(utn => utn.userId);
+
+    this.notificationsGateway.notifyUsersById(userIds, notification.toDto());
+    this.notificationsService.notifyUsersById(userIds, notification);
 
     return await this.ordersRepository.save(order);
   }
