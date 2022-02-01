@@ -13,6 +13,7 @@ import { UserToNotification } from './entities/user-to-notification.entity';
 import { NotificationNotFoundException } from './errors/notification-not-found.exception';
 import { NotificationsGateway } from './notifications.gateway';
 import { NotificationByDeviceBuilder } from 'onesignal-api-client-core';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class NotificationsService {
@@ -21,7 +22,8 @@ export class NotificationsService {
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     @InjectRepository(UserToNotification) private readonly userToNotificationsRepository: Repository<UserToNotification>,
     private readonly notificationsGateway: NotificationsGateway,
-    private readonly oneSignalService: OneSignalService
+    private readonly oneSignalService: OneSignalService,
+    private readonly configService: ConfigService
   ) {}
 
   async paginate({offset, perPage, filters: {
@@ -144,6 +146,7 @@ export class NotificationsService {
       .setHeadings({ en: notification.title })
       .setContents({ en: notification.message })
       .setAttachments({ data: notification.toDto() })
+      .setAppearance({ large_icon: this.configService.get('ONESIGNAL_LARGE_ICON_URL') })
       .build();
 
     await this.oneSignalService.createNotification(input);
