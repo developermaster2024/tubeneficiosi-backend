@@ -8,6 +8,7 @@ import { Notification } from 'src/notifications/entities/notification.entity';
 import { UserToNotification } from 'src/notifications/entities/user-to-notification.entity';
 import { NotificationTypes } from 'src/notifications/enums/notification-types.enum';
 import { NotificationsGateway } from 'src/notifications/notifications.gateway';
+import { NotificationsService } from 'src/notifications/notifications.service';
 import { StoreHour } from 'src/store-hours/entities/store-hour.entity';
 import { Store } from 'src/stores/entities/store.entity';
 import { HashingService } from 'src/support/hashing.service';
@@ -36,7 +37,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly hashingService: HashingService,
     private readonly mailService: MailService,
-    private readonly notificationsGateway: NotificationsGateway
+    private readonly notificationsGateway: NotificationsGateway,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async validateUser(email: string, password: string, role: Role): Promise<Partial<User>> {
@@ -131,7 +133,14 @@ export class AuthService {
 
     const {password: hashedPassword, ...userWithoutPassword} = user;
 
-    const userToNotifications = (await this.getAdmins()).map(admin => UserToNotification.create({ userId: admin.id }));
+    const clients = await this.usersRepository.find({
+      select: ['id'],
+      where: { role: Role.CLIENT },
+    });
+
+    const usersToNotify = clients.concat(await this.getAdmins());
+
+    const userToNotifications = usersToNotify.map(admin => UserToNotification.create({ userId: admin.id }));
 
     const notification = await this.notificationsRepository.save(Notification.create({
       message: 'Nueva tienda registrada',
@@ -140,7 +149,10 @@ export class AuthService {
       userToNotifications,
     }));
 
-    this.notificationsGateway.notifyUsersById(userToNotifications.map(utn => utn.userId), notification.toDto());
+    const userIds = userToNotifications.map(utn => utn.userId);
+
+    this.notificationsGateway.notifyUsersById(userIds, notification.toDto());
+    await this.notificationsService.notifyUsersById(userIds, notification);
 
     return {
       user,
