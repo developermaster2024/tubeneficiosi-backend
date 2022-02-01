@@ -103,7 +103,7 @@ export class Order {
   @JoinColumn({ name: 'cart_id' })
   cart: Cart;
 
-  @OneToMany(() => BankTransfer, bankTransfer => bankTransfer.order, {cascade: true, onDelete: 'CASCADE'})
+  @OneToMany(() => BankTransfer, bankTransfer => bankTransfer.order, {cascade: ['insert'], onDelete: 'CASCADE'})
   bankTransfers: BankTransfer[];
 
   @OneToMany(() => OrderStatusHistory, (history) => history.order, { cascade: ['insert', 'update'] })
