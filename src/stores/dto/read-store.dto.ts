@@ -40,6 +40,10 @@ export class ReadStoreDto extends OmitType(ReadUserDto, ['role']) {
   readonly storeId: string;
 
   @Expose()
+  @Transform(({obj}: {obj: User}) => obj.store.storeCategoryId)
+  readonly storeCategoryId: number;
+
+  @Expose()
   @Transform(({obj: {store: {storeCategory}}}: {obj: User}) => {
     if (!storeCategory || storeCategory instanceof ReadStoreCategoryDto) {
       return storeCategory;
