@@ -143,7 +143,7 @@ export class AuthService {
     const userToNotifications = usersToNotify.map(admin => UserToNotification.create({ userId: admin.id }));
 
     const notification = await this.notificationsRepository.save(Notification.create({
-      message: 'Nueva tienda registrada',
+      message: 'Pulsa aqui para ver sus productos',
       type: NotificationTypes.REGISTERED_STORE,
       additionalData: { storeId: user.store.id },
       userToNotifications,
