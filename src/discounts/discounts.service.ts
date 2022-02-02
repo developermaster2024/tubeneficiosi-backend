@@ -2,9 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CardIssuer } from 'src/card-issuers/entities/card-issuer.entity';
 import { Card } from 'src/cards/entities/card.entity';
+import { Notification } from 'src/notifications/entities/notification.entity';
+import { UserToNotification } from 'src/notifications/entities/user-to-notification.entity';
+import { NotificationTypes } from 'src/notifications/enums/notification-types.enum';
+import { NotificationsService } from 'src/notifications/notifications.service';
 import { Store } from 'src/stores/entities/store.entity';
 import { StoreNotFoundException } from 'src/stores/erros/store-not-found.exception';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
+import { User } from 'src/users/entities/user.entity';
 import { Brackets, Repository } from 'typeorm';
 import { CreateDiscountDto } from './dto/create-discount.dto';
 import { DiscountPaginationOptionsDto } from './dto/discount-pagination-options.dto';
@@ -18,7 +23,10 @@ export class DiscountsService {
     @InjectRepository(Discount) private readonly discountsRepository: Repository<Discount>,
     @InjectRepository(Card) private readonly cardsRepository: Repository<Card>,
     @InjectRepository(CardIssuer) private readonly cardIssuerRepository: Repository<CardIssuer>,
-    @InjectRepository(Store) private readonly storesRepository: Repository<Store>
+    @InjectRepository(Store) private readonly storesRepository: Repository<Store>,
+    @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    @InjectRepository(Notification) private readonly notificationsRepository: Repository<Notification>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async paginate({perPage, offset, filters: {
@@ -113,7 +121,24 @@ export class DiscountsService {
       cardIssuers,
     });
 
-    return await this.discountsRepository.save(discount);
+    const savedDiscount = await this.discountsRepository.save(discount);
+
+    const usersToNotify = await this.usersRepository.createQueryBuilder('user').select(['user.id']).getMany();
+
+    const userToNotifications = usersToNotify.map(user => UserToNotification.create({ userId: user.id }));
+
+    const notification = await this.notificationsRepository.save(Notification.create({
+      message: `La tienda ${store.name} ha registrado un descuento`,
+      type: NotificationTypes.NEW_DISCOUNT,
+      additionalData: { storeId: store.id },
+      userToNotifications,
+    }));
+
+    const userIds = userToNotifications.map(utn => utn.userId);
+
+    this.notificationsService.notifyUsersById(userIds, notification);
+
+    return savedDiscount;
   }
 
   async findOne(id: number): Promise<Discount> {

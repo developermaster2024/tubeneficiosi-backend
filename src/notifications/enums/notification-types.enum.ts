@@ -4,6 +4,7 @@ export enum NotificationTypes {
   ORDER_CREATED = 'ORDER_CREATED',
   REGISTERED_CUSTOMER = 'REGISTERED_CUSTOMER',
   REGISTERED_STORE = 'REGISTERED_STORE',
+  NEW_DISCOUNT = 'NEW_DISCOUNT',
 }
 
 export const NotificationTypesValues = Object.values(NotificationTypes);

@@ -26,4 +26,7 @@ export class ReadNotificationDto {
 
   @Expose()
   readonly distanceInWords: string;
+
+  @Expose()
+  readonly title: string;
 }

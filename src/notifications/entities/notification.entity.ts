@@ -74,8 +74,12 @@ export class Notification {
         return '¡Orden creada!';
       case NotificationTypes.ORDER_STATUS_CHANGE:
         return '¡Estatus de orden actualizado!';
+      case NotificationTypes.REGISTERED_CUSTOMER:
+        return 'Nuevo cliente registrado';
       case NotificationTypes.REGISTERED_STORE:
           return 'Nueva tienda registrada';
+      case NotificationTypes.NEW_DISCOUNT:
+          return '¡Nuevo descuento!';
       default:
         return 'Beneficio Si';
     }
