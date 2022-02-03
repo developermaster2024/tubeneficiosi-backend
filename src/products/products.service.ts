@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from 'src/categories/entities/category.entity';
 import { DeliveryMethodType } from 'src/delivery-method-types/entities/delivery-method-type.entity';
+import { Discount } from 'src/discounts/entities/discount.entity';
 import { ProductFeature } from 'src/product-features/entities/product-feature.entity';
 import { Store } from 'src/stores/entities/store.entity';
 import { StoreNotFoundException } from 'src/stores/erros/store-not-found.exception';
@@ -65,6 +66,7 @@ export class ProductsService {
     minRating,
     storeFeatureIds,
     showDate,
+    minDiscount,
   }, tagsToSortBy}: ProductPaginationOptionsDto, userId: number): Promise<PaginationResult<Product>> {
     const queryBuilder = this.productsRepository.createQueryBuilder('product')
       .take(perPage)
@@ -169,6 +171,24 @@ export class ProductsService {
     }
 
     if (showDate) queryBuilder.andWhere('DATE_FORMAT(show.date, "%Y-%m-%d") = :showDate', { showDate });
+
+    if (minDiscount) {
+      queryBuilder.andWhere(qb => {
+        const subQuery = qb.subQuery()
+          .select([])
+          .from(Discount, 'subDiscount')
+          .where('subDiscount.storeId = product.storeId')
+          .andWhere('subDiscount.value >= :minDiscount', { minDiscount })
+          .andWhere('subDiscount.from <= :minDiscountToday AND subDiscount.until >= :minDiscountToday', { minDiscountToday: new Date() })
+          .getQuery();
+
+        return `EXISTS(${subQuery})`;
+      })
+      .setParameters({
+        minDiscount,
+        minDiscountToday: new Date(),
+      })
+    }
 
     const [products, total] = await queryBuilder.getManyAndCount();
 

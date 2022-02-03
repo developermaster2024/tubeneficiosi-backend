@@ -20,6 +20,7 @@ type ProductFilters = {
   minRating: number;
   storeFeatureIds: number[];
   showDate: string;
+  minDiscount: number;
 };
 
 export class ProductPaginationOptionsDto extends PaginationOptions {
@@ -51,6 +52,7 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       minRating,
       storeFeatureIds = '',
       showDate,
+      minDiscount,
     } = query;
 
     return new ProductPaginationOptionsDto(+page, +perPage, {
@@ -73,6 +75,7 @@ export class ProductPaginationOptionsDto extends PaginationOptions {
       minRating: +minRating,
       storeFeatureIds: storeFeatureIds.split(',').filter(id => id).map(id => Number(id)),
       showDate,
+      minDiscount: +minDiscount,
     }, sortByTags.split(',').filter(id => id).map(id => Number()));
   }
 }
