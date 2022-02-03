@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { format } from 'date-fns';
 import { StoreFeature } from 'src/store-features/entities/store-feature.entity';
+import { StoreHour } from 'src/store-hours/entities/store-hour.entity';
 import { StoreImages } from 'src/stores-profile/dto/store-images';
 import { HashingService } from 'src/support/hashing.service';
 import { PaginationResult } from 'src/support/pagination/pagination-result';
@@ -40,6 +42,7 @@ export class StoresService {
     withinLocationId,
     withinWktPolygon,
     minRating,
+    isOpen,
   }}: StorePaginationOptionsDto, userId: number): Promise<PaginationResult<User>> {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.userStatus', 'userStatus')
@@ -146,6 +149,31 @@ export class StoresService {
 
     if (minRating) {
       queryBuilder.andWhere(`store.rating >= :minRating`, { minRating });
+    }
+
+    if (isOpen !== null && isOpen) {
+      const now = new Date();
+      const dayOfTheWeek = format(now, 'iiii').toUpperCase();
+      const time = format(now, 'HH:mm:ss');
+
+      queryBuilder.andWhere(qb => {
+        const subQuery = qb.subQuery()
+          .select([
+            'subStoreHour.id',
+          ])
+          .from(StoreHour, 'subStoreHour')
+          .where('subStoreHour.storeId = store.id')
+          .andWhere('subStoreHour.isWorkingDay = 1')
+          .andWhere('subStoreHour.day = :day')
+          .andWhere('subStoreHour.startTime <= :time AND subStoreHour.endTime >= :time')
+          .getQuery();
+
+        return `EXISTS(${subQuery})`;
+      })
+      .setParameters({
+        day: dayOfTheWeek,
+        time,
+      });
     }
 
     queryBuilder.leftJoinAndMapOne(

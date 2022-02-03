@@ -1,4 +1,5 @@
 import { PaginationOptions } from "src/support/pagination/pagination-options";
+import queryStringToBoolean from "src/support/query-string-to-boolean";
 
 type StoreFilters = {
   id: string;
@@ -18,6 +19,7 @@ type StoreFilters = {
   withinLocationId: number;
   withinWktPolygon: string;
   minRating: number;
+  isOpen: boolean|null;
 };
 
 export class StorePaginationOptionsDto extends PaginationOptions {
@@ -46,6 +48,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       withinLocationId,
       withinWktPolygon,
       minRating,
+      isOpen,
     } = query;
 
     return new StorePaginationOptionsDto(+page, +perPage, {
@@ -66,6 +69,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       withinLocationId: +withinLocationId,
       withinWktPolygon,
       minRating: +minRating,
+      isOpen: queryStringToBoolean(isOpen),
     });
   }
 }
