@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { format } from 'date-fns';
+import { Discount } from 'src/discounts/entities/discount.entity';
 import { StoreFeature } from 'src/store-features/entities/store-feature.entity';
 import { StoreHour } from 'src/store-hours/entities/store-hour.entity';
 import { StoreImages } from 'src/stores-profile/dto/store-images';
@@ -43,6 +44,7 @@ export class StoresService {
     withinWktPolygon,
     minRating,
     isOpen,
+    minDiscount,
   }}: StorePaginationOptionsDto, userId: number): Promise<PaginationResult<User>> {
     const queryBuilder = this.usersRepository.createQueryBuilder('user')
       .innerJoinAndSelect('user.userStatus', 'userStatus')
@@ -174,6 +176,24 @@ export class StoresService {
         day: dayOfTheWeek,
         time,
       });
+    }
+
+    if (minDiscount) {
+      queryBuilder.andWhere(qb => {
+        const subQuery = qb.subQuery()
+          .select(['1'])
+          .from(Discount, 'subDiscount')
+          .where('subDiscount.storeId = store.id')
+          .andWhere('subDiscount.value >= :minDiscount', { minDiscount })
+          .andWhere('subDiscount.from <= :minDiscountToday AND subDiscount.until >= :minDiscountToday', { minDiscountToday: new Date() })
+          .getQuery();
+
+        return `EXISTS(${subQuery})`;
+      })
+      .setParameters({
+        minDiscount,
+        minDiscountToday: new Date(),
+      })
     }
 
     queryBuilder.leftJoinAndMapOne(

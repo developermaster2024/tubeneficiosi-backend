@@ -20,6 +20,7 @@ type StoreFilters = {
   withinWktPolygon: string;
   minRating: number;
   isOpen: boolean|null;
+  minDiscount: number;
 };
 
 export class StorePaginationOptionsDto extends PaginationOptions {
@@ -49,6 +50,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       withinWktPolygon,
       minRating,
       isOpen,
+      minDiscount,
     } = query;
 
     return new StorePaginationOptionsDto(+page, +perPage, {
@@ -70,6 +72,7 @@ export class StorePaginationOptionsDto extends PaginationOptions {
       withinWktPolygon,
       minRating: +minRating,
       isOpen: queryStringToBoolean(isOpen),
+      minDiscount: +minDiscount,
     });
   }
 }

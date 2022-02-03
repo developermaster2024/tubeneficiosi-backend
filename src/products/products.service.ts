@@ -175,7 +175,7 @@ export class ProductsService {
     if (minDiscount) {
       queryBuilder.andWhere(qb => {
         const subQuery = qb.subQuery()
-          .select([])
+          .select(['1'])
           .from(Discount, 'subDiscount')
           .where('subDiscount.storeId = product.storeId')
           .andWhere('subDiscount.value >= :minDiscount', { minDiscount })
