@@ -19,7 +19,7 @@ export class RegisterClientDto {
 
   @Expose()
   @IsString()
-  @IsPhoneNumber()
+  @MaxLength(50)
   readonly phoneNumber: string;
 
   @Expose()
