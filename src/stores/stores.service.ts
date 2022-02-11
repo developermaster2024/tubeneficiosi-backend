@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { format } from 'date-fns';
 import { Discount } from 'src/discounts/entities/discount.entity';
+import { Product } from 'src/products/entities/product.entity';
 import { StoreFeature } from 'src/store-features/entities/store-feature.entity';
 import { StoreHour } from 'src/store-hours/entities/store-hour.entity';
 import { StoreImages } from 'src/stores-profile/dto/store-images';
@@ -23,6 +24,7 @@ export class StoresService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     @InjectRepository(StoreFeature) private readonly storeFeaturesRepository: Repository<StoreFeature>,
+    @InjectRepository(Product) private readonly productsRepository: Repository<Product>,
     private readonly hashingService: HashingService
   ) {}
 
@@ -80,37 +82,6 @@ export class StoresService {
     if (storeCategoryIds.length > 0) queryBuilder.andWhere('store.storeCategoryId In (:...storeCategoryIds)', { storeCategoryIds });
 
     if (phoneNumber) queryBuilder.andWhere('store.phoneNumber LIKE :phoneNumber', {phoneNumber: `%${phoneNumber}%`});
-
-    if (withCheapestProduct) {
-      queryBuilder.leftJoinAndMapOne(
-        'store.cheapestProduct',
-        'store.products',
-        'product',
-        `(
-          SELECT
-            product_details.price
-          FROM
-            product_details
-          INNER JOIN
-            products products2 ON products2.id = product_details.product_id AND products2.deleted_at IS NULL
-          WHERE
-            product_details.product_id = product.id
-          LIMIT
-            1
-        ) = (
-          SELECT
-            MIN(product_details2.price)
-          FROM
-            product_details product_details2
-          INNER JOIN
-            products products3 ON products3.id = product_details2.product_id AND products3.deleted_at IS NULL
-          WHERE
-            products3.store_id = store.id
-          LIMIT
-            1
-        )`
-      );
-    }
 
     if (cardIssuerIds.length > 0) {
       queryBuilder.andWhere(new Brackets(qb => {
@@ -205,6 +176,19 @@ export class StoresService {
     );
 
     const [stores, total] = await queryBuilder.getManyAndCount();
+
+    if (withCheapestProduct) {
+      const products = await this.productsRepository.createQueryBuilder('product')
+        .addSelect('product.storeId')
+        .leftJoinAndSelect('product.productDetails', 'productDetail')
+        .where('product.storeId IN(:...storeIds)', { storeIds: stores.map(store => store.store.id) })
+        .orderBy('productDetail.price', 'ASC')
+        .getMany();
+
+      for (const store of stores) {
+        store.store.cheapestProduct = products.find(product => product.storeId === store.store.id) ?? null;
+      }
+    }
 
     return new PaginationResult(stores, total, perPage);
   }
