@@ -177,7 +177,7 @@ export class StoresService {
 
     const [stores, total] = await queryBuilder.getManyAndCount();
 
-    if (withCheapestProduct) {
+    if (withCheapestProduct && stores.length > 0) {
       const products = await this.productsRepository.createQueryBuilder('product')
         .addSelect('product.storeId')
         .leftJoinAndSelect('product.productDetails', 'productDetail')
